@@ -1,0 +1,28 @@
+# ❄️ winter-harness
+
+A [winter](https://codeberg.org/pgross/winter) extension curated for the meta [winter-workspace](https://codeberg.org/pgross/winter-workspace) itself.
+
+## ✨ Features
+
+- **Exemplar for others** — serves as an example harness project, a reference others can pull ideas from when assembling their own harness.
+- **Python conventions** (`python/`) — an opinionated guide for developing Python applications.
+- **README convention** (`writing-readme.md`) — guide to managing and writing README files for winter projects.
+- **Canonical exemplars** (`exemplars/python/`) — reference `.py` files showing the expected shape of recurring patterns (repository class, domain object).
+
+## 🚀 Installation
+
+Add to the workspace's `.winter/config.toml`:
+
+```toml
+[[standalone_repository]]
+name = "winter-harness"
+url = "git@codeberg.org:pgross/winter-harness.git"
+```
+
+Then run `winter ws init`.
+
+## 🎯 Scope
+
+Provides additional guidance to agents working on functionality within the target of the winter workspace, improving the quality of agent output within winter itself.
+
+See [`index.md`](./index.md) for the file topology.
