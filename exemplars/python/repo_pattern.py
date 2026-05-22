@@ -1,21 +1,40 @@
 """Canonical repository-pattern example.
 
 Read this when adding a new repository class or extending an existing one.
-The shape is:
+The shape codifies three orthogonal seams the winter codebase has standardized on:
 
-  ReadFooRepository    # read-only operations, owns library imports
-  WriteFooRepository   # extends Read, adds mutating operations
+  1. **Protocol seams, I-prefix names.** The public callable surface is a
+     `Protocol` named `IRead<Foo>Repository` / `IWrite<Foo>Repository`. The
+     I-prefix is the convention — services depend on the Protocol, never on
+     the concrete class.
 
-Coordinators inject the Write variant when they need both reads and writes;
-inject Read where mutations are out of scope (the type documents the contract).
+  2. **`internal/` adapter placement.** Concrete implementations of the
+     Protocols live under an `internal/` subpackage (e.g.
+     `modules/<feature>/internal/foo_repository.py`). The Protocol file
+     itself lives at the feature-package root, alongside the service that
+     uses it. Anything under `internal/` is package-private and must not
+     be imported from outside the feature.
+
+  3. **Factory-injected error wrapping.** Library exceptions are turned
+     into the domain `RepoError` by an injected `RepoErrorFactory.from_*`
+     method, not by inline `raise X from Y` at every call site. The factory
+     logs once at the wrap site and captures structured fields
+     (subcommand, args, cwd, stderr, exit_code) so the reporter and
+     dashboard can render them without re-parsing.
+
+The DI container binds the Write variant where mutations are required and the
+Read variant where they aren't — the Protocol type is the contract.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Protocol
 
-import some_io_library  # confined to this file
+import some_io_library  # confined to this file (and any sibling internal/ adapters)
 
+
+# --- Domain types ----------------------------------------------------------
 
 @dataclass
 class Thing:
@@ -24,32 +43,74 @@ class Thing:
     payload: bytes
 
 
-class FooError(Exception):
-    """Raised by FooRepository methods to signal a failed operation.
+class RepoError(Exception):
+    """Raised by repository methods to signal a failed operation.
 
-    Wraps `some_io_library`'s exceptions so callers don't depend on the lib.
+    Carries structured fields (subcommand, args, cwd, exit_code, stderr)
+    populated by RepoErrorFactory at the wrap site. Callers depend on this
+    type — never on `some_io_library`'s exception hierarchy.
     """
+    def __init__(self, message: str, *, subcommand: str = "", args: tuple[str, ...] = (),
+                 cwd: Path | None = None, exit_code: int | None = None, stderr: str = ""):
+        super().__init__(message)
+        self.subcommand = subcommand
+        self.args = args
+        self.cwd = cwd
+        self.exit_code = exit_code
+        self.stderr = stderr
 
 
-class ReadFooRepository:
-    """Read-only `some_io_library` implementation. All library usage is confined here."""
+# --- Error factory (injected) ---------------------------------------------
+
+class IRepoErrorFactory(Protocol):
+    """The injected error-wrapping seam.
+
+    `from_io(...)` is called by every repository method at the boundary
+    where a library exception is caught. The factory logs once at the
+    wrap site (so we never get catch-log-rethrow cascades) and constructs
+    a RepoError with the structured fields populated.
+    """
+    def from_io(self, exc: Exception, *, subcommand: str, args: tuple[str, ...],
+                cwd: Path | None = None) -> RepoError: ...
+
+
+# --- Public Protocols (the seam services depend on) -----------------------
+
+class IReadFooRepository(Protocol):
+    """Read-only operations against the Foo data store."""
+
+    def get_thing(self, thing_id: str) -> Thing: ...
+    def list_things(self, prefix: str) -> list[Thing]: ...
+
+
+class IWriteFooRepository(IReadFooRepository, Protocol):
+    """Read-write variant. Services that mutate state depend on this."""
+
+    def save_thing(self, thing: Thing) -> None: ...
+    def delete_thing(self, thing_id: str) -> None: ...
+
+
+# --- Concrete adapter (lives at modules/<feature>/internal/foo_repository.py
+# in production; shown here in one file for the exemplar) -------------------
+
+class _ReadFooRepository:
+    """Read-only `some_io_library` adapter. All library usage is confined here."""
+
+    def __init__(self, error_factory: IRepoErrorFactory) -> None:
+        self._errors = error_factory
 
     def get_thing(self, thing_id: str) -> Thing:
-        """Fetch a Thing by id. Raises FooError if not found or on I/O failure."""
         try:
             raw = some_io_library.fetch(thing_id)
-        except some_io_library.NotFoundError as exc:
-            raise FooError(f"thing {thing_id!r} not found") from exc
         except some_io_library.IOError as exc:
-            raise FooError(f"fetch {thing_id!r} failed — {exc}") from exc
+            raise self._errors.from_io(exc, subcommand="fetch", args=(thing_id,))
         return self._parse(thing_id, raw)
 
     def list_things(self, prefix: str) -> list[Thing]:
-        """List all Things with ids starting with `prefix`."""
         try:
             entries = some_io_library.list(prefix)
         except some_io_library.IOError as exc:
-            raise FooError(f"list {prefix!r} failed — {exc}") from exc
+            raise self._errors.from_io(exc, subcommand="list", args=(prefix,))
         return [self._parse(e.id, e.raw) for e in entries]
 
     @staticmethod
@@ -58,21 +119,32 @@ class ReadFooRepository:
         return Thing(id=thing_id, payload=raw)
 
 
-class WriteFooRepository(ReadFooRepository):
-    """Read-write variant. Mutating operations live here; reads inherited from Read."""
+class _WriteFooRepository(_ReadFooRepository):
+    """Read-write adapter. Mutating operations live here; reads inherited."""
 
     def save_thing(self, thing: Thing) -> None:
-        """Persist a Thing. Raises FooError on I/O failure."""
         try:
             some_io_library.write(thing.id, thing.payload)
         except some_io_library.IOError as exc:
-            raise FooError(f"save {thing.id!r} failed — {exc}") from exc
+            raise self._errors.from_io(exc, subcommand="save", args=(thing.id,))
 
     def delete_thing(self, thing_id: str) -> None:
-        """Remove a Thing by id. Raises FooError if it doesn't exist."""
         try:
             some_io_library.delete(thing_id)
-        except some_io_library.NotFoundError as exc:
-            raise FooError(f"thing {thing_id!r} not found") from exc
         except some_io_library.IOError as exc:
-            raise FooError(f"delete {thing_id!r} failed — {exc}") from exc
+            raise self._errors.from_io(exc, subcommand="delete", args=(thing_id,))
+
+
+# --- DI container binding (lives in container.py in production) -----------
+#
+# from dependency_injector import containers, providers
+#
+# class Container(containers.DeclarativeContainer):
+#     error_factory = providers.Singleton(RepoErrorFactory)
+#     foo_repo: providers.Provider[IWriteFooRepository] = providers.Singleton(
+#         _WriteFooRepository, error_factory=error_factory,
+#     )
+#
+# Services that only need reads declare their dependency as `IReadFooRepository`
+# — the Singleton above satisfies the supertype too, and the type system makes
+# the read-only intent visible at the consumer.

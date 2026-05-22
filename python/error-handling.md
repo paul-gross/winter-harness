@@ -79,7 +79,7 @@ Create a custom domain error type (e.g. `RepoError`) when *callers handle that e
 
 `RepoError` earns its keep here because `InitService` boundaries catch `(RepoError, OSError)` to surface failures via `reporter.repo_error()`; they shouldn't have to import `git.GitCommandError` for that. If nothing catches your wrapper specifically — if every caller just propagates — you've added ceremony without value. Let the library exception bubble through.
 
-When wrapping IS justified, do it at the call site, and use `raise X from Y` so the original traceback is preserved:
+When wrapping IS justified, do it at the call site. For ad-hoc wrapping, use `raise X from Y` so the original traceback is preserved:
 
 ```python
 try:
@@ -87,6 +87,38 @@ try:
 except git.GitCommandError as exc:
     raise RepoError(f"clone failed — {exc}") from exc
 ```
+
+## Structured errors via an injected factory
+
+Once the same wrap site appears in many places — every repository method, for instance — promote the wrapping to a factory and inject it. This:
+
+- Centralizes the **log-once-at-wrap-site** convention (no catch-log-rethrow cascades).
+- Captures structured fields (`subcommand`, `args`, `cwd`, `exit_code`, `stderr`) that the reporter and dashboard can render without re-parsing the message.
+- Lets tests substitute a fake factory and assert error shapes.
+
+The canonical shape:
+
+```python
+class IRepoErrorFactory(Protocol):
+    def from_io(self, exc: Exception, *, subcommand: str, args: tuple[str, ...],
+                cwd: Path | None = None) -> RepoError: ...
+```
+
+…with a concrete `RepoErrorFactory` bound in the DI container (singleton) and injected into every repository:
+
+```python
+class _WriteFooRepository:
+    def __init__(self, error_factory: IRepoErrorFactory) -> None:
+        self._errors = error_factory
+
+    def save_thing(self, thing: Thing) -> None:
+        try:
+            some_io_library.write(thing.id, thing.payload)
+        except some_io_library.IOError as exc:
+            raise self._errors.from_io(exc, subcommand="save", args=(thing.id,))
+```
+
+`RepoError` itself becomes a dataclass-shaped exception carrying those fields, not just a message string. See `winter-harness:/exemplars/python/repo_pattern.py` for the full example, and `winter:tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` for the production factory in winter-cli (which wraps `git.GitCommandError`, `subprocess.CalledProcessError`, and other transport-level exceptions).
 
 ## When `bool` is honest
 
