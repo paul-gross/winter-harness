@@ -70,4 +70,9 @@ def _apply_identity(self, repo_path):
 
 ## When app config IS the right injection
 
-Adapter / loader services that exist specifically to translate app config into runtime types (e.g. `RepositoryFactory` building `ProjectRepository` instances from `[[project_repository]]` entries, or the service that constructs `Workspace` from `WorkspaceConfig`) legitimately consume the whole config — that's their job. They sit at the boundary. Downstream consumers receive the derived domain objects, not the config.
+Two narrow categories legitimately consume `WorkspaceConfig` directly:
+
+1. **Adapter / loader services** that exist specifically to translate app config into runtime types — e.g. `RepositoryFactory` building `ProjectRepository` instances from `[[project_repository]]` entries, or the service that constructs `Workspace` from `WorkspaceConfig`. Translation is their entire job.
+2. **Workspace-lifecycle services** that reconcile the whole workspace against the config — e.g. `InitService`, `DestroyService`, `PruneService`, and the `Extension*Service` family. They read several cross-cutting fields (`workspace_root`, `git_identity`, `git_excludes`, `adopt_extensions`, the full `[[project_repository]]` and `[[standalone_repository]]` lists) and walk every declared repo. A small dataclass would either duplicate the schema or omit fields the next reconcile step needs.
+
+Everything else — handlers, per-feature services, status services — consumes domain objects (`Workspace`, `ProjectRepository`, `FeatureWorktree`) only. The smell to watch for is a service taking `WorkspaceConfig` but only reading one or two scalar fields; that one should declare a typed dataclass.
