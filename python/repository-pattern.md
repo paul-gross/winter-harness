@@ -85,4 +85,5 @@ If the docstring is hard to write — if it's vague, or you keep wanting to use 
 
 ## See also
 
-`exemplars/python/repo_pattern.py` — canonical shape for new repository classes.
+- `exemplars/python/repo_pattern.py` — canonical shape for new repository classes.
+- `python/subprocess.md` — the concrete shape for shelling out from inside a repository (`capture_output` / `check=False` / wrap via the injected factory).

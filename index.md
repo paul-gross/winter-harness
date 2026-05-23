@@ -8,6 +8,8 @@ Convention files in this extension live at the **top of the repo**, not under an
 | `python/error-handling.md` | Writing any function that can fail |
 | `python/dependency-injection.md` | Adding a new service or wiring it into the container |
 | `python/repository-pattern.md` | Touching git, filesystem, or any external I/O |
+| `python/subprocess.md` | Shelling out — `subprocess.run` / `Popen` conventions and error wrapping |
+| `python/logging.md` | Adding a log call, picking a level, or deciding between logger / reporter / print |
 | `python/module-layout.md` | Adding a `core/` cross-cutting protocol or a `modules/<feature>/internal/` adapter |
 | `python/linting.md` | Before pushing Python changes, or setting up ruff in a new project |
 | `python/typechecking.md` | Before pushing Python changes, or setting up pyright in a new project |
