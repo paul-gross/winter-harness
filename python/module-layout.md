@@ -21,6 +21,19 @@ src/<package>/
             └── git_foo_repository.py
 ```
 
+Start with a flat `handler.py`. Promote to a `handlers/` subpackage once the feature has multiple distinct CLI surfaces that share little code:
+
+```
+modules/<feature>/
+├── handlers/
+│   ├── __init__.py           # re-exports the handler classes
+│   ├── <surface_a>_handler.py
+│   └── <surface_b>_handler.py
+└── …
+```
+
+`exemplars/python/cli-architecture.md` walks through `modules/workspace/handlers/` as the canonical reference for this split.
+
 ## Rules
 
 1. **Protocols at the feature root.** A feature's public callable surface is a Protocol file at the feature's package root (e.g. `modules/workspace/repo_repository.py`). Anything that depends on the feature imports the Protocol from there.

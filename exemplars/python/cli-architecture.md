@@ -13,56 +13,86 @@ src/winter_cli/
 ├── container.py           # DI container — binds Protocol seams to concrete adapters
 ├── config/                # config loading (.winter/config.toml + config.local.toml)
 ├── core/                  # cross-cutting Protocol seams (≥2-feature usage)
-│   ├── cli_output.py            # ICliOutputService — TUI/CLI output abstraction
-│   ├── cli_input_validation.py  # ICliInputValidationService — click-bound validators
-│   └── internal/                # adapters for the core Protocols
+│   ├── cli_output_service.py            # ICliOutputService — TUI/CLI output abstraction
+│   ├── cli_input_validation_service.py  # ICliInputValidationService — click-bound validators
+│   ├── config_file.py                   # IConfigFileReader — TOML loader seam
+│   ├── filesystem.py                    # IFilesystem — file/dir read/write seam
+│   ├── subprocess_runner.py             # ISubprocessRunner — process execution seam
+│   └── internal/                        # adapters for the core Protocols
 ├── modules/               # feature packages
-│   └── workspace/         # everything reachable from `winter ws *`
-│       ├── command.py          # click commands — thin wrappers over handlers
-│       ├── handler.py          # CLI-shaped output formatting + arg parsing
-│       ├── *_service.py        # domain orchestration (init / destroy / sync / connect …)
-│       ├── *_reporter.py       # stream / json reporters for lifecycle events
-│       ├── repo_repository.py  # IReadRepoRepository / IWriteRepoRepository (Protocols)
-│       └── internal/           # concrete adapters: git_repo_repository, repo_error_factory, …
+│   ├── workspace/         # everything reachable from `winter ws *` and `winter repo *`
+│   │   ├── command.py             # click commands — thin wrappers over handlers
+│   │   ├── handlers/              # CLI-shaped output formatting + arg parsing
+│   │   │   ├── init_handler.py        # `winter ws init`
+│   │   │   ├── destroy_handler.py     # `winter ws destroy`
+│   │   │   ├── workspace_handler.py   # `winter ws {list,status,sync,connect,disconnect,checkout,fetch,pull,push,prune,index,diff}`
+│   │   │   └── repo_handler.py        # `winter repo {list,add,remove}`
+│   │   ├── *_service.py           # domain orchestration (init / destroy / workspace (omnibus) / prune)
+│   │   ├── *_reporter.py          # stream / json reporters for lifecycle events
+│   │   ├── reporter_factory.py    # picks stream-vs-json reporter from --json flag
+│   │   ├── repository_factory.py  # builds per-repo IWriteRepoRepository instances
+│   │   ├── models/                # domain + service models (enums, dataclasses)
+│   │   ├── repo_repository.py     # IReadRepoRepository / IWriteRepoRepository (Protocols)
+│   │   ├── workspace_repository.py # IReadWorkspaceRepository (Protocol)
+│   │   └── internal/              # concrete adapters: git_ops_service, gitpython_repository, repo_error_factory, …
+│   └── tui/               # textual-based dashboard (`winter dashboard`)
 ├── plugins/               # plugin loader — discovers extension click commands + TUI plugins
 └── util.py
-tests/                     # pytest; DI-friendly via injected fixtures
+tests/                     # pytest; DI-friendly via injected fixtures (see tests/conftest.py)
 ```
 
 The layout instantiates four `winter-harness:/python/*.md` rules at once:
 
-- **`python/repository-pattern.md`** — `git`, `subprocess`, and other I/O libraries are confined to `modules/<feature>/internal/*.py`. The Protocol surface (`repo_repository.py` at the feature root) imports nothing from those libraries.
+- **`python/repository-pattern.md`** — `git`, `subprocess`, and other I/O libraries are confined to `modules/<feature>/internal/*.py` (and `core/internal/` for cross-cutting seams like `local_subprocess_runner.py`). The Protocol surface (`repo_repository.py`, `workspace_repository.py`) imports nothing from those libraries.
 - **`python/dependency-injection.md`** — every service receives its collaborators via constructor injection; everything is wired in `container.py`.
-- **`python/module-layout.md`** — Protocols at the feature root, adapters in `internal/`, cross-cutting Protocols in `core/`.
+- **`python/module-layout.md`** — Protocols at the feature root, adapters in `internal/`, cross-cutting Protocols in `core/`. Handlers may live as a flat `handler.py` or as a `handlers/` subpackage once the feature grows past one CLI surface (see [Handlers: flat vs. subpackage](#handlers-flat-vs-subpackage) below).
 - **`python/error-handling.md`** — library exceptions are wrapped at the call site via an injected `IRepoErrorFactory`, never via ad-hoc `raise X from Y`.
+
+## Handlers: flat vs. subpackage
+
+`modules/workspace/` outgrew a single `handler.py` and split into a `handlers/` subpackage organized by CLI surface (init, destroy, the workspace omnibus, repo). The split rule: keep a flat `handler.py` while a feature has one cohesive handler; promote to `handlers/<surface>_handler.py` files when distinct CLI surfaces start sharing little code. Re-export the handler classes from `handlers/__init__.py` so callers import from the subpackage root.
+
+`python/module-layout.md` shows the flat form as the default. This exemplar is the canonical reference for the split form.
 
 ## Adding a new `winter ws foo` subcommand
 
 Follow this order — each step builds on the previous:
 
 1. **click command** in `modules/workspace/command.py` — thin wrapper that parses click args and calls a handler.
-2. **Handler** in `modules/workspace/handler.py` — receives parsed args, calls a service, renders output via `ICliOutputService` (or returns structured JSON for `--json`).
-3. **Service** in `modules/workspace/foo_service.py` — domain orchestration; depends on Protocols, not concretes.
+2. **Handler** in `modules/workspace/handlers/<surface>_handler.py` (or a new `foo_handler.py` if `foo` is its own surface) — receives parsed args, calls a service, renders output via `ICliOutputService` (or returns structured JSON for `--json`).
+3. **Service** — either extend `WorkspaceService` for read-shaped or env-spanning operations, or add `modules/workspace/foo_service.py` for a top-level lifecycle action (like `init` and `destroy`). Services depend on Protocols, not concretes.
 4. **New I/O seam** (only if needed) — Protocol at `modules/workspace/<seam>.py`, concrete adapter at `modules/workspace/internal/<seam>.py`. Apply the I-prefix rule.
 5. **Bind** the service and any new adapters in `container.py`.
-6. **Unit test** under `tests/` — inject fakes for the Protocols. See `tests/test_git_ops_service.py` and `tests/test_write_repo_repository.py` for the fixture pattern.
+6. **Unit test** under `tests/modules/workspace/` (service tests) or `tests/modules/workspace/internal/` (adapter tests) — inject fakes for the Protocols. See `tests/modules/workspace/internal/test_git_ops_service.py` and `tests/modules/workspace/internal/test_write_repo_repository.py` for the fixture pattern.
 7. **Surface the new command** in `workspace:/ai/winter-cli/usage.md` so agents discover it from the docs, not from `--help`.
 
 ## Reporters as lifecycle event sinks
 
-Services don't print. They emit lifecycle events to an injected reporter Protocol — `IInitReporter`, `IFetchReporter`, `IPullReporter`. Concrete reporters (`StreamReporter`, `JsonReporter`) translate those events into human or machine output.
+Services don't print. They emit lifecycle events to an injected reporter Protocol. Three reporter Protocols exist today:
 
-Today the same reporter Protocol serves both `winter ws init` and `winter ws destroy` (the action vocabulary grew over time). When adding a new lifecycle action, extend the existing reporter event vocabulary — don't fork a new reporter Protocol unless the events truly don't overlap.
+- `IInitReporter` — used by both `winter ws init` and `winter ws destroy` (the destroy action vocabulary fits the init event shape).
+- `IFetchReporter` — used by `winter ws fetch`.
+- `IPullReporter` — used by `winter ws pull` and `winter ws push`.
+
+For each Protocol there is a `Stream*Reporter` (human output) and `Json*Reporter` (`--json` mode). `ReporterFactory` picks one based on the `--json` flag.
+
+When adding a new lifecycle action, **extend an existing reporter's event vocabulary first** — don't fork a new reporter Protocol unless the events truly don't overlap with init/fetch/pull. The `IInitReporter` reuse for destroy is the precedent.
 
 ## Testing pattern
 
-The fixture shape, from `tests/test_git_ops_service.py`:
+The fixture shape, from `tests/modules/workspace/internal/test_git_ops_service.py`:
 
 - A fixture builds an `IRepoErrorFactory` (real or fake).
-- A fixture builds an `IGitOpsService` (real with the factory injected, or fake).
+- A fixture builds a `GitOpsService` (real with the factory injected, or fake).
 - The service under test is constructed with the fixtures and asserted against directly.
 
-Lift fixtures into `tests/conftest.py` as soon as a second test file needs them — don't copy them inline.
+Shared fixtures live in `tests/conftest.py` — for example, `tmp_workspace_root` materializes a minimal `.winter/` directory under `tmp_path` so the real `WorkspaceConfigService` loader runs against a controlled config. Lift fixtures into `conftest.py` as soon as a second test file needs them — don't copy them inline.
+
+Test paths mirror `src/winter_cli/`:
+
+- Service-level tests: `tests/modules/<feature>/test_<service>.py`
+- Adapter tests: `tests/modules/<feature>/internal/test_<adapter>.py`
+- Cross-cutting `core/` adapter tests: `tests/core/internal/test_<adapter>.py`
 
 ## Network resilience
 
