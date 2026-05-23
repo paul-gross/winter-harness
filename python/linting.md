@@ -37,7 +37,7 @@ dev = [
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"  # set to the minimum `requires-python`
+target-version = "py311"  # set to the minimum `requires-python`
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "C4", "SIM", "RUF"]
