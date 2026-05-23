@@ -80,19 +80,7 @@ When adding a new lifecycle action, **extend an existing reporter's event vocabu
 
 ## Testing pattern
 
-The fixture shape, from `tests/modules/workspace/internal/test_git_ops_service.py`:
-
-- A fixture builds an `IRepoErrorFactory` (real or fake).
-- A fixture builds a `GitOpsService` (real with the factory injected, or fake).
-- The service under test is constructed with the fixtures and asserted against directly.
-
-Shared fixtures live in `tests/conftest.py` — for example, `tmp_workspace_root` materializes a minimal `.winter/` directory under `tmp_path` so the real `WorkspaceConfigService` loader runs against a controlled config. Lift fixtures into `conftest.py` as soon as a second test file needs them — don't copy them inline.
-
-Test paths mirror `src/winter_cli/`:
-
-- Service-level tests: `tests/modules/<feature>/test_<service>.py`
-- Adapter tests: `tests/modules/<feature>/internal/test_<adapter>.py`
-- Cross-cutting `core/` adapter tests: `tests/core/internal/test_<adapter>.py`
+Full testing conventions — directory layout, conftest scoping, fake-vs-mock guidance, and per-layer assertion patterns — live in `python/testing.md`. The winter-cli tree under `tests/` is its working reference; start at `tests/conftest.py` and `tests/modules/workspace/test_init_service.py`.
 
 ## Network resilience
 

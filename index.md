@@ -11,6 +11,7 @@ Convention files in this extension live at the **top of the repo**, not under an
 | `python/module-layout.md` | Adding a `core/` cross-cutting protocol or a `modules/<feature>/internal/` adapter |
 | `python/linting.md` | Before pushing Python changes, or setting up ruff in a new project |
 | `python/typechecking.md` | Before pushing Python changes, or setting up pyright in a new project |
+| `python/testing.md` | Adding or refactoring tests — pytest layout, conftest scoping, fake-vs-mock guidance |
 | `exemplars/python/repo_pattern.py` | Reference for the repository pattern (I-prefix Protocol seam + `internal/` adapter + factory-injected errors) |
 | `exemplars/python/cli-architecture.md` | Guided tour of how the conventions are applied in winter-cli — read before adding a `winter ws foo` subcommand |
 | `writing-readme.md` | Writing or editing a `README.md` for any winter ecosystem repo |
