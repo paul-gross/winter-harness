@@ -9,6 +9,7 @@ Convention files in this extension live at the **top of the repo**, not under an
 | `python/dependency-injection.md` | Adding a new service or wiring it into the container |
 | `python/repository-pattern.md` | Touching git, filesystem, or any external I/O |
 | `python/module-layout.md` | Adding a `core/` cross-cutting protocol or a `modules/<feature>/internal/` adapter |
+| `python/linting.md` | Before pushing Python changes, or setting up ruff in a new project |
 | `exemplars/python/repo_pattern.py` | Reference for the repository pattern (I-prefix Protocol seam + `internal/` adapter + factory-injected errors) |
 | `exemplars/python/cli-architecture.md` | Guided tour of how the conventions are applied in winter-cli — read before adding a `winter ws foo` subcommand |
 | `writing-readme.md` | Writing or editing a `README.md` for any winter ecosystem repo |
