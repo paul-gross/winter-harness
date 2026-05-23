@@ -109,7 +109,7 @@ The fake satisfies the Protocol structurally — pyright/mypy will reject a dive
 
 - **Services** — assert against the **event vocabulary** captured by injected reporter fakes and against repository call logs. Example: `assert ("demo", path, "cloned", "") in init_reporter.actions` and `assert git.clones == [(url, dest)]`. Don't assert on stdout — services don't print.
 - **Handlers** — assert **exit codes** (`pytest.raises(SystemExit)`) and **rendered output** via `capsys`. Stub the underlying services with `MagicMock` since the handler's contract is "translate CLI args ↔ service calls ↔ output."
-- **Adapters (`internal/`)** — assert real I/O effects against `tmp_path` or a real `git.Repo`. Helpers like `make_git_repo(path)` in `tests/conftest.py` provide a bootstrapped repo so each adapter test doesn't reinvent init + identity + commit.
+- **Adapters (`internal/`)** — mock the underlying library at the adapter's import site (`monkeypatch.setattr(<adapter_module>, "<lib>", MagicMock())`); assert both the library-call shape and the adapter's return value. See `python/repository-pattern.md` for the full rule.
 - **Container / DI** — `tests/test_container.py` resolves every provider to catch wiring regressions. One smoke test per Singleton is enough.
 
 ## Naming
@@ -117,7 +117,7 @@ The fake satisfies the Protocol structurally — pyright/mypy will reject a dive
 - **Test files**: `test_<unit_under_test>.py`. One file per source module.
 - **Test functions**: `test_<scenario>_<expected_outcome>` — read like a sentence. `test_reconcile_projects_clones_missing_repo`, `test_fetch_failed_with_empty_results_exits_nonzero_in_text_mode`.
 - **Fakes**: `Fake<Protocol-without-the-I-prefix>` — `FakeFilesystem`, `FakeGitRepository`, `FakeInitReporter`. The class docstring restates the Protocol it satisfies.
-- **Builder helpers**: `make_<thing>(...)` for low-ceremony constructors (`make_git_repo`), reserved for one-call setup. Prefer fixtures for anything shared across tests.
+- **Builder helpers**: `make_<thing>(...)` for low-ceremony constructors, reserved for one-call setup. Prefer fixtures for anything shared across tests.
 
 ## See also
 

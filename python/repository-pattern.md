@@ -83,7 +83,34 @@ If the docstring is hard to write — if it's vague, or you keep wanting to use 
 - High-level orchestration (which entity to read, when to retry, which path to take) lives in services, not in the repository.
 - A repository owns I/O against *its* external system. A git-scoped repository doesn't own unrelated filesystem checks; a filesystem-scoped one doesn't own HTTP. Cross-system orchestration is the caller's job.
 
+## Testing adapters
+
+**Rule**: adapter tests mock the underlying library at the adapter's import site, not at the library's source. Use `monkeypatch.setattr(<adapter_module>, "<library_symbol>", MagicMock())` per test. No shared mock fixtures across the file — each test asserts a distinct library-call shape and must be self-contained.
+
+```python
+# correct — patch at the adapter's import site
+from winter_cli.core.internal import local_subprocess_runner
+
+def test_run_passes_args(monkeypatch):
+    fake = MagicMock()
+    fake.run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+    monkeypatch.setattr(local_subprocess_runner, "subprocess", fake)
+    ...
+
+# wrong — patch at the library's source
+monkeypatch.setattr("subprocess.run", fake_run)
+```
+
+Assert both the library-call shape (`fake.run.assert_called_once_with(...)`) and the adapter's return value. Both matter: the first pins the contract, the second pins the translation logic.
+
+Use the real exception class for error-path tests (`OSError`, `git.GitCommandError`, `tomllib.TOMLDecodeError`). A `MagicMock(spec=ExcClass)` won't satisfy an `except ExcClass` clause.
+
+**Tradeoff**: this pattern catches contract bugs in the adapter — wrong arguments, missing keyword, wrong exception wrapping. It does not catch library-version drift (the real `subprocess.run` signature changing, or GitPython changing a method name). Library-version drift requires an integration or smoke test that runs the real library against real I/O.
+
+**Future integration harness**: a smoke harness that exercises adapters against real external systems (a real git repo, a real filesystem, a live subprocess) lives outside `pytest` and is not yet established. When it is, it supplements adapter unit tests; it does not replace them.
+
 ## See also
 
 - `exemplars/python/repo_pattern.py` — canonical shape for new repository classes.
 - `python/subprocess.md` — the concrete shape for shelling out from inside a repository (`capture_output` / `check=False` / wrap via the injected factory).
+- `python/testing.md` — full test strategy; the Adapters bullet in the assertion-patterns section applies here.
