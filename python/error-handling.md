@@ -96,19 +96,13 @@ Once the same wrap site appears in many places — every repository method, for 
 - Captures structured fields (`subcommand`, `args`, `cwd`, `exit_code`, `stderr`) that the reporter and dashboard can render without re-parsing the message.
 - Lets tests substitute a fake factory and assert error shapes.
 
-The canonical shape:
+A concrete `RepoErrorFactory` bound in the DI container (singleton) and injected into every repository is enough — the seam is exercised by tests through a fake factory, and there has not yet been a need for a second adapter behind it. Consider extracting an `IRepoErrorFactory` Protocol when (and only when) a second factory shape appears (e.g. a non-git transport that needs a different `from_*` constructor).
 
-```python
-class IRepoErrorFactory(Protocol):
-    def from_io(self, exc: Exception, *, subcommand: str, args: tuple[str, ...],
-                cwd: Path | None = None) -> RepoError: ...
-```
-
-…with a concrete `RepoErrorFactory` bound in the DI container (singleton) and injected into every repository:
+Until then, inject the concrete class:
 
 ```python
 class _WriteFooRepository:
-    def __init__(self, error_factory: IRepoErrorFactory) -> None:
+    def __init__(self, error_factory: RepoErrorFactory) -> None:
         self._errors = error_factory
 
     def save_thing(self, thing: Thing) -> None:

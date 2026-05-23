@@ -62,13 +62,19 @@ class RepoError(Exception):
 
 # --- Error factory (injected) ---------------------------------------------
 
-class IRepoErrorFactory(Protocol):
+class RepoErrorFactory:
     """The injected error-wrapping seam.
 
     `from_io(...)` is called by every repository method at the boundary
     where a library exception is caught. The factory logs once at the
     wrap site (so we never get catch-log-rethrow cascades) and constructs
     a RepoError with the structured fields populated.
+
+    Inject the concrete class directly. An I-prefix `IRepoErrorFactory`
+    Protocol is only worth extracting when a second factory shape appears
+    (e.g. a non-git transport that needs different `from_*` constructors);
+    until then the concrete is the seam, and tests substitute a fake by
+    type.
     """
     def from_io(self, exc: Exception, *, subcommand: str, args: tuple[str, ...],
                 cwd: Path | None = None) -> RepoError: ...
@@ -96,7 +102,7 @@ class IWriteFooRepository(IReadFooRepository, Protocol):
 class _ReadFooRepository:
     """Read-only `some_io_library` adapter. All library usage is confined here."""
 
-    def __init__(self, error_factory: IRepoErrorFactory) -> None:
+    def __init__(self, error_factory: RepoErrorFactory) -> None:
         self._errors = error_factory
 
     def get_thing(self, thing_id: str) -> Thing:

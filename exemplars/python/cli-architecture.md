@@ -46,7 +46,7 @@ The layout instantiates four `winter-harness:/python/*.md` rules at once:
 - **`python/repository-pattern.md`** — `git`, `subprocess`, and other I/O libraries are confined to `modules/<feature>/internal/*.py` (and `core/internal/` for cross-cutting seams like `local_subprocess_runner.py`). The Protocol surface (`repo_repository.py`, `workspace_repository.py`) imports nothing from those libraries.
 - **`python/dependency-injection.md`** — every service receives its collaborators via constructor injection; everything is wired in `container.py`.
 - **`python/module-layout.md`** — Protocols at the feature root, adapters in `internal/`, cross-cutting Protocols in `core/`. Handlers may live as a flat `handler.py` or as a `handlers/` subpackage once the feature grows past one CLI surface (see [Handlers: flat vs. subpackage](#handlers-flat-vs-subpackage) below).
-- **`python/error-handling.md`** — library exceptions are wrapped at the call site via an injected `IRepoErrorFactory`, never via ad-hoc `raise X from Y`.
+- **`python/error-handling.md`** — library exceptions are wrapped at the call site via an injected concrete `RepoErrorFactory`, never via ad-hoc `raise X from Y`.
 
 ## Handlers: flat vs. subpackage
 
