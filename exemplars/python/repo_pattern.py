@@ -19,7 +19,7 @@ The shape codifies three orthogonal seams the winter codebase has standardized o
      into the domain `RepoError` by an injected `RepoErrorFactory.from_*`
      method, not by inline `raise X from Y` at every call site. The factory
      logs once at the wrap site and captures structured fields
-     (subcommand, args, cwd, stderr, exit_code) so the reporter and
+     (subcommand, cmd_args, cwd, stderr, exit_code) so the reporter and
      dashboard can render them without re-parsing.
 
 The DI container binds the Write variant where mutations are required and the
@@ -46,15 +46,15 @@ class Thing:
 class RepoError(Exception):
     """Raised by repository methods to signal a failed operation.
 
-    Carries structured fields (subcommand, args, cwd, exit_code, stderr)
+    Carries structured fields (subcommand, cmd_args, cwd, exit_code, stderr)
     populated by RepoErrorFactory at the wrap site. Callers depend on this
     type — never on `some_io_library`'s exception hierarchy.
     """
-    def __init__(self, message: str, *, subcommand: str = "", args: tuple[str, ...] = (),
+    def __init__(self, message: str, *, subcommand: str = "", cmd_args: tuple[str, ...] = (),
                  cwd: Path | None = None, exit_code: int | None = None, stderr: str = ""):
         super().__init__(message)
         self.subcommand = subcommand
-        self.args = args
+        self.cmd_args = cmd_args
         self.cwd = cwd
         self.exit_code = exit_code
         self.stderr = stderr
@@ -76,7 +76,7 @@ class RepoErrorFactory:
     until then the concrete is the seam, and tests substitute a fake by
     type.
     """
-    def from_io(self, exc: Exception, *, subcommand: str, args: tuple[str, ...],
+    def from_io(self, exc: Exception, *, subcommand: str, cmd_args: tuple[str, ...],
                 cwd: Path | None = None) -> RepoError: ...
 
 
@@ -109,14 +109,14 @@ class _ReadFooRepository:
         try:
             raw = some_io_library.fetch(thing_id)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="fetch", args=(thing_id,))
+            raise self._errors.from_io(exc, subcommand="fetch", cmd_args=(thing_id,))
         return self._parse(thing_id, raw)
 
     def list_things(self, prefix: str) -> list[Thing]:
         try:
             entries = some_io_library.list(prefix)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="list", args=(prefix,))
+            raise self._errors.from_io(exc, subcommand="list", cmd_args=(prefix,))
         return [self._parse(e.id, e.raw) for e in entries]
 
     @staticmethod
@@ -138,7 +138,7 @@ class _WriteFooRepository(_ReadFooRepository):
         try:
             some_io_library.delete(thing_id)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="delete", args=(thing_id,))
+            raise self._errors.from_io(exc, subcommand="delete", cmd_args=(thing_id,))
 
 
 # --- DI container binding (lives in container.py in production) -----------

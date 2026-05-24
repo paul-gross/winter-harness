@@ -93,7 +93,7 @@ except git.GitCommandError as exc:
 Once the same wrap site appears in many places — every repository method, for instance — promote the wrapping to a factory and inject it. This:
 
 - Centralizes the **log-once-at-wrap-site** convention (no catch-log-rethrow cascades).
-- Captures structured fields (`subcommand`, `args`, `cwd`, `exit_code`, `stderr`) that the reporter and dashboard can render without re-parsing the message.
+- Captures structured fields (`subcommand`, `cmd_args`, `cwd`, `exit_code`, `stderr`) that the reporter and dashboard can render without re-parsing the message.
 - Lets tests substitute a fake factory and assert error shapes.
 
 A concrete `RepoErrorFactory` bound in the DI container (singleton) and injected into every repository is enough — the seam is exercised by tests through a fake factory, and there has not yet been a need for a second adapter behind it. Consider extracting an `IRepoErrorFactory` Protocol when (and only when) a second factory shape appears (e.g. a non-git transport that needs a different `from_*` constructor).
@@ -109,7 +109,7 @@ class _WriteFooRepository:
         try:
             some_io_library.write(thing.id, thing.payload)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="save", args=(thing.id,))
+            raise self._errors.from_io(exc, subcommand="save", cmd_args=(thing.id,))
 ```
 
 `RepoError` itself becomes a dataclass-shaped exception carrying those fields, not just a message string. See `winter-harness:/exemplars/python/repo_pattern.py` for the full example, and `winter:tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` for the production factory in winter-cli (which wraps `git.GitCommandError`, `subprocess.CalledProcessError`, and other transport-level exceptions).

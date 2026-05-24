@@ -4,7 +4,7 @@
 
 - All `subprocess.run` / `subprocess.Popen` usage is confined to a repository or adapter under `internal/` — see `python/repository-pattern.md`.
 - Always `capture_output=True`, `text=True`, `check=False`. Inspect `returncode` explicitly.
-- Wrap non-zero exits and `OSError` into the feature's `RepoError` via the injected `RepoErrorFactory` (see `python/error-handling.md`). Capture `subcommand`, `args`, `cwd`, `exit_code`, and `stderr` as structured fields, not as a concatenated message.
+- Wrap non-zero exits and `OSError` into the feature's `RepoError` via the injected `RepoErrorFactory` (see `python/error-handling.md`). Capture `subcommand`, `cmd_args`, `cwd`, `exit_code`, and `stderr` as structured fields, not as a concatenated message.
 - Never `shell=True` for any command whose tokens come from a variable. Pass `cmd` as a `list[str]`.
 
 ## Why
@@ -28,7 +28,7 @@ def fetch(self, cwd: Path, remote: str) -> None:
     )
     if completed.returncode != 0:
         raise self._errors.from_subprocess(
-            completed, subcommand="fetch", args=(remote,), cwd=cwd,
+            completed, subcommand="fetch", cmd_args=(remote,), cwd=cwd,
         )
 ```
 
