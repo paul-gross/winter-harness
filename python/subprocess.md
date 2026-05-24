@@ -28,11 +28,13 @@ def fetch(self, cwd: Path, remote: str) -> None:
     )
     if completed.returncode != 0:
         raise self._errors.from_subprocess(
-            completed, subcommand="fetch", cmd_args=(remote,), cwd=cwd,
+            completed, f"fetch {remote} failed", cwd=cwd,
         )
 ```
 
-The factory extracts `exit_code` and `stderr` off `completed` and attaches them to the `RepoError` as structured fields — same shape as `from_io(exc, ...)` in `python/error-handling.md`. Callers don't repeat that extraction at every wrap site.
+The factory extracts `subcommand`, `cmd_args`, `exit_code`, and `stderr` off `completed.args` and attaches them to the `RepoError` as structured fields — same shape as `from_git(exc, message, *, cwd)` in `python/error-handling.md`. Callers pass only the high-level `message` and don't repeat the extraction at every wrap site.
+
+**Method-name convention:** the factory has one method per underlying transport — `from_git` for `git.GitCommandError`, `from_subprocess` for `subprocess.CompletedProcess`, and so on. Production winter-cli currently exposes only `from_git`; `from_subprocess` is the canonical shape for new adapters that wrap raw `subprocess`.
 
 ## Don't
 
@@ -49,7 +51,7 @@ subprocess.run(["git", "fetch", remote], cwd=cwd)
 
 ## See also
 
-- `python/error-handling.md` — structured errors via the injected factory; `from_io(exc, ...)` canonical shape.
+- `python/error-handling.md` — structured errors via the injected factory; `from_<transport>(exc, message, *, cwd)` canonical shape.
 - `python/repository-pattern.md` — why subprocess lives in `internal/`.
 - `python/logging.md` — log levels for wrapped subprocess failures.
 - `winter/tools/winter-cli/src/winter_cli/core/internal/local_subprocess_runner.py` — the production `ISubprocessRunner` adapter (`run` + `popen` seams).

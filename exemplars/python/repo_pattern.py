@@ -65,18 +65,30 @@ class RepoError(Exception):
 class RepoErrorFactory:
     """The injected error-wrapping seam.
 
-    `from_io(...)` is called by every repository method at the boundary
-    where a library exception is caught. The factory logs once at the
-    wrap site (so we never get catch-log-rethrow cascades) and constructs
-    a RepoError with the structured fields populated.
+    The factory exposes one `from_<transport>(...)` method per underlying
+    exception type it knows how to translate. Each method is called by a
+    repository at the boundary where the library exception is caught. The
+    factory logs once at the wrap site (so we never get catch-log-rethrow
+    cascades) and constructs a `RepoError` with the structured fields
+    populated.
+
+    The caller passes a high-level `message` describing what failed. The
+    factory extracts `subcommand`, `cmd_args`, `exit_code`, and `stderr`
+    off the exception itself — callers don't repeat that extraction at
+    every wrap site.
+
+    Production winter-cli currently exposes one method, `from_git`
+    (wraps `git.GitCommandError`). New transports add new methods
+    following the same shape — `from_subprocess(completed, message, *, cwd)`
+    for `subprocess.CompletedProcess`, `from_http(response, message, *, cwd)`
+    for an HTTP client, and so on.
 
     Inject the concrete class directly. An I-prefix `IRepoErrorFactory`
     Protocol is only worth extracting when a second factory shape appears
-    (e.g. a non-git transport that needs different `from_*` constructors);
-    until then the concrete is the seam, and tests substitute a fake by
-    type.
+    (different field schema, different log policy); until then the concrete
+    is the seam, and tests substitute a fake by type.
     """
-    def from_io(self, exc: Exception, *, subcommand: str, cmd_args: tuple[str, ...],
+    def from_io(self, exc: Exception, message: str, *,
                 cwd: Path | None = None) -> RepoError: ...
 
 
@@ -109,14 +121,14 @@ class _ReadFooRepository:
         try:
             raw = some_io_library.fetch(thing_id)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="fetch", cmd_args=(thing_id,))
+            raise self._errors.from_io(exc, f"fetch failed for {thing_id}")
         return self._parse(thing_id, raw)
 
     def list_things(self, prefix: str) -> list[Thing]:
         try:
             entries = some_io_library.list(prefix)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="list", cmd_args=(prefix,))
+            raise self._errors.from_io(exc, f"list failed for prefix {prefix!r}")
         return [self._parse(e.id, e.raw) for e in entries]
 
     @staticmethod
@@ -132,13 +144,13 @@ class _WriteFooRepository(_ReadFooRepository):
         try:
             some_io_library.write(thing.id, thing.payload)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="save", args=(thing.id,))
+            raise self._errors.from_io(exc, f"save failed for {thing.id}")
 
     def delete_thing(self, thing_id: str) -> None:
         try:
             some_io_library.delete(thing_id)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="delete", cmd_args=(thing_id,))
+            raise self._errors.from_io(exc, f"delete failed for {thing_id}")
 
 
 # --- DI container binding (lives in container.py in production) -----------

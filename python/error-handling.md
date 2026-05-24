@@ -109,8 +109,10 @@ class _WriteFooRepository:
         try:
             some_io_library.write(thing.id, thing.payload)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, subcommand="save", cmd_args=(thing.id,))
+            raise self._errors.from_io(exc, f"save failed for {thing.id}")
 ```
+
+The factory has one `from_<transport>(exc, message, *, cwd)` method per underlying exception type it knows how to translate — `from_git` for `git.GitCommandError`, `from_subprocess` for `subprocess.CompletedProcess`, `from_io` for a generic IO library, etc. Each method extracts the structured fields (`subcommand`, `cmd_args`, `exit_code`, `stderr`) off the exception itself; callers pass only the high-level `message`. Production winter-cli currently exposes only `from_git`.
 
 `RepoError` itself becomes a dataclass-shaped exception carrying those fields, not just a message string. See `winter-harness:/exemplars/python/repo_pattern.py` for the full example, and `winter:tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` for the production factory in winter-cli (which wraps `git.GitCommandError`, `subprocess.CalledProcessError`, and other transport-level exceptions).
 
