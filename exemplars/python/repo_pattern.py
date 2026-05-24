@@ -153,6 +153,15 @@ class WriteFooRepository(ReadFooRepository):
             raise self._errors.from_io(exc, f"delete failed for {thing_id}")
 
 
+# Typecheck-time Protocol/adapter conformance sentinel. Pyright rejects the
+# return if WriteFooRepository drifts from IWriteFooRepository. Lives next to
+# the concrete so the Protocol module doesn't import its own adapter. Because
+# IWriteFooRepository extends IReadFooRepository, this single sentinel pins
+# both seams. See python/protocol-conformance.md for the full pattern.
+def _conforms_write_foo_repository(x: WriteFooRepository) -> IWriteFooRepository:
+    return x
+
+
 # --- DI container binding (lives in container.py in production) -----------
 #
 # from dependency_injector import containers, providers

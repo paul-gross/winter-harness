@@ -57,4 +57,5 @@ modules/<feature>/
 
 - `python/dependency-injection.md` — the DI conventions and `Workspace` injection rule.
 - `python/repository-pattern.md` — the rule about confining library imports.
+- `python/protocol-conformance.md` — pin each Protocol/adapter pair with a typecheck-time sentinel so DI-laundered drift fails the build.
 - `exemplars/python/repo_pattern.py` — full worked example combining all three.
