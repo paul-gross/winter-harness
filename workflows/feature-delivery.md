@@ -14,31 +14,23 @@ The source checkouts under `<workspace>/projects/<repo>/` are **read-only refere
 
 If unsure which env to work in, ask. Don't pick one silently.
 
-## Branch naming
+## Pinned repos
 
-Two branch names matter, and they don't have to match:
-
-- **Local branch** — always the env name. `winter ws init <env>` creates the worktree on a branch literally named `<env>` (see `workspace:/CLAUDE.md` for env naming and port assignment).
-- **Remote feature branch** — set via `winter ws connect <env> <feature-branch>` when the env should push to a named remote branch instead of `master`. The remote name is independent of the local branch (e.g. local `alpha` → remote `feature/basic-addon`).
-
-For the default delivery flow (push to `origin/master`), no `connect` is needed — `winter ws push` lands the env's commits directly on `master`.
+All project repos are **pinned** in `.winter/config.toml` — pinned worktrees track `origin/master` and pushes land directly on `master`. No feature branches, no `winter ws connect`. A contributor may add unpinned repos to a local `.winter/config.toml` overlay to test or verify in-progress functionality against a non-canonical upstream; treat those as scratch, not part of the delivery path.
 
 ## Push target
 
-**Completed work pushes directly to `origin/master`** for each project repo. No PR, no MR, no review gate, no remote feature branches in the default flow.
+**Agents: never push without explicit user sign-off.** `master` is shared and lands immediately — no PR review, no CI gate, and reverting a bad push requires a force-push (destructive). After committing, stop and ask the user to confirm before running `winter ws push` or raw `git push`. "Work on issue #N" is not authorization to push the resulting commit; commit and wait.
 
-Use the CLI:
+**Completed work pushes directly to `origin/master`** for each project repo. No PR, no MR, no review gate.
 
 ```bash
-winter ws push                  # every env's non-pinned worktrees
-winter ws push <env>            # one env's non-pinned worktrees
-winter ws push <env>/<repo>     # one specific worktree
-winter ws push --include-pinned # also push pinned worktrees
+winter ws push <env> --include-pinned         # every repo in <env> that's ahead of master
+winter ws push <env>/<repo> --include-pinned  # one specific repo's worktree
+git push                                      # from inside <env>/<repo>/, single repo
 ```
 
-`winter ws push` only pushes repos that are ahead of their upstream — clean repos are skipped silently. The full `push` command reference (patterns, pinned-repo semantics, `--standalone`, `--all`) is in `workspace:/ai/worktree-ops.md`.
-
-When the env *is* connected to a remote feature branch, `winter ws push` pushes to that branch instead of `master` — use that path for shared in-progress work.
+`winter ws push` only pushes repos that are ahead of their upstream — clean repos are skipped silently. Full reference: `workspace:/ai/worktree-ops.md`.
 
 ## Linear history — always rebase, never merge
 

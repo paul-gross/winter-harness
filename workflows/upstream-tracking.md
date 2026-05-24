@@ -2,16 +2,6 @@
 
 How a workspace consumes an **upstream framework repo** while keeping its own customizations on top.
 
-## When this applies
-
-Applies when the workspace's `origin/master` is `<upstream-name>/master` + exactly one commit (its own `.winter/config.toml`, `CLAUDE.md`, extension registrations). Verify after bootstrap:
-
-```bash
-git log --oneline <upstream-name>/master..HEAD
-```
-
-If that prints exactly one line, this doc governs the workspace. If it prints zero, the workspace doesn't track an upstream — ignore this doc. If it prints more than one, the workspace is out of contract — see [Single-commit-on-top contract](#single-commit-on-top-contract) for how to restore it.
-
 ## Bootstrap
 
 A fresh clone of the user's fork has only `origin` set. Wire up the upstream remote once:
@@ -64,6 +54,8 @@ git push --force-with-lease origin master
 
 The rebase replays the single customization commit onto the new upstream tip. **Always `--force-with-lease`, never plain `--force`** — `--force-with-lease` aborts if `origin/master` has moved since the last fetch, which protects against overwriting another contributor's push to the fork.
 
+**Agents: never force-push without explicit user sign-off.** `--force-with-lease` is still a history rewrite — anyone who fetched the prior tip needs to rebase after it lands. After the local rebase succeeds, stop and ask the user to confirm before running `git push --force-with-lease`.
+
 If the rebase reports conflicts, the upstream has changed something the customization commit also touches. Resolve in the worktree with raw git, then continue with `git rebase --continue` and the force-push.
 
 ## Amend vs new commit
@@ -77,6 +69,8 @@ git push --force-with-lease origin master
 ```
 
 **Never create a second customization commit.** Two commits on top of upstream breaks the single-commit contract and makes the next `git rebase <upstream-name>/master` ambiguous about which commit represents "the customization."
+
+The same agent-sign-off rule from [Sync flow](#sync-flow) applies to the amend push.
 
 Project repos are governed separately — see `./workflows/feature-delivery.md`.
 
