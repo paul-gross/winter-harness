@@ -17,6 +17,7 @@ Convention files in this extension live at the **top of the repo**, not under an
 | `exemplars/python/repo_pattern.py` | Reference for the repository pattern (I-prefix Protocol seam + `internal/` adapter + factory-injected errors) |
 | `exemplars/python/cli-architecture.md` | Guided tour of how the conventions are applied in winter-cli — read before adding a `winter ws foo` subcommand |
 | `writing-readme.md` | Writing or editing a `README.md` for any winter ecosystem repo |
+| `harness/index.md` | Authoring agents, skills, configuration, or any doc that references winter things — start here for ecosystem-wide engineering conventions |
 | `CONTRIBUTING.md` | Before pushing — commit format, voice rules, link/reference validation |
 
 ## Tooling
