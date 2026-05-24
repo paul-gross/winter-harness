@@ -16,44 +16,49 @@ Exceptions concentrate failure handling at the boundary that actually wants to h
 
 ## Do
 
+The example below is synthetic — a stand-in `FooService` that runs four
+steps against a `FooRepository`. The point is the shape, not the API: a
+single `try/except` at the boundary that wants to handle the failure,
+with the happy path staying linear.
+
 ```python
-def _apply_identity(self, repo_path: Path) -> None:
-    if identity := self._workspace.git_identity:
-        self._repo_repo.set_identity(repo_path, identity)
+def _apply_tag(self, foo_id: str) -> None:
+    if tag := self._workspace.foo_tag:
+        self._foo_repo.set_tag(foo_id, tag)
 
 
-def _reconcile_source_checkout(self, repo, reporter) -> bool:
+def _reconcile_foo(self, foo, reporter) -> bool:
     try:
-        self._repo_repo.clone(repo, repo.main_path)
-        self._apply_identity(repo.main_path)
-        self._write_excludes(repo.main_path, repo, reporter)
-        self._run_cmds(repo.main_path, repo.name, list(repo.cmd), reporter)
+        self._foo_repo.create(foo, foo.main_path)
+        self._apply_tag(foo.main_path)
+        self._write_metadata(foo.main_path, foo, reporter)
+        self._run_hooks(foo.main_path, foo.name, list(foo.hooks), reporter)
         return True
-    except (RepoError, OSError) as exc:
-        reporter.repo_error(repo.name, str(exc))
+    except (FooError, OSError) as exc:
+        reporter.foo_error(foo.name, str(exc))
         return False
 ```
 
 ## Don't
 
 ```python
-def _apply_identity(self, repo_path, reporter, repo_name) -> bool:
+def _apply_tag(self, foo_id, reporter, foo_name) -> bool:
     try:
-        self._repo_repo.set_identity(repo_path, identity)
+        self._foo_repo.set_tag(foo_id, tag)
         return True
-    except RepoError as exc:
-        reporter.repo_error(repo_name, str(exc))
+    except FooError as exc:
+        reporter.foo_error(foo_name, str(exc))
         return False
 
 
-def _reconcile_source_checkout(self, repo, reporter):
-    if not self._clone(repo, repo.main_path, reporter):
+def _reconcile_foo(self, foo, reporter):
+    if not self._create(foo, foo.main_path, reporter):
         return False
-    if not self._apply_identity(repo.main_path, reporter, repo.name):
+    if not self._apply_tag(foo.main_path, reporter, foo.name):
         return False
-    if not self._write_excludes(repo.main_path, repo, reporter):
+    if not self._write_metadata(foo.main_path, foo, reporter):
         return False
-    if not self._run_cmds(repo.main_path, repo.name, list(repo.cmd), reporter):
+    if not self._run_hooks(foo.main_path, foo.name, list(foo.hooks), reporter):
         return False
     return True
 ```
