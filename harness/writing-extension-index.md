@@ -22,7 +22,7 @@ Out of scope — these belong elsewhere:
 - **Lifecycle-hook tables** (`on_env_init` / `on_env_destroy` script names, what each does). Behind-the-scenes — the user doesn't invoke these; `winter ws init/destroy` does. The manifest at `winter-ext.toml` is self-documenting for anyone modifying the extension.
 - **Doctor probe internals** (which probes the script emits, the NDJSON shape, exit-code semantics). The user reads `winter doctor`'s rendered output, not the probe internals. The contract lives in `workspace:/ai/winter-cli/setup.md#doctor-probes`.
 - **Manifest schema, plugin internals, hook-script implementation details.** All behind-the-scenes.
-- **Installation steps.** Those belong in `README.md` (see `winter-harness:/writing-readme.md`).
+- **Installation steps.** Those belong in `README.md` (see `winter-harness:/harness/writing-readme.md`).
 - **Setup walkthroughs.** Those belong in `ai/` (e.g. `ai/workflow-setup.md`) and are referenced *from* `index.md` with a one-line pointer.
 
 ## Where the rejected content goes
@@ -33,7 +33,7 @@ If you're tempted to add a section that's out-of-scope per the rule above:
 |--------------|------|
 | Hook tables, probe internals, manifest details | The extension's source — `winter-ext.toml`, the hook script's header comment, the probe script's header comment. Self-documenting code beats redundant markdown. |
 | Setup walkthroughs and interactive guides | `ai/<topic>.md` inside the extension. Reference from `index.md` with one line. |
-| User-facing feature pitch, installation, scope | `README.md`. See `winter-harness:/writing-readme.md`. |
+| User-facing feature pitch, installation, scope | `README.md`. See `winter-harness:/harness/writing-readme.md`. |
 | Cross-cutting engineering conventions | `winter-harness:/`. |
 
 ## Do
