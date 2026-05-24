@@ -75,6 +75,25 @@ Rules and canonical config: `./python/linting.md` (ruff) and `./python/typecheck
 
 If the env spans multiple repos, run pre-push checks in every repo that has uncommitted or unpushed changes, not just the one you happened to touch last.
 
+## After pushing
+
+Fast-forward the source checkout in `projects/<repo>/` after a push lands. `winter ws init <env>` branches new envs from the local `projects/<repo>/master`, so any commit on `origin/master` not reflected there starts the next env behind.
+
+```bash
+winter ws sync <env>    # fast-forwards every projects/<repo>/master to origin/master as a side effect
+```
+
+Run it against the env you just pushed from — the worktrees are at master (no commits to integrate), and the side effect catches every source checkout up. Full reference: `workspace:/ai/worktree-ops.md`.
+
+For single-repo work, the raw equivalent is:
+
+```bash
+git -C ./projects/<repo>/ fetch origin
+git -C ./projects/<repo>/ merge --ff-only origin/master
+```
+
+Direct edits under `projects/` are otherwise discouraged — the source checkouts are read-only references (see *Where work happens*). This fast-forward is the narrow exception.
+
 ## See also
 
 - `workspace:/ai/project/contributing.md` — canonical commit format, `Closes #N` footer rules, push policy
