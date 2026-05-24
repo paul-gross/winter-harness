@@ -42,17 +42,23 @@ Each layer's job:
 ```python
 def __init__(
     self,
-    repo_factory: RepositoryFactory,
-    repo_repo: WriteRepoRepository,
+    thing_factory: ThingFactory,
+    foo_repo: IWriteFooRepository,
     workspace: Workspace,
 ) -> None:
     self._workspace = workspace
     ...
 
-def _apply_identity(self, repo_path: Path) -> None:
-    if identity := self._workspace.git_identity:
-        self._repo_repo.set_identity(repo_path, identity)
+def _apply_tag(self, foo_path: Path) -> None:
+    if tag := self._workspace.foo_tag:
+        self._foo_repo.set_tag(foo_path, tag)
 ```
+
+(The placeholder name `ThingFactory` is deliberately abstract — don't
+confuse it with `RepositoryFactory` discussed in the carve-out below.
+That class is a production type that *is itself* one of the legitimate
+config consumers, and reusing its name here would muddle which rule
+applies.)
 
 ## Don't
 
@@ -61,8 +67,8 @@ def __init__(self, config: WorkspaceConfig, ...) -> None:
     self._config = config
 
 
-def _apply_identity(self, repo_path):
-    identity = self._config.git_identity  # reaches into the app schema
+def _apply_tag(self, foo_path):
+    tag = self._config.foo_tag  # reaches into the app schema
     ...
     # This service now "depends on" the entire WorkspaceConfig type, even
     # though it only reads one field. Dependency arrow points the wrong way.
