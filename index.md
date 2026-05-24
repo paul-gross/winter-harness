@@ -19,6 +19,8 @@ Convention files in this extension live at the **top of the repo**, not under an
 | `exemplars/python/cli-architecture.md` | Guided tour of how the conventions are applied in winter-cli — read before adding a `winter ws foo` subcommand |
 | `writing-readme.md` | Writing or editing a `README.md` for any winter ecosystem repo |
 | `harness/index.md` | Authoring agents, skills, configuration, or any doc that references winter things — start here for ecosystem-wide engineering conventions |
+| `workflows/feature-delivery.md` | Day-to-day flow for landing a change: worktree model, branch naming, push target, rebase rule, pre-push checks |
+| `workflows/upstream-tracking.md` | When a workspace customizes an upstream framework repo — dual-remote layout, single-commit-on-top, sync via rebase + force-with-lease |
 | `CONTRIBUTING.md` | Before pushing — commit format, voice rules, link/reference validation |
 
 ## Tooling
