@@ -111,7 +111,7 @@ class IWriteFooRepository(IReadFooRepository, Protocol):
 # --- Concrete adapter (lives at modules/<feature>/internal/foo_repository.py
 # in production; shown here in one file for the exemplar) -------------------
 
-class _ReadFooRepository:
+class ReadFooRepository:
     """Read-only `some_io_library` adapter. All library usage is confined here."""
 
     def __init__(self, error_factory: RepoErrorFactory) -> None:
@@ -137,7 +137,7 @@ class _ReadFooRepository:
         return Thing(id=thing_id, payload=raw)
 
 
-class _WriteFooRepository(_ReadFooRepository):
+class WriteFooRepository(ReadFooRepository):
     """Read-write adapter. Mutating operations live here; reads inherited."""
 
     def save_thing(self, thing: Thing) -> None:
@@ -160,7 +160,7 @@ class _WriteFooRepository(_ReadFooRepository):
 # class Container(containers.DeclarativeContainer):
 #     error_factory = providers.Singleton(RepoErrorFactory)
 #     foo_repo: providers.Provider[IWriteFooRepository] = providers.Singleton(
-#         _WriteFooRepository, error_factory=error_factory,
+#         WriteFooRepository, error_factory=error_factory,
 #     )
 #
 # Services that only need reads declare their dependency as `IReadFooRepository`

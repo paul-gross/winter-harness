@@ -106,7 +106,7 @@ A concrete `RepoErrorFactory` bound in the DI container (singleton) and injected
 Until then, inject the concrete class:
 
 ```python
-class _WriteFooRepository:
+class WriteFooRepository:
     def __init__(self, error_factory: RepoErrorFactory) -> None:
         self._errors = error_factory
 
