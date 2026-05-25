@@ -51,7 +51,7 @@ If `git rebase` reports conflicts, resolve them in the worktree with raw git —
 
 ## Commit conventions
 
-Use Conventional Commits with a scope, and include a `Closes #N` footer for any Codeberg issue this commit finishes:
+Use Conventional Commits with a scope, and include a `Closes #N` footer for any GitHub issue this commit finishes:
 
     docs(winter-harness): tighten error-handling do/don't pairing
 

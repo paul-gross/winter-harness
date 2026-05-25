@@ -30,4 +30,4 @@ Three layers, each in its own directory:
 
 ## Tooling
 
-- **Codeberg interactions** should be done via the [`tea`](https://gitea.com/gitea/tea) CLI (issues, PRs, releases, repo management). Never script against the web UI. The full winter-side workflow lives in `winter-codeberg:/ai/tea-cli.md` and `workspace:/ai/codeberg.md` (canonical label set, capability matrix). This extension only states the rule.
+- **GitHub interactions** should be done via the [`gh`](https://cli.github.com/) CLI (issues, PRs, releases, repo management). Never script against the web UI. The full winter-side workflow lives in `winter-github:/ai/gh-cli.md` and `workspace:/ai/github.md` (canonical label set). This extension only states the rule.

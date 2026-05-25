@@ -12,7 +12,7 @@ Conventional Commits with a scope:
 
 - Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `style`, `ai`. `docs` is the common case here.
 - Scope: `harness` (or a subsystem like `python`, `exemplars`).
-- Use `Closes #N` to link a Codeberg issue this commit finishes (workspace-level rules at `workspace:/ai/project/contributing.md`).
+- Use `Closes #N` to link a GitHub issue this commit finishes (workspace-level rules at `workspace:/ai/project/contributing.md`).
 - The `/wf-commit` skill from [winter-workflow](https://github.com/paul-gross/winter-workflow) generates commits in this format.
 
 Example:
@@ -31,7 +31,7 @@ No linters, formatters, or tests are wired in. Before pushing, manually validate
 
 - **Internal links** — every `winter-harness:/path/file.md` reference, every relative link inside this repo, resolves to an existing file.
 - **Code references** — any production example cited via path notation (e.g. `winter:tools/winter-cli/...`) still exists at that path with the claimed shape. Conventions go stale when winter-cli refactors; if you spot drift while reading, fix it.
-- **Cross-repo refs** — `winter-codeberg:/...`, `winter-workflow:/...` etc. point at real files in those repos.
+- **Cross-repo refs** — `winter-harness:/...`, `winter-workflow:/...` etc. point at real files in those repos.
 
 ## Delivery
 
