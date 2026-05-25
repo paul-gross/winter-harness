@@ -53,6 +53,10 @@ modules/<feature>/
 - **Discoverability for agents.** The Protocol file at the feature root is the agent's first read when asked to extend a feature. They see the surface area without scanning every concrete file.
 - **Encapsulation.** `internal/` is a hard signal that imports from outside are wrong. Linters and code reviewers can enforce it mechanically.
 
+## Enforcement
+
+In winter-cli, the I-prefix-on-Protocols rule and the no-Protocols-in-`internal/` rule are checked at `mise run test` time by `winter:tools/winter-cli/tests/conventions/test_protocol_naming.py`. The check walks every class definition; a class is treated as a Protocol if its bases include `typing.Protocol` or it carries `@runtime_checkable`. Violations fail with file:line and a back-link here.
+
 ## See also
 
 - `python/dependency-injection.md` — the DI conventions and `Workspace` injection rule.

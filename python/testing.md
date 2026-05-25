@@ -119,6 +119,49 @@ The fake satisfies the Protocol structurally — pyright/mypy will reject a dive
 - **Fakes**: `Fake<Protocol-without-the-I-prefix>` — `FakeFilesystem`, `FakeGitRepository`, `FakeInitReporter`. The class docstring restates the Protocol it satisfies.
 - **Builder helpers**: `make_<thing>(...)` for low-ceremony constructors, reserved for one-call setup. Prefer fixtures for anything shared across tests.
 
+## Convention tests
+
+Some Python conventions describe AST-level patterns that `ruff`, `pyright`, and `import-linter` can't reach — Protocol naming (`I`-prefix), the no-whole-Config-injection rule, the no-catch-log-rethrow pattern. Code review and the `code-reviewer` agent catch them probabilistically; promoting each rule to a small pytest file under `tests/conventions/` makes the check deterministic and runs it alongside the rest of `mise run test`.
+
+### Layout
+
+```
+tests/conventions/
+  conftest.py                     # shared walk_src() helper + collect_ignore
+  test_protocol_naming.py         # one rule per file
+  test_no_whole_config_injection.py
+  test_no_catch_log_rethrow.py
+  fixtures/                       # excluded from collection
+    violating_protocol_naming.py  # deliberately violates the rule
+    violating_no_whole_config_injection.py
+    violating_no_catch_log_rethrow.py
+```
+
+`conftest.py` exposes `walk_src() -> Iterator[(Path, ast.Module)]` that every rule file iterates, plus a module-level `collect_ignore = ["fixtures"]` so the deliberate violations don't surface as suite failures.
+
+### Shape of a rule file
+
+Each rule file factors detection into a pure function — `find_<rule>_violations(file_path, tree) -> list[str]` — and uses it twice:
+
+1. A top-level test that walks `src/` and `pytest.fail`s with the joined violation list. Each violation cites file:line and the convention doc.
+2. A regression test that parses the matching `fixtures/violating_<rule>.py` and asserts the function returns at least one violation. This keeps the lint honest — if a refactor silently disables detection, the fixture test fails.
+
+Failure messages follow the pattern `f"{file}:{line}: <rule restatement> ({winter-harness:/python/<conv>.md})"` so the offending line and the convention citation are both inline.
+
+### Carve-outs
+
+The literal convention may permit narrow exceptions (e.g. `python/dependency-injection.md` allows whole-`WorkspaceConfig` injection in translation services and workspace-lifecycle services). Encode those as an explicit `ALLOWED_FILES = frozenset({...})` at the top of the rule file, with each entry paired to the carve-out paragraph in the convention doc. New code that re-introduces the pattern outside the allowlist fails the test loudly. Mirror the existence of the test in the convention doc itself — add a short "Enforcement" pointer at the end of the convention so an agent reading the rule knows the gate exists.
+
+### Adding a fourth rule
+
+The shortest path is to copy `test_protocol_naming.py` and adapt it. The contract is:
+
+1. Add `tests/conventions/test_<rule>.py`. Factor detection into a pure function with the signature `find_<rule>_violations(file_path: Path, tree: ast.Module) -> list[str]` — the existing `walk_src()` iteration depends on this exact shape.
+2. Use the function twice in the same file: once in the src-wide test that fails with the joined violation list, once in a regression test that parses `fixtures/violating_<rule>.py` and asserts the returned list is non-empty.
+3. Add `tests/conventions/fixtures/violating_<rule>.py` — deliberately violates the rule, syntactically valid (it gets `ast.parse`d by the regression test). The conftest's `collect_ignore` already excludes everything under `fixtures/`; no further wiring needed.
+4. Cite the convention doc in the failure message, following the template above, and in the rule-file docstring.
+5. Add an "Enforcement" pointer to the convention doc itself so the rule and its gate cross-link both ways.
+
 ## See also
 
 - `python/dependency-injection.md` — why services receive Protocols, not concretes.

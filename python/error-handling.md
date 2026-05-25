@@ -78,6 +78,8 @@ This adds noise without value. The exception still propagates; you've just logge
 
 The rule is binary: catch and *handle* (do something specific — recover, transform, surface to a reporter), or don't catch at all.
 
+In winter-cli, this is checked at `mise run test` time by `winter:tools/winter-cli/tests/conventions/test_no_catch_log_rethrow.py`. CLI entrypoints (`cli.py`, `__main__.py`) are exempt — that's the boundary where log-and-exit is the actual handling. See the test's docstring for the two detection blind spots (`if/else` arms; nested control flow).
+
 ## Custom error types
 
 Create a custom domain error type (e.g. `RepoError`) when *callers handle that error specifically* — and would otherwise need to depend on the underlying library to do so. That's the YAGNI test.

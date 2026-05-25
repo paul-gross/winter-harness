@@ -61,8 +61,8 @@ Follow this order — each step builds on the previous:
 1. **click command** in `modules/workspace/command.py` — thin wrapper that parses click args and calls a handler.
 2. **Handler** in `modules/workspace/handlers/<surface>_handler.py` (or a new `foo_handler.py` if `foo` is its own surface) — receives parsed args, calls a service, renders output via `ICliOutputService` (or returns structured JSON for `--json`).
 3. **Service** — either extend `WorkspaceService` for read-shaped or env-spanning operations, or add `modules/workspace/foo_service.py` for a top-level lifecycle action (like `init` and `destroy`). Services depend on Protocols, not concretes.
-4. **New I/O seam** (only if needed) — Protocol at `modules/workspace/<seam>.py`, concrete adapter at `modules/workspace/internal/<seam>.py`. Apply the I-prefix rule.
-5. **Bind** the service and any new adapters in `container.py`.
+4. **New I/O seam** (only if needed) — Protocol at `modules/workspace/<seam>.py`, concrete adapter at `modules/workspace/internal/<seam>.py`. Apply the I-prefix rule (enforced by `tests/conventions/test_protocol_naming.py`).
+5. **Bind** the service and any new adapters in `container.py`. Services consume domain objects, not `WorkspaceConfig` directly — see `python/dependency-injection.md` for the carve-outs (enforced by `tests/conventions/test_no_whole_config_injection.py`).
 6. **Unit test** under `tests/modules/workspace/` (service tests) or `tests/modules/workspace/internal/` (adapter tests) — inject fakes for the Protocols. See `tests/modules/workspace/internal/test_git_ops_service.py` and `tests/modules/workspace/internal/test_write_repo_repository.py` for the fixture pattern.
 7. **Surface the new command** in `workspace:/ai/winter-cli/usage.md` so agents discover it from the docs, not from `--help`.
 

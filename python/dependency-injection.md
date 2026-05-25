@@ -82,3 +82,7 @@ Two narrow categories legitimately consume `WorkspaceConfig` directly:
 2. **Workspace-lifecycle services** that reconcile the whole workspace against the config — e.g. `InitService`, `DestroyService`, `PruneService`, and the `Extension*Service` family. They read several cross-cutting fields (`workspace_root`, `git_identity`, `git_excludes`, `adopt_extensions`, the full `[[project_repository]]` and `[[standalone_repository]]` lists) and walk every declared repo. A small dataclass would either duplicate the schema or omit fields the next reconcile step needs.
 
 Everything else — handlers, per-feature services, status services — consumes domain objects (`Workspace`, `ProjectRepository`, `FeatureWorktree`) only. The smell to watch for is a service taking `WorkspaceConfig` but only reading one or two scalar fields; that one should declare a typed dataclass.
+
+## Enforcement
+
+In winter-cli, this rule is checked at `mise run test` time by `winter:tools/winter-cli/tests/conventions/test_no_whole_config_injection.py`. The two carve-outs above are encoded as an `ALLOWED_FILES` frozenset at the top of that file. Adding a new service that legitimately falls under one of the carve-outs requires extending the frozenset (with a one-line rationale citing this doc); anything outside it fails loudly with file:line and a back-link here.
