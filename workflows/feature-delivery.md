@@ -39,11 +39,13 @@ Before pushing, the env must be rebased onto the latest `origin/master`. The eco
 Two routes:
 
 ```bash
-winter ws sync <env>            # bulk: fetches every repo and ff-merges origin/<main>
+winter ws merge master <env>    # bulk: offline ff-only against local master (run `winter ws fetch` first if you need fresh refs)
 git rebase origin/master        # single repo: from inside <env>/<repo>/
 ```
 
-`winter ws sync` does an ff-only merge (with a 3-way fallback when ff isn't possible), which is fine for the common case where the env has no local commits yet on top of master. Once local commits exist, prefer `git rebase origin/master` in the affected repo so the new work sits cleanly on the tip and stays one commit per logical change.
+`winter ws merge` does an ff-only merge by default and does not hit the remote, so it's safe to fan across multiple envs in a single call (`winter ws merge master alpha beta gamma`) without redundant per-env fetches. Pass `--merge` for a 3-way fallback when ff-only would refuse. Once local commits exist, prefer `git rebase origin/master` in the affected repo so the new work sits cleanly on the tip and stays one commit per logical change.
+
+`winter ws sync <env>` bundles fetch + ff-merge + source-checkout FF for one env — use it when you want all three in a single command and don't mind the per-env remote call.
 
 If `git rebase` reports conflicts, resolve them in the worktree with raw git — `winter` does not own conflict resolution.
 
