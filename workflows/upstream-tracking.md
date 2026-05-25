@@ -19,8 +19,8 @@ After bootstrap, the workspace repo has **two remotes**:
 
 | Remote | Points at | Used for |
 |--------|-----------|----------|
-| `origin` | The user's fork (e.g. `git@codeberg.org:<user>/<workspace>.git`) | Pushes |
-| `<upstream-name>` | The upstream framework repo (e.g. `git@codeberg.org:pgross/winter.git`) | Pulls |
+| `origin` | The user's fork (e.g. `git@github.com:<user>/<workspace>.git`) | Pushes |
+| `<upstream-name>` | The upstream framework repo (e.g. `git@github.com:paul-gross/winter.git`) | Pulls |
 
 Verify:
 

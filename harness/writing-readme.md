@@ -8,7 +8,7 @@ Conventions for `README.md` files across the winter ecosystem (the framework, ex
 - Every top-level section (`##`) starts with an emoji, **except `License`**.
 - One-paragraph lede directly under the title: what this is and what it does. No "## Overview" header.
 - Sections appear in the order listed below. Skip sections that don't apply rather than rearrange.
-- Link to other ecosystem repos with their full codeberg URL — never bare names.
+- Link to other ecosystem repos with their full GitHub URL — never bare names.
 
 ## Voice — common pitfalls
 
@@ -50,7 +50,7 @@ When an extension needs a section not in the table above, pick an emoji that's:
 ```markdown
 # ❄️ winter-product
 
-A [winter](https://codeberg.org/pgross/winter) extension that adds product-workflow tooling to a winter workspace: planning conventions, product agents, and the `todo` skill.
+A [winter](https://github.com/paul-gross/winter) extension that adds product-workflow tooling to a winter workspace: planning conventions, product agents, and the `todo` skill.
 
 ## ✨ Features
 
@@ -64,14 +64,14 @@ Add to `.winter/config.toml`:
 \`\`\`toml
 [[standalone_repository]]
 name = "winter-product"
-url = "git@codeberg.org:pgross/winter-product.git"
+url = "git@github.com:paul-gross/winter-product.git"
 \`\`\`
 
 Then run `winter ws init`.
 
 ## 🎯 Scope
 
-Planning and task tracking only. Code conventions live in [winter-harness](https://codeberg.org/pgross/winter-harness).
+Planning and task tracking only. Code conventions live in [winter-harness](https://github.com/paul-gross/winter-harness).
 
 ## License
 

@@ -1,6 +1,6 @@
 # ❄️ winter-harness
 
-A [winter](https://codeberg.org/pgross/winter) extension curated for the meta [winter-workspace](https://codeberg.org/pgross/winter-workspace) itself.
+A [winter](https://github.com/paul-gross/winter) extension curated for the meta [winter-workspace](https://github.com/paul-gross/winter-workspace) itself.
 
 ## ✨ Features
 
@@ -16,7 +16,7 @@ Add to the workspace's `.winter/config.toml`:
 ```toml
 [[standalone_repository]]
 name = "winter-harness"
-url = "git@codeberg.org:pgross/winter-harness.git"
+url = "git@github.com:paul-gross/winter-harness.git"
 ```
 
 Then run `winter ws init`.

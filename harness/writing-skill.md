@@ -27,7 +27,7 @@ Frontmatter is the standard Claude Code skill set — `description`, `model`, `a
 
 Do not declare a `name:` field. The skill's canonical name is the directory name (`foo/SKILL.md` → `foo`); a frontmatter `name:` either restates it (drift risk) or contradicts it (loader confusion).
 
-The `description` field must cover **what the skill does and when to use it** — the skill picker reads it to decide whether to fire on a given user prompt, so a description that says only "what" loses to one that also says "when". Pattern: "<one-clause what>. Use when <trigger / cadence / context>." See [`winter-workflow:/skills/harness-score/SKILL.md`](https://codeberg.org/pgross/winter-workflow/src/branch/master/skills/harness-score/SKILL.md) for an exemplar — it ends `… Use weekly to track progress or divergence.`
+The `description` field must cover **what the skill does and when to use it** — the skill picker reads it to decide whether to fire on a given user prompt, so a description that says only "what" loses to one that also says "when". Pattern: "<one-clause what>. Use when <trigger / cadence / context>." See [`winter-workflow:/skills/harness-score/SKILL.md`](https://github.com/paul-gross/winter-workflow/src/branch/master/skills/harness-score/SKILL.md) for an exemplar — it ends `… Use weekly to track progress or divergence.`
 
 Body — one short paragraph plus one execute line. Two jobs:
 
@@ -114,7 +114,7 @@ Ask the user to confirm the score.                                     ← "the 
 
 ## Precedent
 
-[`pgross/winter-workflow#9`](https://codeberg.org/pgross/winter-workflow/pulls/9) split `harness-score` along these lines:
+[`pgross/winter-workflow#9`](https://github.com/paul-gross/winter-workflow/pulls/9) split `harness-score` along these lines:
 
 - Thin entry point: `winter-workflow:/skills/harness-score/SKILL.md`
 - Procedure: `winter-workflow:/ai/harness-score/process.md`
