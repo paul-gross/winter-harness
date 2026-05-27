@@ -101,5 +101,6 @@ Direct edits under `projects/` are otherwise discouraged — the source checkout
 - `workspace:/ai/project/contributing.md` — canonical commit format, `Closes #N` footer rules, push policy
 - `workspace:/ai/worktree-ops.md` — full reference for `winter ws init` / `sync` / `connect` / `pull` / `push` / `destroy`, including pinned-repo semantics
 - `./python/linting.md`, `./python/typechecking.md` — pre-push tools for Python repos
+- `../harness/evaluating-harness-changes.md` — pre-push eval for any change that teaches a reviewer agent a new rule
 - `./workflows/upstream-tracking.md` — separate flow for workspaces that customize an upstream framework repo
 - `./CONTRIBUTING.md` — the same rules applied to this repo (`winter-harness`) specifically
