@@ -19,6 +19,7 @@ Three layers, each in its own directory:
 | `python/subprocess.md` | Shelling out — `subprocess.run` / `Popen` conventions and error wrapping |
 | `python/logging.md` | Adding a log call, picking a level, or deciding between logger / reporter / print |
 | `python/module-layout.md` | Adding a `core/` cross-cutting protocol or a `modules/<feature>/internal/` adapter |
+| `python/plugin-author.md` | Authoring a winter TUI plugin — a `plugin.py` that contributes dashboard badges, TUI screens, or keybound actions |
 | `python/linting.md` | Before pushing Python changes, or setting up ruff in a new project |
 | `python/typechecking.md` | Before pushing Python changes, or setting up pyright in a new project |
 | `python/testing.md` | Adding or refactoring tests — pytest layout, conftest scoping, fake-vs-mock guidance |
