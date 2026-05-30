@@ -9,7 +9,7 @@ Paired reviewers: `context-reviewer` reads this directory before reviewing agent
 | `./documentation-governance.md` | Authoring or auditing the public framework docs (docs site, READMEs) — the consumable-extension catalog vs. the Examples list, and the consumable-extension vs. example/reference distinction |
 | `./evaluating-harness-changes.md` | Adding a rule a reviewer agent will enforce — the cold-spawn negative-case eval that closes the loop before push |
 | `./facts-vs-methodology.md` | Building any agentic feature (reviewer, skill, context doc) — deciding where the facts it acts on live (the harness, or the review target's own harness) vs. where the methodology it applies lives (the workflow) |
-| `./principles.md` | Cross-cutting principles for any agent-facing markdown — the *no retrospective framing* rule |
+| `./principles.md` | Cross-cutting principles for any agent-facing markdown file — read before authoring or editing one |
 | `./winter-references.md` | Writing a cross-context path reference, naming an agent / skill / slash command, or reviewing any document that does so |
 | `./writing-documentation.md` | Landing a feature — the "no undocumented feature" invariant: a change to user-facing surface updates the docs that render it, in the same commit |
 | `./writing-extension-index.md` | Writing, editing, or auditing a winter extension's top-level `index.md` — what belongs there vs. what's behind-the-scenes (the file is auto-loaded into every agent context) |

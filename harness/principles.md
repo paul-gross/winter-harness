@@ -31,3 +31,30 @@ State the rule, then the forward-looking reason.
 Each frames the current state as a correction to an invisible prior version. Strip the historical clause; what remains is the convention.
 
 **See also.** [`./writing-readme.md`](./writing-readme.md) §"Voice — common pitfalls" — sibling voice rules (positioning relative to siblings, colon-then-elaboration).
+
+## No manual line wrapping
+
+**Rule.** Don't hard-wrap prose. Put one sentence or one paragraph per physical line and let the editor and renderer soft-wrap it; never reflow prose to a fixed column. Scope is prose only — code fences, tables, and YAML metadata blocks keep their own formatting and are exempt.
+
+**Why.** Hard-wrapping makes a one-word edit reflow every line below it in the paragraph, so the diff buries the real change in reflow churn and the reviewer can't see what actually moved. One sentence per line keeps each edit localized to the line it touches — the diff shows exactly the words that changed, and reviews stay legible.
+
+**Do.**
+
+```
+The reviewer reads the harness conventions before reviewing any agent-facing markdown, so a new rule reaches it through the same discovery chain a future author will traverse.
+Each sentence sits on its own physical line; the editor soft-wraps it to the viewport.
+```
+
+One sentence per physical line — editing a word touches only that line.
+
+**Don't.**
+
+```
+The reviewer reads the harness conventions before reviewing any
+agent-facing markdown, so a new rule reaches it through the same
+discovery chain a future author will traverse. Each sentence is
+hard-wrapped at a fixed column, so editing one word reflows every
+line beneath it.
+```
+
+Prose reflowed to a fixed column — a one-word edit churns every wrapped line below it.
