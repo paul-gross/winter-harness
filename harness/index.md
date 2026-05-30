@@ -11,6 +11,5 @@ Paired reviewer: `context-reviewer` reads this directory before reviewing any ch
 | `./writing-extension-index.md` | Writing, editing, or auditing a winter extension's top-level `index.md` — what belongs there vs. what's behind-the-scenes (the file is auto-loaded into every agent context) |
 | `./writing-skill.md` | Authoring a skill — picking between the self-contained and thin (`SKILL.md` + `ai/<name>/process.md`) shapes |
 | `./principles.md` | Cross-cutting principles for any agent-facing markdown — the *no retrospective framing* rule |
+| `./writing-documentation.md` | Landing a feature — the "no undocumented feature" invariant: a change to user-facing surface updates the docs that render it, in the same commit |
 | `./evaluating-harness-changes.md` | Adding a rule a reviewer agent will enforce — the cold-spawn negative-case eval that closes the loop before push |
-
-This directory is intended to grow with companion docs (e.g. `writing-agent.md`, `writing-claude-md.md`, `writing-ai-doc.md`) as their need surfaces.

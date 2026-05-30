@@ -77,6 +77,8 @@ Rules and canonical config: `./python/linting.md` (ruff) and `./python/typecheck
 
 If the env spans multiple repos, run pre-push checks in every repo that has uncommitted or unpushed changes, not just the one you happened to touch last.
 
+**No undocumented feature.** A change to user-facing surface — a `winter` subcommand or flag, an extension capability, a skill or agent, an env-root file or a convention — carries its documentation delta in the same unit of work, the same way it carries its tests. Before pushing, confirm the canonical `ai/` / `index.md` / convention source for the changed surface is current; if a rendered docs page narrates that surface, confirm it references rather than restates the canonical detail. The full invariant is `../harness/writing-documentation.md`; the workspace's pre-push review gate surfaces a missing-docs delta the same way it surfaces a missing test.
+
 ## After pushing
 
 Fast-forward the source checkout in `projects/<repo>/` after a push lands. `winter ws init <env>` branches new envs from the local `projects/<repo>/master`, so any commit on `origin/master` not reflected there starts the next env behind.
@@ -101,6 +103,7 @@ Direct edits under `projects/` are otherwise discouraged — the source checkout
 - `workspace:/ai/project/contributing.md` — canonical commit format, `Closes #N` footer rules, push policy
 - `workspace:/ai/worktree-ops.md` — full reference for `winter ws init` / `sync` / `connect` / `pull` / `push` / `destroy`, including pinned-repo semantics
 - `./python/linting.md`, `./python/typechecking.md` — pre-push tools for Python repos
+- `../harness/writing-documentation.md` — the "no undocumented feature" invariant the pre-push doc-currency check enforces
 - `../harness/evaluating-harness-changes.md` — pre-push eval for any change that teaches a reviewer agent a new rule
 - `./workflows/upstream-tracking.md` — separate flow for workspaces that customize an upstream framework repo
 - `./CONTRIBUTING.md` — the same rules applied to this repo (`winter-harness`) specifically

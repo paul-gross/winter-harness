@@ -1,0 +1,47 @@
+# Documentation convention
+
+The "no undocumented feature" invariant for the winter ecosystem. A change that adds or alters user-facing surface updates the documentation that describes that surface, in the same unit of work — the expectation the harness already holds for tests, applied to docs.
+
+## Rule
+
+When a change touches **user-facing surface**, the documentation that describes that surface is updated in the same commit. User-facing surface is anything an adopter learns winter from:
+
+- a `winter` subcommand, flag, or `config.toml` key;
+- an extension capability — a hook, a service, a dashboard plugin, an env-root file (`up` / `down` / `status`, `.winter.env`);
+- a skill or agent the workspace installs;
+- a convention an agent is expected to follow.
+
+The unit of work is the commit. A feature commit with no documentation delta is the anti-pattern, the same way a feature commit with no test is. Documented state then only holds or improves as features land — it never silently rots.
+
+## One source per fact
+
+Every concept has exactly one canonical home: the agent-facing markdown already in the ecosystem — `ai/` directories, extension `index.md` files, and the `winter-harness` convention files. That is what an authoring change edits.
+
+If the workspace publishes a rendered documentation site (a `docs/` tree built by a static-site generator), its pages are a **human-facing view over** those canonical sources, not a fork of them. A docs page narrates a concept for an adopter and **links back** to the canonical source for authoritative detail (exact flags, config keys, convention text). It does not re-copy that detail — a second copy drifts the moment the canonical source changes, and the drift is invisible until an adopter hits it.
+
+So "update the docs" has two halves, and a change owes both:
+
+1. **Currency** — the canonical `ai/` / `index.md` / convention source for the changed surface is updated in the same commit.
+2. **Non-duplication** — if the rendered site already narrates that surface, its page is updated to match, and it still references rather than restates the canonical detail.
+
+## Why
+
+A doc that lags its feature is worse than no doc — it tells an adopter something that is no longer true. The only reliable gate is the unit of work: if the docs delta rides in the same commit as the feature, the two cannot diverge. Deferring it to "a docs pass later" guarantees divergence, because the next author has no signal that the gap exists. Tests earn their place in the commit for the same reason; docs are no different.
+
+## Do
+
+- Land the canonical-source edit in the same commit as the feature. A new `winter ws foo` subcommand updates `winter-cli`'s `ai/` reference in that commit; a new extension hook updates the extension's `index.md` in that commit.
+- In a rendered docs page, link to the canonical source for the authoritative detail: *"see [feature-delivery](…) for the full pre-push sequence."*
+- When a feature has no adopter-facing angle yet (internal refactor, scaffolding), say so — the absence of a docs delta is a deliberate, reviewable call, not an oversight.
+
+## Don't
+
+- Ship a `winter` subcommand, extension capability, skill, agent, or convention change with no documentation delta anywhere in the commit.
+- Copy a command's flag list, a `config.toml` schema, or a convention's exact wording into a `docs/` page. Link to the canonical source instead — the copy will drift.
+- Defer the docs update to a follow-up commit "once the feature settles." The follow-up is the divergence.
+
+## See also
+
+- [`../workflows/feature-delivery.md`](../workflows/feature-delivery.md) §Pre-push checks — where the invariant rides the existing pre-push gate.
+- [`./principles.md`](./principles.md) §"No retrospective framing" — the canonical-source-is-current-state rule a docs page must also obey.
+- [`./writing-extension-index.md`](./writing-extension-index.md) — what belongs in an extension `index.md`, the most common canonical source a feature touches.
