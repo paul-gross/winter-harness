@@ -26,3 +26,7 @@ Then run `winter ws init`.
 Provides additional guidance to agents working on functionality within the target of the winter workspace, improving the quality of agent output within winter itself.
 
 See [`index.md`](./index.md) for the file topology.
+
+## License
+
+MIT.
