@@ -32,7 +32,7 @@ When an extension installs an agent, skill, or slash command into a workspace, t
 | Agent | `product-specialist` | `wp-product-specialist` |
 | Skill / command | `/blizzard`, `/thaw`, `/commit`, `/cold-review`, `/harness-review` | `/wf-blizzard`, `/wf-thaw`, ... |
 | Skill / command | `/refine`, `/todo` | `/wp-refine`, `/wp-todo` |
-| Skill / command | `/issue` | `/wc-issue` |
+| Skill / command | `/issue` | `/wg-issue` |
 
 ### What this rule does NOT cover
 
