@@ -45,3 +45,4 @@ A doc that lags its feature is worse than no doc — it tells an adopter somethi
 - [`../workflows/feature-delivery.md`](../workflows/feature-delivery.md) §Pre-push checks — where the invariant rides the existing pre-push gate.
 - [`./principles.md`](./principles.md) §"No retrospective framing" — the canonical-source-is-current-state rule a docs page must also obey.
 - [`./writing-extension-index.md`](./writing-extension-index.md) — what belongs in an extension `index.md`, the most common canonical source a feature touches.
+- [`./documentation-governance.md`](./documentation-governance.md) — the companion contract: which content belongs on which documentation surface, and the consumable-extension vs. example distinction. This file keeps docs current; that one places them.
