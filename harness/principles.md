@@ -58,3 +58,25 @@ line beneath it.
 ```
 
 Prose reflowed to a fixed column — a one-word edit churns every wrapped line below it.
+
+## Point, don't duplicate
+
+**Rule.** When one agent-facing doc points at another file or section — an index or "when to read" table row, a `CLAUDE.md` navigation entry, an extension `index.md` line, a cross-reference — describe the target by what the reader gets there or when to go, not by enumerating or copying its contents. A pointer that restates its target's contents is a second copy of them, and the copy drifts the moment the target changes.
+
+**Why.** Duplicated contents rot silently. An index row that lists the rules inside the file it points at keeps asserting the old list after a rule is added or renamed, and nothing flags the staleness until a reader follows the link and hits the mismatch. A pointer written as an outcome — "read before authoring an agent-facing file" — stays true across every edit to the target, and the reader follows the link for the current detail, which lives in exactly one place.
+
+**Do.**
+
+- Index / "when to read" row described by read-trigger: `| ./principles.md | Cross-cutting principles for any agent-facing markdown file — read before authoring or editing one |`
+- `CLAUDE.md` navigation row described by destination: `| Worktree git operations | ai/worktree-ops.md |` — names where to go, not the steps the target lists.
+
+Describe the destination; let the reader follow the link for the contents.
+
+**Don't.**
+
+- Index row enumerating the target's contents: `| ./principles.md | The no-retrospective-framing, no-manual-line-wrapping, and point-don't-duplicate rules |` — the list must be re-synced by hand every time a principle is added or renamed.
+- An extension `index.md` line or `CLAUDE.md` row that restates the contents of the file it points at, instead of naming the destination — a second copy that drifts.
+
+The enumerated list reads as complete, so the next author trusts it instead of the target — and it is wrong the first time the target changes.
+
+**See also.** [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold negative-case eval to run before shipping this principle, since `context-reviewer` enforces it.
