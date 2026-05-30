@@ -34,6 +34,7 @@ Every field defaults empty — populate only what the plugin contributes:
 |-------|------|-------------|
 | `worktree_repo_decorators` | `list[IWorktreeRepoDecorator]` | badges on a repo's dashboard status row |
 | `environment_decorators` | `list[IEnvironmentDecorator]` | badges on a feature-env header |
+| `detail_panels` | `list[IDetailPanel]` | named info panels in the detail screen (tabs) |
 | `tui_screens` | `list[Any]` | full dashboard screens |
 | `tui_actions` | `list[TuiAction]` | keybound actions, scoped via `ActionScope` |
 | `metadata` | `dict` | free-form plugin metadata |
@@ -58,11 +59,40 @@ class IEnvironmentDecorator(Protocol):
 
 Keep the `<key>` short and plugin-unique (the worked example uses `"wst"`).
 
+## Detail panels (`IDetailPanel`)
+
+Decorators contribute terse badge *strings*; a **detail panel** contributes a whole named pane of read-only info in the detail screen, surfaced as a tab alongside the built-in repo info. The same panels render in **both** the feature-environment detail view (`WorktreeDetailScreen`) and the standalone-repo detail view (`StandaloneDetailScreen`).
+
+```python
+class IDetailPanel(Protocol):
+    name: str   # stable identifier
+    title: str  # tab label
+    def render(self, context: DetailPanelContext) -> object: ...
+```
+
+`render` is called on each detail refresh and returns **rich-console markup** (a `str`) or any Rich renderable — that becomes the panel body. It is handed a `DetailPanelContext` describing the focused repo the screen is showing — the focused worktree in a feature-env view, the standalone repo in a standalone view:
+
+```python
+@dataclasses.dataclass
+class DetailPanelContext:
+    worktree: FeatureWorktree | None = None  # set in a feature-env detail view
+    repo: StandaloneRepository | None = None  # set in a standalone detail view
+```
+
+Exactly one field is set. Branch on whichever you need; treat it as read-only.
+
+Two behaviors the screen guarantees, so author to them:
+
+- **Error isolation** — a panel whose `render` raises shows an error state in *its* tab only; the rest of the screen keeps rendering (same contract as a decorator that raises). You still want to catch and degrade for a useful message rather than a stack-trace string.
+- **No empty tab bar** — with zero contributed panels the detail screen renders exactly the built-in info (no tabs). Tabs appear only once at least one panel is registered.
+
+`render` runs on the dashboard's refresh worker thread and must not touch Textual widgets — return a renderable and let the screen mount it.
+
 ## Pinned public names
 
 These names are the plugin author's API surface — an author typechecks `create_plugin() -> IWinterPlugin` against them. Renaming any of them is a breaking change for external plugins and **must update this doc in the same change** (the analog of `python/protocol-conformance.md` pinning Protocol/adapter pairs):
 
-`IWinterPlugin`, `PluginRegistration`, `IWorktreeRepoDecorator`, `IEnvironmentDecorator`, `TuiAction`, `ActionScope`, and the `create_plugin` / `plugin.py` discovery names.
+`IWinterPlugin`, `PluginRegistration`, `IWorktreeRepoDecorator`, `IEnvironmentDecorator`, `IDetailPanel`, `DetailPanelContext`, `TuiAction`, `ActionScope`, and the `create_plugin` / `plugin.py` discovery names.
 
 ## See also
 
