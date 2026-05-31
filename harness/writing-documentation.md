@@ -17,12 +17,12 @@ The unit of work is the commit. A feature commit with no documentation delta is 
 
 Every concept has exactly one canonical home: the agent-facing markdown already in the ecosystem — `ai/` directories, extension `index.md` files, and the `winter-harness` convention files. That is what an authoring change edits.
 
-If the workspace publishes a rendered documentation site (a `docs/` tree built by a static-site generator), its pages are a **human-facing view over** those canonical sources, not a fork of them. A docs page narrates a concept for an adopter and **links back** to the canonical source for authoritative detail (exact flags, config keys, convention text). It does not re-copy that detail — a second copy drifts the moment the canonical source changes, and the drift is invisible until an adopter hits it.
+If the ecosystem publishes a rendered documentation site, its pages are a **human-facing view over** those canonical sources, not a fork of them. The rendered site may be an in-repo `docs/` tree built by a static-site generator, **or a separate docs-site repo** — for this ecosystem it is the latter: **`winter-docs`**, a standalone repo, not a `docs/` tree inside the code repos (see [`./documentation-governance.md`](./documentation-governance.md) for what it is). Do not conclude "nothing rendered narrates this surface" just because the changed repo has no `docs/` tree; the public site lives in `winter-docs`, so a surface change in `winter` or an extension still owes a `winter-docs` check. A docs page narrates a concept for an adopter and **links back** to the canonical source for authoritative detail (exact flags, config keys, convention text). It does not re-copy that detail — a second copy drifts the moment the canonical source changes, and the drift is invisible until an adopter hits it.
 
 So "update the docs" has two halves, and a change owes both:
 
 1. **Currency** — the canonical `ai/` / `index.md` / convention source for the changed surface is updated in the same commit.
-2. **Non-duplication** — if the rendered site already narrates that surface, its page is updated to match, and it still references rather than restates the canonical detail.
+2. **Non-duplication** — if the rendered site (`winter-docs`) already narrates that surface, its page is updated to match, and it still references rather than restates the canonical detail. `winter-docs` is a separate repo, so this half of the invariant reaches across repos — see [`../workflows/feature-delivery.md`](../workflows/feature-delivery.md) §"Anatomy of a feature delivery" for where it sits in a delivery.
 
 ## Why
 
@@ -31,13 +31,14 @@ A doc that lags its feature is worse than no doc — it tells an adopter somethi
 ## Do
 
 - Land the canonical-source edit in the same commit as the feature. A new `winter ws foo` subcommand updates `winter-cli`'s `ai/` reference in that commit; a new extension hook updates the extension's `index.md` in that commit.
-- In a rendered docs page, link to the canonical source for the authoritative detail: *"see [feature-delivery](…) for the full pre-push sequence."*
+- In a rendered docs page (in `winter-docs`), link to the canonical source for the authoritative detail: *"see [feature-delivery](…) for the full pre-push sequence."*
 - When a feature has no adopter-facing angle yet (internal refactor, scaffolding), say so — the absence of a docs delta is a deliberate, reviewable call, not an oversight.
 
 ## Don't
 
 - Ship a `winter` subcommand, extension capability, skill, agent, or convention change with no documentation delta anywhere in the commit.
-- Copy a command's flag list, a `config.toml` schema, or a convention's exact wording into a `docs/` page. Link to the canonical source instead — the copy will drift.
+- Copy a command's flag list, a `config.toml` schema, or a convention's exact wording into a `winter-docs` page. Link to the canonical source instead — the copy will drift.
+- Conclude no docs update is owed because the changed repo has no in-repo `docs/` tree. The public site is the separate `winter-docs` repo — check it.
 - Defer the docs update to a follow-up commit "once the feature settles." The follow-up is the divergence.
 
 ## See also

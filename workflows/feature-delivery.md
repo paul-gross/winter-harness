@@ -14,6 +14,19 @@ The source checkouts under `<workspace>/projects/<repo>/` are **read-only refere
 
 If unsure which env to work in, ask. Don't pick one silently.
 
+## Anatomy of a feature delivery
+
+A complete delivery touches every surface the change has, not just the code. Treat this as the definition of done — before a change is ready to push, walk the list and confirm each surface is current or deliberately N/A:
+
+- **Code** — the implementation, in the repo that owns the surface.
+- **Tests** — coverage for the new or changed behaviour, in the same unit of work. A feature commit with no test is the anti-pattern.
+- **Canonical `ai/` docs** — the agent-facing source of truth for the surface: the owning repo's `ai/` reference, an extension `index.md`, or a `winter-harness` convention file. This is the *currency* half of the no-undocumented-feature invariant.
+- **Public docs site** — the human-facing documentation site, which for this ecosystem is its **own repo, `winter-docs`** (a separate repo, *not* an in-repo `docs/` tree — see `../harness/documentation-governance.md` for what it is). If any page there narrates the surface you changed, update it to match in the same delivery; it must reference rather than restate the canonical detail. This is the *non-duplication* half of the invariant.
+
+The documentation surfaces span repos: a change in `winter` or an extension that alters user-facing surface usually owes a `winter-docs` edit too, even though `winter-docs` is a separate repo with no commits of its own yet. Because the public site lives in `winter-docs` rather than alongside the code, it is easy to miss — so checking it is an explicit step here, not an afterthought. The full invariant and the canonical-source-vs-rendered-site relationship live in `../harness/writing-documentation.md`; which repo the public site is is recorded in `../harness/documentation-governance.md`.
+
+When a surface genuinely doesn't apply (an internal refactor with no adopter-facing angle, a change no `winter-docs` page narrates), the absence is a deliberate, reviewable call — note it rather than leaving it silent.
+
 ## Pinned repos
 
 All project repos are **pinned** in `.winter/config.toml` — pinned worktrees track `origin/master` and pushes land directly on `master`. No feature branches, no `winter ws connect`. A contributor may add unpinned repos to a local `.winter/config.toml` overlay to test or verify in-progress functionality against a non-canonical upstream; treat those as scratch, not part of the delivery path.
@@ -77,7 +90,7 @@ Rules and canonical config: `./python/linting.md` (ruff) and `./python/typecheck
 
 If the env spans multiple repos, run pre-push checks in every repo that has uncommitted or unpushed changes, not just the one you happened to touch last.
 
-**No undocumented feature.** A change to user-facing surface — a `winter` subcommand or flag, an extension capability, a skill or agent, an env-root file or a convention — carries its documentation delta in the same unit of work, the same way it carries its tests. Before pushing, confirm the canonical `ai/` / `index.md` / convention source for the changed surface is current; if a rendered docs page narrates that surface, confirm it references rather than restates the canonical detail. The full invariant is `../harness/writing-documentation.md`; the workspace's pre-push review gate surfaces a missing-docs delta the same way it surfaces a missing test.
+**No undocumented feature.** A change to user-facing surface — a `winter` subcommand or flag, an extension capability, a skill or agent, an env-root file or a convention — carries its documentation delta in the same unit of work, the same way it carries its tests. Before pushing, walk the *Anatomy of a feature delivery* checklist above: confirm the canonical `ai/` / `index.md` / convention source for the changed surface is current, **and** confirm the public docs site (`winter-docs`) is current — if a page there narrates the changed surface, it is updated and still references rather than restates the canonical detail. The full invariant is `../harness/writing-documentation.md`; a pre-push review gate surfaces a missing-docs delta the same way it surfaces a missing test — but such a gate only sees repos with commits, so the `winter-docs` currency check is yours to run even when `winter-docs` has none.
 
 ## After pushing
 
