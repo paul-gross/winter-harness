@@ -66,6 +66,15 @@ Follow this order — each step builds on the previous:
 6. **Unit test** under `tests/modules/workspace/` (service tests) or `tests/modules/workspace/internal/` (adapter tests) — inject fakes for the Protocols. See `tests/modules/workspace/internal/test_git_ops_service.py` and `tests/modules/workspace/internal/test_write_repo_repository.py` for the fixture pattern.
 7. **Surface the new command** in `workspace:/ai/winter-cli/usage.md` so agents discover it from the docs, not from `--help`.
 
+## Startup latency: lazy imports
+
+`winter` is invoked per-command (e.g. the editor's worktrees picker shells out to `winter ws worktrees --json`), so import cost on the hot path is felt directly. Two seams keep the cold imports off the `winter ws` path; respect both when adding commands.
+
+- **`LazyGroup` (cli.py).** The root group is a `LazyGroup` whose `_LAZY_SUBCOMMANDS` maps each top-level command name to a `"module:attribute"` reference, imported only when that command is dispatched (`--help` still lists them all without importing). **Adding a new top-level command** (a sibling of `ws` / `doctor` / `dashboard`, not a `winter ws foo` subcommand) means adding an entry here — don't `add_command` an eagerly-imported object.
+- **`_lazy()` providers (container.py).** The DI `Container` is built on *every* invocation, so a module-top `import` of a command-specific tree (the `doctor`, `lint`, and `tui`/textual trees) would load it for `winter ws` too. Those providers use `providers.Factory(_lazy("module:Class"), ...)`, which imports the class on first resolution instead. **When binding a provider whose class drags in a heavy tree only one command needs**, wrap it in `_lazy(...)` rather than importing at the top; the workspace/core seams that `ws` itself needs stay eagerly imported.
+
+`cli.py` also sets `sys.pycache_prefix` (a per-user cache dir) instead of `sys.dont_write_bytecode = True`, so the core package keeps a warm `.pyc` cache across runs while plugin extension source trees stay free of `__pycache__/`. The ordering — set before importing `click` / `winter_cli.*` — is load-bearing (hence the `E402` ignore for `cli.py`).
+
 ## Reporters as lifecycle event sinks
 
 Services don't print. They emit lifecycle events to an injected reporter Protocol. Three reporter Protocols exist today:

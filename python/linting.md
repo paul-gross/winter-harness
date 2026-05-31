@@ -70,9 +70,10 @@ Use `[tool.ruff.lint.per-file-ignores]` for genuinely intentional patterns — n
 Real examples from `winter-cli`:
 
 ```toml
-# cli.py sets sys.dont_write_bytecode = True before importing click and
-# winter_cli.* so plugin imports don't scribble __pycache__ into extension
-# source trees — that ordering is load-bearing, so E402 doesn't apply.
+# cli.py sets sys.pycache_prefix before importing click and winter_cli.* so
+# their bytecode lands under the redirected cache (and never scribbles
+# __pycache__ into plugin extension source trees) — that ordering is
+# load-bearing, so E402 doesn't apply.
 "src/winter_cli/cli.py" = ["E402"]
 ```
 
