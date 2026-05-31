@@ -47,5 +47,5 @@ The facts now live in two places and drift; the reviewer cannot be reused agains
 
 - [`./documentation-governance.md`](./documentation-governance.md) — an instance of this rule: the doc-classification facts live in the harness contract; the workflow's documentation-review skill reads them rather than carrying them.
 - [`./writing-documentation.md`](./writing-documentation.md) — the "no undocumented feature" invariant the same `documentation-reviewer` enforces: a fact (docs ride with the feature) held in the harness, not embedded in the reviewer.
-- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold negative-case eval to run before shipping a change to a rule a reviewer enforces, including this one.
+- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping context an agent must act on; its enforcement instance covers a rule a reviewer enforces, including this one.
 - [`./principles.md`](./principles.md) — cross-cutting authoring principles for the markdown these features are written in.

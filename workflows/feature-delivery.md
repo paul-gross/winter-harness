@@ -92,6 +92,8 @@ If the env spans multiple repos, run pre-push checks in every repo that has unco
 
 **No undocumented feature.** A change to user-facing surface — a `winter` subcommand or flag, an extension capability, a skill or agent, an env-root file or a convention — carries its documentation delta in the same unit of work, the same way it carries its tests. Before pushing, walk the *Anatomy of a feature delivery* checklist above: confirm the canonical `ai/` / `index.md` / convention source for the changed surface is current, **and** confirm the public docs site (`winter-docs`) is current — if a page there narrates the changed surface, it is updated and still references rather than restates the canonical detail. The full invariant is `../harness/writing-documentation.md`; a pre-push review gate surfaces a missing-docs delta the same way it surfaces a missing test — but such a gate only sees repos with commits, so the `winter-docs` currency check is yours to run even when `winter-docs` has none.
 
+**Behavioral-expectation eval.** A change that adds context an agent is expected to act on — a new skill, agent, rule, feedforward doc, or routing change — carries a cold eval the same way it carries its tests: declare the behavior it expects and confirm a fresh agent, holding only the discovery chain, both reaches the context and acts on it. Before pushing, run the eval for the changed context and fix what fails — an unreached scenario is a discoverability defect, a reached-but-not-behaved one a content defect. The full procedure, the trigger threshold, and who runs the cold spawn are in `../harness/evaluating-harness-changes.md`.
+
 ## After pushing
 
 Fast-forward the source checkout in `projects/<repo>/` after a push lands. `winter ws init <env>` branches new envs from the local `projects/<repo>/master`, so any commit on `origin/master` not reflected there starts the next env behind.
@@ -117,6 +119,6 @@ Direct edits under `projects/` are otherwise discouraged — the source checkout
 - `workspace:/ai/worktree-ops.md` — full reference for `winter ws init` / `sync` / `connect` / `pull` / `push` / `destroy`, including pinned-repo semantics
 - `./python/linting.md`, `./python/typechecking.md` — pre-push tools for Python repos
 - `../harness/writing-documentation.md` — the "no undocumented feature" invariant the pre-push doc-currency check enforces
-- `../harness/evaluating-harness-changes.md` — pre-push eval for any change that teaches a reviewer agent a new rule
+- `../harness/evaluating-harness-changes.md` — pre-push eval for any change that adds context an agent is expected to act on (new skill, agent, rule, feedforward doc, or routing)
 - `./workflows/upstream-tracking.md` — separate flow for workspaces that customize an upstream framework repo
 - `./CONTRIBUTING.md` — the same rules applied to this repo (`winter-harness`) specifically

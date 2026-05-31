@@ -77,4 +77,4 @@ Listing `winter-harness` and `winter-workflow` in the consumable catalog present
 - [`./writing-documentation.md`](./writing-documentation.md) — the companion docs convention: this file governs *what content belongs on which surface*; that one governs *keeping it current* (the "no undocumented feature" invariant) and the canonical-source-vs-rendered-site relationship.
 - [`./writing-extension-index.md`](./writing-extension-index.md) — what belongs in an extension's auto-loaded `index.md` (the runtime-surface rule this contract points to for that surface).
 - [`./writing-readme.md`](./writing-readme.md) — README structure for the framework and extension docs.
-- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold negative-case eval to run before shipping a change to this contract, since a reviewer enforces it.
+- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping a change to this contract; its enforcement instance applies, since a reviewer enforces it.

@@ -79,4 +79,4 @@ Describe the destination; let the reader follow the link for the contents.
 
 The enumerated list reads as complete, so the next author trusts it instead of the target — and it is wrong the first time the target changes.
 
-**See also.** [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold negative-case eval to run before shipping this principle, since `context-reviewer` enforces it.
+**See also.** [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping this principle; its enforcement instance applies, since `context-reviewer` enforces it.

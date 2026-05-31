@@ -47,3 +47,4 @@ A doc that lags its feature is worse than no doc — it tells an adopter somethi
 - [`./principles.md`](./principles.md) §"No retrospective framing" — the canonical-source-is-current-state rule a docs page must also obey.
 - [`./writing-extension-index.md`](./writing-extension-index.md) — what belongs in an extension `index.md`, the most common canonical source a feature touches.
 - [`./documentation-governance.md`](./documentation-governance.md) — the companion contract: which content belongs on which documentation surface, and the consumable-extension vs. example distinction. This file keeps docs current; that one places them.
+- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval that extends this invariant from currency to efficacy: currency keeps the doc true, that eval proves a cold agent reaches and acts on it.
