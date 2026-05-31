@@ -1,2 +1,10 @@
 name = "winter-harness"
 prefix = "wh"
+
+# winter-harness is the governance layer: it documents conventions for the
+# modules it governs, so its docs reference them directly. Those references are
+# dead pointers unless the governed module is installed alongside, so each is a
+# real dependency. Nothing requires winter-harness back, so this list can grow
+# without forming a cycle. Declare a module here only once a doc actually
+# references it (winter-product is governed but not yet referenced).
+requires = ["winter-github", "winter-service-tmux", "winter-workflow"]

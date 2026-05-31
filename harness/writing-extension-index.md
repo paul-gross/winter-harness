@@ -1,6 +1,6 @@
 # Extension `index.md` convention
 
-Conventions for the top-level `index.md` of a winter extension (the file resolved by the extension's path-notation prefix — e.g. `winter-service-tmux:/index.md`).
+Conventions for the top-level `index.md` of a winter extension (the file resolved by the extension's path-notation prefix — e.g. `winter-harness:/index.md`).
 
 ## Why this matters
 
