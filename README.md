@@ -2,6 +2,8 @@
 
 A [winter](https://github.com/paul-gross/winter) extension curated for the meta [winter-workspace](https://github.com/paul-gross/winter-workspace) itself.
 
+📚 **Documentation:** <https://paul-gross.github.io/winter-docs/>
+
 ## ✨ Features
 
 - **Exemplar for others** — serves as an example harness project, a reference others can pull ideas from when assembling their own harness.

@@ -7,6 +7,7 @@ Conventions for `README.md` files across the winter ecosystem (the framework, ex
 - Title is `# <emoji> <repo-name>` — every winter repo uses ❄️ as the title emoji.
 - Every top-level section (`##`) starts with an emoji, **except `License`**.
 - One-paragraph lede directly under the title: what this is and what it does. No "## Overview" header.
+- A one-line link to the published documentation site directly under the lede, before the first `##`: `📚 **Documentation:** <https://paul-gross.github.io/winter-docs/>` — same label and placement in every ecosystem repo, so the rendered docs are reachable from any front page. (`winter-docs` is that site; its own README links its deployed URL near the top rather than repeating this line.)
 - Sections appear in the order listed below. Skip sections that don't apply rather than rearrange.
 - Link to other ecosystem repos with their full GitHub URL — never bare names.
 
@@ -52,6 +53,8 @@ When an extension needs a section not in the table above, pick an emoji that's:
 
 A [winter](https://github.com/paul-gross/winter) extension that adds product-workflow tooling to a winter workspace: planning conventions, product agents, and the `todo` skill.
 
+📚 **Documentation:** <https://paul-gross.github.io/winter-docs/>
+
 ## ✨ Features
 
 - **Planning conventions** — ...
@@ -82,6 +85,8 @@ MIT.
 
 ```markdown
 # winter-product                              ← missing ❄️
+
+A winter extension that ...                   ← no 📚 docs-site link under the lede
 
 ## Overview                                   ← redundant with the lede paragraph
 
