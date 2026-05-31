@@ -16,8 +16,8 @@ Refer to files in other repos or contexts using a `<context>:<path>` prefix. The
 Notes:
 
 - Extension and standalone notations resolve via the consuming workspace's `CLAUDE.winter.md` block — the on-disk path varies (e.g. `.winter/ext/<name>/` for adopted extensions, `<name>/` for top-level clones). Authors do not encode the on-disk path.
-- Do not write absolute paths or sibling-relative paths (`../winter-product/...`) when crossing a repo or context boundary. Always use a prefix so the reference survives directory and adoption changes.
-- A repo's own files may be referred to with bare relative paths (`./python/error-handling.md` from inside `winter-harness/index.md`). The prefix is only required when *crossing* a context.
+- Do not write absolute paths or sibling-relative paths (`../winter-product/...`) when crossing a repo or context boundary. Always use a prefix so the reference survives directory and adoption changes. <!-- winter-lint:example -->
+- A repo's own files may be referred to with bare relative paths (`./python/error-handling.md` from inside `winter-harness/index.md`). The prefix is only required when *crossing* a context. <!-- winter-lint:example -->
 
 ## Names for agents, skills, and slash commands
 

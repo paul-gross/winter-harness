@@ -1,6 +1,14 @@
 name = "winter-harness"
 prefix = "wh"
 
+# Markdown-convention lint checks contributed to `winter lint` (see
+# harness/markdown-lints.md). The field takes a list, so each check ships as its
+# own script and runs over the selected scope, emitting NDJSON findings.
+lint = [
+    "harness/scripts/lint_path_notation.py",
+    "harness/scripts/lint_doc_references.py",
+]
+
 # winter-harness is the governance layer: it documents conventions for the
 # modules it governs, so its docs reference them directly. Those references are
 # dead pointers unless the governed module is installed alongside, so each is a
