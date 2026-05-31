@@ -42,6 +42,8 @@ Every field defaults empty — populate only what the plugin contributes:
 
 `commands` is part of the dataclass but is **not wired**: click resolves the subcommand before the plugin registry is built (the registry is constructed inside the `_cli_group` callback). Wiring it means building the registry at group-construction time. Until then, ship behavior through the dashboard surfaces above.
 
+A `TuiAction.key` is the action's **default** binding only: users can remap it from `.winter/config.toml` under `[keybindings.bindings]` via the action id `plugin.<name>` (where `<name>` is your `TuiAction.name`), and may even bind it to a multi-key chord. Pick a sensible single-key default and keep `name` stable — it is the user-facing config id. Set `key` as a raw Textual key token (`"e"`, `"ctrl+e"`, `"enter"`); the config-override grammar is documented in `winter:/ai/winter-cli/usage.md#keybindings`.
+
 ## Decorator Protocols
 
 Both are `__call__(status, path) -> None` callables that **mutate** the status object's `extensions` dict in place; whatever you store there is appended to the rendered cell verbatim, joined by spaces.
