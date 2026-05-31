@@ -2,7 +2,7 @@
 
 Cross-cutting principles that apply to every agent-facing markdown file in the winter ecosystem — READMEs, extension `index.md`, skills, agents, `CLAUDE.md`, `ai/` convention docs. Principles that apply to one specific file shape live in their own convention file (`writing-readme.md`, `writing-skill.md`, etc.) and are not duplicated here.
 
-Each principle follows the `Rule` / `Why` / `Do` / `Don't` shape from [`../CONTRIBUTING.md`](../CONTRIBUTING.md).
+Each principle follows a `Rule` / `Why` / `Do` / `Don't` shape.
 
 ## No retrospective framing
 
@@ -29,8 +29,6 @@ State the rule, then the forward-looking reason.
 - *"This used to be a thick `SKILL.md` that delegated to a sibling doc, but we collapsed it."*
 
 Each frames the current state as a correction to an invisible prior version. Strip the historical clause; what remains is the convention.
-
-**See also.** [`./writing-readme.md`](./writing-readme.md) §"Voice — common pitfalls" — sibling voice rules (positioning relative to siblings, colon-then-elaboration).
 
 ## No manual line wrapping
 

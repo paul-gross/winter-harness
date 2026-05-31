@@ -73,8 +73,8 @@ Listing `winter-harness` and `winter-workflow` in the consumable catalog present
 
 ## See also
 
-- [`./facts-vs-methodology.md`](./facts-vs-methodology.md) — the general rule this contract is an instance of: the doc-classification facts live here in the harness; the workflow's documentation-review skill reads them rather than carrying a copy.
+- [`../canon/facts-vs-methodology.md`](../canon/facts-vs-methodology.md) — the general rule this contract is an instance of: the doc-classification facts live here in the harness; the workflow's documentation-review skill reads them rather than carrying a copy.
 - [`./writing-documentation.md`](./writing-documentation.md) — the companion docs convention: this file governs *what content belongs on which surface*; that one governs *keeping it current* (the "no undocumented feature" invariant) and the canonical-source-vs-rendered-site relationship.
 - [`./writing-extension-index.md`](./writing-extension-index.md) — what belongs in an extension's auto-loaded `index.md` (the runtime-surface rule this contract points to for that surface).
 - [`./writing-readme.md`](./writing-readme.md) — README structure for the framework and extension docs.
-- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping a change to this contract; its enforcement instance applies, since a reviewer enforces it.
+- [`../canon/evaluating-harness-changes.md`](../canon/evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping a change to this contract; its enforcement instance applies, since a reviewer enforces it.

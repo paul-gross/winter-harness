@@ -2,15 +2,17 @@
 
 Convention files in this extension live at the **top of the repo**, not under an `ai/` subdirectory. This is deliberate — `winter-harness` *is* the conventions repo, so its content is its public surface, addressed directly via the `winter-harness:` path notation (e.g. `winter-harness:/python/error-handling.md`). Do not look for these files under `ai/`.
 
-Three layers, each in its own directory:
+Four layers, each in its own directory:
 
-- **Meta** (`harness/`) — conventions for writing the agent-facing markdown of the winter ecosystem (READMEs, extension `index.md` files, path references, agent / skill / command names). `harness/index.md` is the entry point.
+- **Canon** (`canon/`) — the universal, enforceable substrate true of every harness, independent of language, project, or workflow. Self-contained: it references only itself. `canon/index.md` is the entry point.
+- **Markdown** (`harness/`) — winter-ecosystem conventions for writing the agent-facing markdown the framework is composed of (READMEs, extension `index.md` files, path references, agent / skill / command names). Rests on the Canon. `harness/index.md` is the entry point.
 - **Code** (`python/`, `exemplars/`) — conventions for writing application code, with reference files showing the expected shape.
 - **Process** (`workflows/`) — conventions for the day-to-day workflows by which changes are delivered.
 
 | File | When to read |
 |------|--------------|
-| `harness/index.md` | Authoring or auditing any agent-facing markdown (README, extension `index.md`, agent, skill, doc) |
+| `canon/index.md` | Reasoning about a universal harness convention — cross-cutting authoring principles, the facts/methodology placement rule, the pre-push harness-change eval, or the four levers |
+| `harness/index.md` | Authoring or auditing winter-ecosystem agent-facing markdown (README, extension `index.md`, agent, skill, doc governance) |
 | `python/domain-modeling.md` | Adding a domain type, refactoring a function with many parameters |
 | `python/error-handling.md` | Writing any function that can fail |
 | `python/dependency-injection.md` | Adding a new service or wiring it into the container |

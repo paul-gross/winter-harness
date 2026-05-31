@@ -4,7 +4,7 @@ When you build an agentic feature — a reviewer agent, a review skill, a contex
 
 ## Rule
 
-- **Facts and invariants live in the harness.** What must be true of the code or docs under review — the conventions, patterns, practices, and invariants a change has to honor — is a *fact*. It lives in a harness doc: this `winter-harness:/` for ecosystem-wide facts, or the **target project's own harness** for invariants that only make sense inside that project.
+- **Facts and invariants live in the harness.** What must be true of the code or docs under review — the conventions, patterns, practices, and invariants a change has to honor — is a *fact*. It lives in a harness doc: a **shared harness** for facts common across projects, or the **target project's own harness** for invariants that only make sense inside that project.
 - **Methodology lives in the workflow.** How a particular workflow conducts a review — which agents it spawns, cold vs. warm, what it sequences, how it categorizes findings — is *methodology*. It is one team's swappable opinion and lives with the reviewer (the agent/skill), not in the harness.
 - **Reviewers derive criteria; they do not embed them.** A reviewer is built to **read** the harness and the target project, discover the invariants and patterns that apply, and review against those. It must not hard-code domain criteria into its own prompt.
 - **Domain-specific invariants stay in the target.** An invariant that only makes sense within the thing under review belongs in that target's harness, reached by reading the target — not carried as a copy inside the reviewer.
@@ -12,18 +12,18 @@ When you build an agentic feature — a reviewer agent, a review skill, a contex
 
 ## Why
 
-A reviewer with the project's invariants baked into its prompt is a fork waiting to happen. Swap the workflow and the facts leave with it; change the project and the reviewer silently reviews against stale criteria. Keeping facts in the harness makes it the single source of truth for *what is true*, and keeps the workflow a swappable opinion about *how to act on it* — so a consumer can replace the entire workflow (it is a personal, interchangeable reference; see [`./documentation-governance.md`](./documentation-governance.md)) and still inherit every fact, and a project can evolve its invariants in one place and have every reviewer pick them up on the next run.
+A reviewer with the project's invariants baked into its prompt is a fork waiting to happen. Swap the workflow and the facts leave with it; change the project and the reviewer silently reviews against stale criteria. Keeping facts in the harness makes it the single source of truth for *what is true*, and keeps the workflow a swappable opinion about *how to act on it* — so a consumer can replace the entire workflow and still inherit every fact, and a project can evolve its invariants in one place and have every reviewer pick them up on the next run.
 
 This is dependency inversion across the harness/workflow seam: the reviewer depends on the *abstraction* (read whatever facts the harness and target publish), never on a *copy* of today's facts.
 
 ## Do
 
-The workflow's documentation-review skill reads `winter-harness:/harness/` and the target project's own conventions, then reviews the target against them:
+The workflow's documentation-review skill reads a shared harness and the target project's own conventions, then reviews the target against them:
 
 ```markdown
 ## Execute
 Spawn `documentation-reviewer` cold against <target>. Instruct it to read the
-governing facts — `winter-harness:/harness/` plus the target project's own
+governing facts — a shared harness plus the target project's own
 harness/conventions — and report violations against what it finds there.
 ```
 
@@ -45,7 +45,5 @@ The facts now live in two places and drift; the reviewer cannot be reused agains
 
 ## See also
 
-- [`./documentation-governance.md`](./documentation-governance.md) — an instance of this rule: the doc-classification facts live in the harness contract; the workflow's documentation-review skill reads them rather than carrying them.
-- [`./writing-documentation.md`](./writing-documentation.md) — the "no undocumented feature" invariant the same `documentation-reviewer` enforces: a fact (docs ride with the feature) held in the harness, not embedded in the reviewer.
 - [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping context an agent must act on; its enforcement instance covers a rule a reviewer enforces, including this one.
 - [`./principles.md`](./principles.md) — cross-cutting authoring principles for the markdown these features are written in.

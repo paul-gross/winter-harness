@@ -64,7 +64,7 @@ Each flavor below is one instance of the same scenario shape.
 **Enforcement** — the negative-case reviewer eval, one instance of the model. A new convention adds a rule `context-reviewer` should catch.
 
 - **cue** — "Review this skill doc." (hand the cold reviewer a fabricated fixture exhibiting the anti-pattern)
-- **via** — the reviewer's `winter-harness:/` lookups → `harness/index.md` → the new convention.
+- **via** — the reviewer's lookups into the published conventions → the convention index → the new convention.
 - **reached** — the report cites the new convention by file path.
 - **behaved** — the report flags the anti-pattern under `## must-fix` or `## consider`.
 - **control** — the same fixture reviewed without the new convention present: no flag.
@@ -149,5 +149,3 @@ Note the run count and the tally alongside the change so the next author knows t
 
 - [`./principles.md`](./principles.md) §"No retrospective framing" — concrete precedent: an enforcement rule whose efficacy depends on a paired reviewer surfacing the anti-pattern from fresh text.
 - [`./index.md`](./index.md) — the discovery chain a cold agent traverses to reach a leaf convention.
-- [`../workflows/feature-delivery.md`](../workflows/feature-delivery.md) §Pre-push checks — the broader pre-push surface for any winter ecosystem repo.
-- [`./writing-documentation.md`](./writing-documentation.md) — the "no undocumented feature" invariant this extends: currency keeps the doc true, this eval proves the doc works.
