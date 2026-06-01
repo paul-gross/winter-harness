@@ -23,9 +23,11 @@ Two corollaries:
 
 ### `skills/<name>/SKILL.md`
 
-Frontmatter is the standard Claude Code skill set — `description`, `model`, `allowed-tools`, and `argument-hint` when the skill takes `$ARGUMENTS`. Nothing shape-specific here; same fields a self-contained skill uses.
+Frontmatter is the standard Claude Code skill set — `description`, `allowed-tools`, and `argument-hint` when the skill takes `$ARGUMENTS`. Nothing shape-specific here; same fields a self-contained skill uses.
 
 Do not declare a `name:` field. The skill's canonical name is the directory name (`foo/SKILL.md` → `foo`); a frontmatter `name:` either restates it (drift risk) or contradicts it (loader confusion).
+
+Do not declare a `model:` field. A skill runs inline in the calling session and inherits its model; pinning a model forces a mid-session switch that invalidates the prompt cache on the way in and out, and on a tiered session (e.g. 1M context) can fail to load the pinned model at all. When a sub-task genuinely needs a different model, spawn a subagent — agent definitions carry their own `model:` — rather than switching the whole session.
 
 The `description` field must cover **what the skill does and when to use it** — the skill picker reads it to decide whether to fire on a given user prompt, so a description that says only "what" loses to one that also says "when". Pattern: "<one-clause what>. Use when <trigger / cadence / context>." See [`winter-workflow:/skills/harness-score/SKILL.md`](https://github.com/paul-gross/winter-workflow/src/branch/master/skills/harness-score/SKILL.md) for an exemplar — it ends `… Use weekly to track progress or divergence.`
 
@@ -73,7 +75,6 @@ A minimal thin `skills/<name>/SKILL.md`:
 ```markdown
 ---
 description: Score the current codebase against the harness maturity matrix and write an HTML report. Use weekly to track progress, or before a planning review.
-model: opus
 allowed-tools: Bash, Read, Glob, Grep, Write
 ---
 
