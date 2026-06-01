@@ -13,6 +13,7 @@ Four layers, each in its own directory:
 |------|--------------|
 | `canon/index.md` | Reasoning about a universal harness convention — cross-cutting authoring principles, the facts/methodology placement rule, the pre-push harness-change eval, or the four levers |
 | `harness/index.md` | Authoring or auditing winter-ecosystem agent-facing markdown (README, extension `index.md`, agent, skill, doc governance) |
+| `python/service-architecture.md` | Before authoring new behavior — the service-based principle the other Python conventions assume: behavior in injected service classes, free functions for pure helpers only |
 | `python/domain-modeling.md` | Adding a domain type, refactoring a function with many parameters |
 | `python/error-handling.md` | Writing any function that can fail |
 | `python/dependency-injection.md` | Adding a new service or wiring it into the container |

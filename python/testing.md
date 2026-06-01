@@ -121,7 +121,7 @@ The fake satisfies the Protocol structurally — pyright/mypy will reject a dive
 
 ## Convention tests
 
-Some Python conventions describe AST-level patterns that `ruff`, `pyright`, and `import-linter` can't reach — Protocol naming (`I`-prefix), the no-whole-Config-injection rule, the no-catch-log-rethrow pattern. Code review and the `code-reviewer` agent catch them probabilistically; promoting each rule to a small pytest file under `tests/conventions/` makes the check deterministic and runs it alongside the rest of `mise run test`.
+Some Python conventions describe AST-level patterns that `ruff`, `pyright`, and `import-linter` can't reach — Protocol naming (`I`-prefix), the no-whole-Config-injection rule, the no-catch-log-rethrow pattern, the service-based-behavior rule. Code review and the `code-reviewer` agent catch them probabilistically; promoting each rule to a small pytest file under `tests/conventions/` makes the check deterministic and runs it alongside the rest of `mise run test`.
 
 ### Layout
 
@@ -131,10 +131,12 @@ tests/conventions/
   test_protocol_naming.py         # one rule per file
   test_no_whole_config_injection.py
   test_no_catch_log_rethrow.py
+  test_service_based_behavior.py
   fixtures/                       # excluded from collection
     violating_protocol_naming.py  # deliberately violates the rule
     violating_no_whole_config_injection.py
     violating_no_catch_log_rethrow.py
+    violating_service_based_behavior.py
 ```
 
 `conftest.py` exposes `walk_src() -> Iterator[(Path, ast.Module)]` that every rule file iterates, plus a module-level `collect_ignore = ["fixtures"]` so the deliberate violations don't surface as suite failures.
