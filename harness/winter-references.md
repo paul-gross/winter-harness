@@ -23,16 +23,16 @@ Notes:
 
 When an extension installs an agent, skill, or slash command into a workspace, the install symlinks add a **workspace-configurable prefix** at the seam (commonly `wf-`, `wp-`, `wc-` — set per workspace in `.winter/config.toml`). The prefix is not part of the canonical name and is not guaranteed across deployments — a different workspace may set a different prefix or none at all.
 
-**Rule:** in extension documentation, refer to agents, skills, and slash commands by their **canonical, unprefixed name**. Examples:
+**Rule:** in extension documentation, refer to agents, skills, and slash commands by their **canonical, unprefixed name — with no leading slash**. A slash form reads as a typeable command, and the typeable command always carries the workspace prefix: `/commit` is not invocable in any workspace, so writing it helps no one. Write "the `commit` skill" and let the reader (or the executing agent, via its installed-skills list) resolve the locally installed name. The slash belongs only where the literal typed command is known — workspace-level docs and README typing examples (see below) — and to unprefixed workspace-core skills (e.g. `/ws-push`), whose typed form is their canonical name. Examples:
 
-| Kind | Canonical name | Common installed name |
+| Kind | Canonical name | Common installed/typed name |
 |------|---------------|----------------------|
 | Agent | `agentic-development-manager` | `wf-agentic-development-manager` |
 | Agent | `developer`, `architect`, `code-reviewer`, `harness-reviewer` | `wf-developer`, `wf-architect`, ... |
 | Agent | `product-specialist` | `wp-product-specialist` |
-| Skill / command | `/blizzard`, `/thaw`, `/commit`, `/cold-review`, `/harness-review` | `/wf-blizzard`, `/wf-thaw`, ... |
-| Skill / command | `/refine`, `/todo` | `/wp-refine`, `/wp-todo` |
-| Skill / command | `/issue` | `/wg-issue` |
+| Skill / command | `blizzard`, `thaw`, `commit`, `cold-review`, `harness-review` | `/wf-blizzard`, `/wf-thaw`, ... |
+| Skill / command | `refine`, `todo` | `/wp-refine`, `/wp-todo` |
+| Skill / command | `issue` | `/wg-issue` |
 
 ### What this rule does NOT cover
 

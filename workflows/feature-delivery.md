@@ -72,7 +72,7 @@ Use Conventional Commits with a scope, and include a `Closes #N` footer for any 
 
 Full rules — type vocabulary, scope choice, `Closes` / `Fixes` / `Refs` keywords, cross-repo `owner/repo#N` form — live in `workspace:/ai/project/contributing.md`. Don't restate them here; read that doc when drafting a commit message.
 
-The `/commit` skill (from `winter-workflow`) generates commits in this exact format from the staged diff and the current conversation. Prefer it over hand-writing messages.
+The `commit` skill (from `winter-workflow`) generates commits in this exact format from the staged diff and the current conversation. Prefer it over hand-writing messages.
 
 ## Pre-push checks
 

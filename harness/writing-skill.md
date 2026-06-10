@@ -6,7 +6,7 @@ How to author a skill across the winter ecosystem. Skills come in two shapes; th
 
 **Self-contained.** The entire procedure lives in `SKILL.md`. The body is the procedure. The only way to execute it is to invoke the slash command. Examples: `winter-workflow:/skills/blizzard/SKILL.md`, `winter-workflow:/skills/thaw/SKILL.md`, `winter-workflow:/skills/commit/SKILL.md`.
 
-**Thin SKILL.md backed by an `ai/` procedure doc.** `SKILL.md` is a small entry point that names an `ai/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `ai/<name>/process.md`. Other agents (a `/blizzard` snowflake, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/ai/harness-score/process.md`.
+**Thin SKILL.md backed by an `ai/` procedure doc.** `SKILL.md` is a small entry point that names an `ai/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `ai/<name>/process.md`. Other agents (a `blizzard` snowflake, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/ai/harness-score/process.md`.
 
 ## When to pick the thin shape
 
