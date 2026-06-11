@@ -47,7 +47,7 @@ multiple envs can run side-by-side without port conflicts.
 
 ## Feature environment setup steps
 
-This extension needs `workspace:/ai/project/workflow.sh`. Walk the user
+This extension needs `workspace:/ai/project/setup-tmux.sh`. Walk the user
 through [ai/workflow-setup.md](./ai/workflow-setup.md) to generate it.
 
 ## Service management rules
@@ -55,7 +55,7 @@ through [ai/workflow-setup.md](./ai/workflow-setup.md) to generate it.
 - Never start services as background processes — always go through `./up`.
 - Never kill services directly — always `./down`.
 - Read pane output with `tmux capture-pane` against the targets in
-  `workspace:/ai/project/workflow.md`.
+  `workspace:/ai/project/setup-tmux.md`.
 ```
 
 Every section is something the user (or an agent acting for the user) must know to operate the workspace correctly.
