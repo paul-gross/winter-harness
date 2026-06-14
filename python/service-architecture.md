@@ -4,6 +4,17 @@ Winter code is **service-based**: behavior lives in service classes whose collab
 
 This is the principle the other Python conventions are facets of. Dependency injection (`python/dependency-injection.md`) is *how* a service receives its collaborators; module layout (`python/module-layout.md`) is *where* the service and its Protocol seam live; the repository pattern (`python/repository-pattern.md`) is the I/O-owning service shape. Read this first — it names the shape those three assume.
 
+## Core tenet: interchangeability
+
+**Adapters behind a Protocol seam are interchangeable, and the seam keeps them that way.** Any code that drives a swappable backend — a service orchestrator, a git provider, a config source — depends on a **winter-defined, stable contract**: a fixed, documented set of operations and options that *winter* owns, not the backend. Swapping the adapter behind the seam must not change what callers can ask for. This is the *why* behind the protocol-seam pattern the other conventions describe: the seam exists so the thing behind it can be replaced.
+
+**Define the contract; never pass arguments through.** A command surface over a swappable backend exposes exactly the options winter defines and maps them onto whatever adapter is plugged in. It does not forward arbitrary caller arguments down to the backend. Pass-through couples every caller to one backend's flag vocabulary — the moment a caller passes a backend-specific flag, swapping the backend breaks them, and the seam stops being a seam. The contract does exactly what winter defines, and each adapter is responsible for realizing that contract on its own terms.
+
+- **Do.** `winter service up <env>` exposes winter's fixed action set (`up` / `down` / `status` / `restart` / `logs`); each orchestrator adapter implements those actions. A different orchestrator slots in without changing the command surface.
+- **Don't.** A `winter service <action> <env> -- <raw backend args>` pass-through that forwards tmux-specific flags to the tmux adapter — callers that learned the tmux flags can't move to another orchestrator, so the orchestrators are no longer interchangeable.
+
+The contract is the abstraction the Dependency Inversion section below depends on: callers depend on winter's operation set (the Protocol), never on a concrete backend's argument surface. See `python/dependency-injection.md` for how the chosen adapter is wired and `python/protocol-conformance.md` for pinning each adapter to the seam it must satisfy.
+
 ## Rule
 
 - **Behavior belongs in a class.** Anything that orchestrates collaborators — calls a repository, drives another service, picks an adapter, emits to a reporter — is a method on a service class. The class declares its collaborators in `__init__` and receives them via the container.
@@ -63,4 +74,4 @@ In winter-cli, this rule is checked at `mise run test` time by `winter:tools/win
 - `python/module-layout.md` — where the service, its Protocol seam, and its adapter live.
 - `python/repository-pattern.md` — the service that owns I/O against one external system.
 - `python/protocol-conformance.md` — pinning the Protocol/adapter seam each service depends on.
-- `exemplars/python/cli-architecture.md` — the principle applied end-to-end in winter-cli.
+- `architecture/winter-cli.md` — the principle applied end-to-end in winter-cli.

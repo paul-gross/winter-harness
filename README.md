@@ -9,7 +9,8 @@ A [winter](https://github.com/paul-gross/winter) extension curated for the meta 
 - **Exemplar for others** — serves as an example harness project, a reference others can pull ideas from when assembling their own harness.
 - **Python conventions** (`python/`) — an opinionated guide for developing Python applications.
 - **Agent-facing markdown conventions** (`harness/`) — an opinionated guide for writing the markdown that agents read across the winter ecosystem.
-- **Canonical exemplars** (`exemplars/python/`) — reference `.py` files showing the expected shape of recurring patterns (repository class, domain object) plus `cli-architecture.md`, the live tour of how the conventions are applied in winter-cli today.
+- **Canonical exemplars** (`exemplars/python/`) — reference `.py` files showing the expected shape of recurring patterns (repository class, domain object).
+- **Architecture** (`architecture/`) — cross-cutting and application-specific architecture concerns, e.g. `architecture/winter-cli.md`, the live tour of how the conventions are applied in winter-cli today; `architecture/index.md` is the entry point.
 
 ## 🚀 Installation
 

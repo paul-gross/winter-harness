@@ -6,7 +6,7 @@ Four layers, each in its own directory:
 
 - **Canon** (`canon/`) — the universal, enforceable substrate true of every harness, independent of language, project, or workflow. Self-contained: it references only itself. `canon/index.md` is the entry point.
 - **Markdown** (`harness/`) — winter-ecosystem conventions for writing the agent-facing markdown the framework is composed of (READMEs, extension `index.md` files, path references, agent / skill / command names). Rests on the Canon. `harness/index.md` is the entry point.
-- **Code** (`python/`, `exemplars/`) — conventions for writing application code, with reference files showing the expected shape.
+- **Code** (`python/`, `exemplars/`, `architecture/`) — conventions for writing application code: `python/` for generic language-level rules, `exemplars/` for reference shapes in isolation, and `architecture/` for cross-cutting and application-specific architecture concerns. `architecture/index.md` is the entry point — read it before changing the code of any winter application.
 - **Process** (`workflows/`) — conventions for the day-to-day workflows by which changes are delivered.
 
 | File | When to read |
@@ -27,7 +27,7 @@ Four layers, each in its own directory:
 | `python/typechecking.md` | Before pushing Python changes, or setting up pyright in a new project |
 | `python/testing.md` | Adding or refactoring tests — pytest layout, conftest scoping, fake-vs-mock guidance |
 | `exemplars/python/repo_pattern.py` | Reference for the repository pattern (I-prefix Protocol seam + `internal/` adapter + factory-injected errors) |
-| `exemplars/python/cli-architecture.md` | Guided tour of how the conventions are applied in winter-cli — read before adding a `winter ws foo` subcommand |
+| `architecture/index.md` | Before changing the code of any winter application — routes to the architecture doc for the surface you're touching |
 | `workflows/feature-delivery.md` | Day-to-day flow for landing a change: worktree model, branch naming, push target, rebase rule, pre-push checks |
 | `workflows/upstream-tracking.md` | When a workspace customizes an upstream framework repo — dual-remote layout, single-commit-on-top, sync via rebase + force-with-lease |
 | `CONTRIBUTING.md` | Before pushing — commit format, voice rules, link/reference validation |

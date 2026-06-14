@@ -1,8 +1,8 @@
-# Worked example: the `winter` CLI
+# winter-cli architecture
 
-A guided tour of how the generic conventions in `python/*.md` get applied in the real `winter` (winter-cli) codebase. Read this when you're about to add or modify a `winter` subcommand and want to see the conventions in situ before diving in.
+The architecture of the real `winter` (winter-cli) codebase — how the generic conventions in `../python/*.md` are realized here, plus the CLI's own argument conventions. Read this before adding or modifying a `winter` subcommand, so you build with the existing structure instead of reverse-engineering it.
 
-This is a **reference**, not a CLAUDE.md — it is not auto-loaded. Open it on demand from `winter-harness:/exemplars/python/cli-architecture.md`.
+This is a **reference**, not a CLAUDE.md — it is not auto-loaded. Open it on demand from `winter-harness:/architecture/winter-cli.md` (reached via `architecture/index.md`).
 
 ## Layout
 
@@ -25,7 +25,7 @@ src/winter_cli/
 │   │   ├── handlers/              # CLI-shaped output formatting + arg parsing
 │   │   │   ├── init_handler.py        # `winter ws init`
 │   │   │   ├── destroy_handler.py     # `winter ws destroy`
-│   │   │   ├── workspace_handler.py   # `winter ws {list,status,sync,connect,disconnect,checkout,fetch,pull,push,prune,index,diff}`
+│   │   │   ├── workspace_handler.py   # `winter ws {list,status,connect,disconnect,checkout,fetch,pull,push,prune,index,diff}`
 │   │   │   └── repo_handler.py        # `winter repo {list,add,remove}`
 │   │   ├── *_service.py           # domain orchestration (init / destroy / workspace (omnibus) / prune)
 │   │   ├── *_reporter.py          # stream / json reporters for lifecycle events
@@ -54,6 +54,24 @@ The layout instantiates the `winter-harness:/python/*.md` rules at once:
 `modules/workspace/` outgrew a single `handler.py` and split into a `handlers/` subpackage organized by CLI surface (init, destroy, the workspace omnibus, repo). The split rule: keep a flat `handler.py` while a feature has one cohesive handler; promote to `handlers/<surface>_handler.py` files when distinct CLI surfaces start sharing little code. Re-export the handler classes from `handlers/__init__.py` so callers import from the subpackage root.
 
 `python/module-layout.md` shows the flat form as the default. This exemplar is the canonical reference for the split form.
+
+## Argument conventions
+
+Read this before designing a new command's signature — the existing `winter ws` family is uniform, and a new command joins it.
+
+**Target selection is a positional, segment-aware glob `PATTERN` over `<env>/<repo>`.** Every command that acts on worktrees (`status`, `pull`, `push`, `merge`, `fetch`, `diff`, …) takes its targets as positional `PATTERNS`, not a flag. The glob is segment-aware: `*` does not cross `/`, and a bare env name with no `/` is treated as `<env>/*`.
+
+```
+winter ws status                 # all environments
+winter ws status alpha           # alpha's worktrees (== alpha/*)
+winter ws status alpha/winter    # one specific worktree
+winter ws status '*/winter'      # every env's winter worktree
+winter ws status '*/*'           # every env's every worktree (explicit)
+```
+
+A new command that selects worktrees **reuses this positional `PATTERNS` form** — it does not introduce a `--env NAME` or `--name` flag for a target the positional pattern already expresses. The pattern already covers single-env, single-worktree, and cross-env selection; a parallel flag fractures the surface and can't express `*/winter`. Match `winter ws status` / `winter ws pull` (`[PATTERNS]...`, defaulting to all) for read-shaped commands; match `winter ws merge` (a leading required positional like `SOURCE_REF`, then `[PATTERNS]...` with no implicit "all" default) when an action needs an explicit target.
+
+Reserve `--flags` for *modifiers* on the selected set, not for selection itself — `--json`, `--standalone`, `--all`, `--exclude-pinned`, `--rebase`. The positional answers *which worktrees*; flags answer *how to act on them*.
 
 ## Adding a new `winter ws foo` subcommand
 

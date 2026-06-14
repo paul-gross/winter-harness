@@ -32,7 +32,7 @@ modules/<feature>/
 └── …
 ```
 
-`exemplars/python/cli-architecture.md` walks through `modules/workspace/handlers/` as the canonical reference for this split.
+`architecture/winter-cli.md` walks through `modules/workspace/handlers/` as the canonical reference for this split.
 
 ## Rules
 

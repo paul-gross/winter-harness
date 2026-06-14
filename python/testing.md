@@ -169,5 +169,5 @@ The shortest path is to copy `test_protocol_naming.py` and adapt it. The contrac
 - `python/dependency-injection.md` — why services receive Protocols, not concretes.
 - `python/repository-pattern.md` — the I-prefix Protocol seam that makes fakes cheap to write.
 - `exemplars/python/repo_pattern.py` — canonical `IReadFooRepository` / `IWriteFooRepository` shape.
-- `exemplars/python/cli-architecture.md` — testing-pattern section, including the "lift to conftest" rule.
+- `architecture/winter-cli.md` — testing-pattern section, including the "lift to conftest" rule.
 - `winter/tools/winter-cli/tests/` — the working reference for all patterns above. Start at `tests/conftest.py` and `tests/modules/workspace/test_init_service.py`.

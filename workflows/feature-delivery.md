@@ -10,7 +10,7 @@ All code changes happen inside a **feature environment worktree**, at:
 
 The `<env>` is a feature environment (Greek letters by convention — `alpha`, `beta`, … — but any name works). Each env contains one git worktree per project repo, all set up by `winter ws init <env>`.
 
-The source checkouts under `<workspace>/projects/<repo>/` are **read-only references** — they exist so `git worktree add` has somewhere to share its object database. Never edit files under `projects/` directly; the changes won't appear in any feature env and will be lost the next time `winter ws sync` fast-forwards the checkout.
+The source checkouts under `<workspace>/projects/<repo>/` are **read-only references** — they exist so `git worktree add` has somewhere to share its object database. Never edit files under `projects/` directly; the changes won't appear in any feature env and will be lost the next time `winter ws fetch` fast-forwards the checkout.
 
 If unsure which env to work in, ask. Don't pick one silently.
 
@@ -58,7 +58,7 @@ git rebase origin/master        # single repo: from inside <env>/<repo>/
 
 `winter ws merge` does an ff-only merge by default and does not hit the remote, so it's safe to fan across multiple envs in a single call (`winter ws merge master alpha beta gamma`) without redundant per-env fetches. Pass `--merge` for a 3-way fallback when ff-only would refuse. Once local commits exist, prefer `git rebase origin/master` in the affected repo so the new work sits cleanly on the tip and stays one commit per logical change.
 
-`winter ws sync <env>` bundles fetch + ff-merge + source-checkout FF for one env — use it when you want all three in a single command and don't mind the per-env remote call.
+`winter ws pull <env>` fetches and ff-integrates every worktree in one env in a single per-env call — and because it fetches, it fast-forwards the source checkouts too.
 
 If `git rebase` reports conflicts, resolve them in the worktree with raw git — `winter` does not own conflict resolution.
 
@@ -73,6 +73,15 @@ Use Conventional Commits with a scope, and include a `Closes #N` footer for any 
 Full rules — type vocabulary, scope choice, `Closes` / `Fixes` / `Refs` keywords, cross-repo `owner/repo#N` form — live in `workspace:/ai/project/contributing.md`. Don't restate them here; read that doc when drafting a commit message.
 
 The `commit` skill (from `winter-workflow`) generates commits in this exact format from the staged diff and the current conversation. Prefer it over hand-writing messages.
+
+### How we commit: one unit of work, one commit
+
+A branch reaches push time as **one commit per landed unit of work** (see *Linear history* above). What counts as "a unit" depends on how the work arrived:
+
+- **Ad-hoc work** (conversational, no tracking issue) — keep rolling into a **single** commit. When the user gives follow-up feedback on unpushed work, `git commit --amend` or squash it into the existing commit; don't stack a second `feedback revisions` commit on top.
+- **Work-item / issue work** — **one commit per tracked work item**, each carrying its own issue-closing footer (`Closes #N` or the tracker's equivalent). Don't fold several work items into one commit, and don't split one across several. When a single env touches multiple work items, land them as separate commits.
+
+If unpushed work has drifted to more than one commit for its unit, squash before pushing (`git rebase -i origin/master`).
 
 ## Pre-push checks
 
@@ -94,15 +103,24 @@ If the env spans multiple repos, run pre-push checks in every repo that has unco
 
 **Behavioral-expectation eval.** A change that adds context an agent is expected to act on — a new skill, agent, rule, feedforward doc, or routing change — carries a cold eval the same way it carries its tests: declare the behavior it expects and confirm a fresh agent, holding only the discovery chain, both reaches the context and acts on it. Before pushing, run the eval for the changed context and fix what fails — an unreached scenario is a discoverability defect, a reached-but-not-behaved one a content defect. The full procedure, the trigger threshold, and who runs the cold spawn are in `../canon/evaluating-harness-changes.md`.
 
+## Verify against the real environment
+
+Automated tests are necessary but not sufficient. Before a change is done, **exercise it through the environment's real entrypoints** — the installed `winter` CLI and any env-root entrypoints an extension installs that a user would actually invoke — not throwaway stubs wired straight at the in-progress worktree. A green suite over a stub proves the code compiles, not that the wired-up system runs it: an env left on the old install executes the old code no matter what the worktree says. This is what "tested" means here, and it is the failure mode behind a change that "passed" yet broke the moment the user ran it for real. State in the delivery summary **which wiring you actually exercised**, and call out anything verified only against a stub.
+
+The real entrypoints resolve to *installed* code by default, so two mechanisms point them at the in-progress worktree:
+
+- **The CLI** — the `winter` launcher takes a `--winter=PATH` override as its **first** argument, where `PATH` is an env (or any dir) containing `tools/winter-cli`; the launcher runs that tree's CLI against the current workspace (e.g. `winter --winter=./alpha/winter ws status`). It is per-invocation — no restore step — and fails fast on a missing path or one without `tools/winter-cli`.
+- **Extension-installed entrypoints** — entrypoints an extension installs at the env root (commonly symlinks) resolve to the *installed* extension code, not the worktree. winter has no flag to override these; the procedure to repoint one at a worktree and restore it after is owned by the installing extension — see that extension's docs. Restoring is mandatory: a left-over override silently makes every later call in that env run worktree code.
+
 ## After pushing
 
 Fast-forward the source checkout in `projects/<repo>/` after a push lands. `winter ws init <env>` branches new envs from the local `projects/<repo>/master`, so any commit on `origin/master` not reflected there starts the next env behind.
 
 ```bash
-winter ws sync <env>    # fast-forwards every projects/<repo>/master to origin/master as a side effect
+winter ws fetch <env>    # refreshes remote refs and fast-forwards every projects/<repo>/master to origin/master
 ```
 
-Run it against the env you just pushed from — the worktrees are at master (no commits to integrate), and the side effect catches every source checkout up. Full reference: `workspace:/ai/worktree-ops.md`.
+Run it against the env you just pushed from — `winter ws fetch` fast-forwards every source checkout to `origin/master`; the feature worktrees are left untouched. Full reference: `workspace:/ai/worktree-ops.md`.
 
 For single-repo work, the raw equivalent is:
 
@@ -112,6 +130,16 @@ git -C ./projects/<repo>/ merge --ff-only origin/master
 ```
 
 Direct edits under `projects/` are otherwise discouraged — the source checkouts are read-only references (see *Where work happens*). This fast-forward is the narrow exception.
+
+## Delivery sequence — end to end
+
+The sections above are organized by topic; this is the ordered walkthrough that sequences them once the change is built and its surfaces are current (see *Anatomy of a feature delivery*). Each step defers to its detailed section — follow the link for the commands and rules.
+
+1. **Rebase onto the latest `origin/master`** so history stays linear — see *Linear history — always rebase, never merge* for the merge-vs-pull-vs-rebase choice (`git rebase origin/master` once you have local commits).
+2. **Ensure the pre-push gate has run on this change-set — once.** Run the gates in *Pre-push checks* and the `pre-push` review skill (from `winter-workflow`), but only if they haven't already run since your last change. The step is idempotent: don't re-run a gate that's still green.
+3. **Push to `origin/master`** with explicit user sign-off — see *Push target*.
+4. **Catch up the source checkouts** for the env you pushed from — see *After pushing* (`winter ws fetch <env>`; this fast-forwards the read-only checkouts, distinct from the step-1 worktree rebase).
+5. **If you delivered to a repo the workspace tracks as an upstream framework, re-sync the workspace.** When the change landed in a repo the workspace itself consumes upstream — for this workspace, `winter` — that repo's `master` has advanced and the workspace repo now sits behind its upstream tip. Replay the workspace's single customization commit onto the new tip per `./upstream-tracking.md` (*Sync flow*: fetch the upstream remote, rebase, force-with-lease — with sign-off). Skip this step when the delivered repo isn't one the workspace tracks upstream (most extension and standalone changes).
 
 ## See also
 

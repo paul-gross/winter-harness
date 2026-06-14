@@ -25,6 +25,10 @@ Out of scope — these belong elsewhere:
 - **Installation steps.** Those belong in `README.md` (see `winter-harness:/harness/writing-readme.md`).
 - **Setup walkthroughs.** Those belong in `ai/` (e.g. `ai/workflow-setup.md`) and are referenced *from* `index.md` with a one-line pointer.
 
+## Structure
+
+How an `index.md` is shaped for discovery — when to split it into a hub plus per-topic files, and how to write its routing rows as read-triggers rather than contents summaries — is the canon's [`../canon/progressive-disclosure.md`](../canon/progressive-disclosure.md). This file does not restate it. The extension-specific overlay is scope: an extension `index.md` is the hub for the extension's *workspace-runtime* surface only (the Rule above), so its routing rows point at the deeper `ai/<topic>.md` walkthroughs and project-config files an operator descends to, not at the behind-the-scenes detail.
+
 ## Where the rejected content goes
 
 If you're tempted to add a section that's out-of-scope per the rule above:
