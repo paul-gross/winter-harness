@@ -44,13 +44,15 @@ The row inventories the target's contents; it must be re-synced by hand every ti
 
 ## Tables for a set of options
 
-**Rule.** Present a set of parallel choices — files to route to, commands to pick among, modes to compare — as a table, not as sequential prose. One column carries the choice (the link, the command, the option), the next carries the discriminator that tells the reader which one is theirs.
+**Rule.** Present a set of parallel choices — files to route to, commands to pick among, modes to compare — as a table, not as sequential prose, and put the **choice column first**. The leftmost column carries the thing the reader is selecting (the link/destination, the command, the option); the column(s) to its right carry the discriminator that tells the reader which row is theirs. When the choice is a file reference — a routing table — those links form a single scannable left edge the eye runs straight down.
 
-**Why.** A table lets an agent scan one column for the row that matches its need and stop, reading one row instead of the whole block. Sequential prose forces a linear read of every option to find the relevant one, and buries the discriminator that distinguishes them inside sentences. The table makes the parallelism structural, so the reader sees the full option set at a glance and the discriminator sits where it can be compared across rows.
+**Why.** A table lets an agent scan one column for the row that matches its need and stop, reading one row instead of the whole block. Sequential prose forces a linear read of every option to find the relevant one, and buries the discriminator that distinguishes them inside sentences. Leading with the choice column is what makes that scan fast: the destinations line up on the left edge, so the reader runs down one column to find their row. Lead with the discriminator instead and the links scatter into a ragged right column the reader has to hunt across, one row at a time — the linear read the table was meant to replace.
 
-**Do.** A routing table whose rows are `| destination | when to read |`, or a command table whose rows are `| command | usage | purpose |` — the reader scans the discriminator column and descends one row.
+**Do.** A routing table whose rows are `| destination | when to read |` (the file link first), or a command table whose rows are `| command | usage | purpose |` — the choice on the left, the reader scanning the discriminator column to its right and descending one row.
 
-**Don't.** A paragraph that names each option in turn — "For X, read A. For Y, read B. For Z, read C." — which the reader must consume whole to find their case.
+**Don't.** Invert the columns — `| when to read | destination |` — stranding the links on the right where they no longer line up. And don't fall back to a paragraph that names each option in turn ("For X, read A. For Y, read B. For Z, read C."), which the reader must consume whole to find their case.
+
+**Scope.** This binds tables that exist **to route** — a choice per row, the row's point being "pick this / go here." It does not bind a table that merely *contains* a link incidentally — a feature matrix, a comparison, a schema table — where the link is one attribute among several and no column is "the choice." When unsure, ask what the table is *for*: if a reader consults it to decide which row to act on or which file to open next, lead with that choice.
 
 ## Indexes warrant more scrutiny than leaves
 
