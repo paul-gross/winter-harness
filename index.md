@@ -28,7 +28,7 @@ Four layers, each in its own directory:
 | `python/testing.md` | Adding or refactoring tests — pytest layout, conftest scoping, fake-vs-mock guidance |
 | `exemplars/python/repo_pattern.py` | Reference for the repository pattern (I-prefix Protocol seam + `internal/` adapter + factory-injected errors) |
 | `architecture/index.md` | Before changing the code of any winter application — routes to the architecture doc for the surface you're touching |
-| `workflows/feature-delivery.md` | Day-to-day flow for landing a change: worktree model, branch naming, push target, rebase rule, pre-push checks |
+| `workflows/feature-delivery.md` | Decomposing a feature into phases — walk its surface checklist so each surface a change owes is a planned phase, not a pre-push catch; and the day-to-day landing flow: worktree model, branch naming, push target, rebase rule, pre-push checks |
 | `workflows/upstream-tracking.md` | When a workspace customizes an upstream framework repo — dual-remote layout, single-commit-on-top, sync via rebase + force-with-lease |
 | `CONTRIBUTING.md` | Before pushing — commit format, voice rules, link/reference validation |
 

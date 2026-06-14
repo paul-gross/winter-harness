@@ -22,7 +22,7 @@ If the ecosystem publishes a rendered documentation site, its pages are a **huma
 So "update the docs" has two halves, and a change owes both:
 
 1. **Currency** — the canonical `ai/` / `index.md` / convention source for the changed surface is updated in the same commit.
-2. **Non-duplication** — if the rendered site (`winter-docs`) already narrates that surface, its page is updated to match, and it still references rather than restates the canonical detail. `winter-docs` is a separate repo, so this half of the invariant reaches across repos — see [`../workflows/feature-delivery.md`](../workflows/feature-delivery.md) §"Anatomy of a feature delivery" for where it sits in a delivery.
+2. **Non-duplication** — if the rendered site (`winter-docs`) already narrates that surface, its page is updated to match, and it still references rather than restates the canonical detail. `winter-docs` is a separate repo, so this half of the invariant reaches across repos — see [`../workflows/feature-delivery.md`](../workflows/feature-delivery.md) §"Anatomy of feature delivery" for where it sits in a delivery.
 
 ## No negative space
 
