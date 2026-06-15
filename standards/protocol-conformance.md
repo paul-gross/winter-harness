@@ -57,6 +57,6 @@ A runtime test using `inspect.signature` equality (the previous approach in this
 
 ## See also
 
-- `python/module-layout.md` — the Protocol-at-feature-root + adapter-in-`internal/` layout these sentinels reinforce.
-- `python/dependency-injection.md` — the DI container that launders Protocol types and motivates the sentinel.
+- `../architecture/module-layout.md` — the Protocol-at-feature-root + adapter-in-`internal/` layout these sentinels reinforce.
+- `../architecture/dependency-injection.md` — the DI container that launders Protocol types and motivates the sentinel.
 - `exemplars/python/repo_pattern.py` — canonical Protocol/adapter file with the sentinel in place.

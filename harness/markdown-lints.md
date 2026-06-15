@@ -24,7 +24,7 @@ It fires on five unambiguous shapes and leaves everything else alone:
 | `winter-<name>/…` | bare repo name, no context prefix | `winter-<name>:/…` |
 | `/home/…`, `/Users/…`, `/root/…` | machine-absolute path | a `<context>:/…` prefix | <!-- winter-lint:example -->
 
-A repo's own files referred to with bare relative paths (`./python/error-handling.md`, `tools/winter-cli/pyproject.toml`) and references already in canonical notation are never flagged.
+A repo's own files referred to with bare relative paths (`./architecture/error-handling.md`, `tools/winter-cli/pyproject.toml`) and references already in canonical notation are never flagged.
 
 ## `lint_doc_references.py` — routing-table integrity
 

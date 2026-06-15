@@ -92,7 +92,7 @@ Two behaviors the screen guarantees, so author to them:
 
 ## Pinned public names
 
-These names are the plugin author's API surface — an author typechecks `create_plugin() -> IWinterPlugin` against them. Renaming any of them is a breaking change for external plugins and **must update this doc in the same change** (the analog of `python/protocol-conformance.md` pinning Protocol/adapter pairs):
+These names are the plugin author's API surface — an author typechecks `create_plugin() -> IWinterPlugin` against them. Renaming any of them is a breaking change for external plugins and **must update this doc in the same change** (the analog of `../standards/protocol-conformance.md` pinning Protocol/adapter pairs):
 
 `IWinterPlugin`, `PluginRegistration`, `IWorktreeRepoDecorator`, `IEnvironmentDecorator`, `IDetailPanel`, `DetailPanelContext`, `TuiAction`, `ActionScope`, and the `create_plugin` / `plugin.py` discovery names.
 
@@ -100,4 +100,4 @@ These names are the plugin author's API surface — an author typechecks `create
 
 - `winter-service-tmux:/plugin.py` — the canonical single-file worked example.
 - `winter:tools/winter-cli/src/winter_cli/plugins/types.py` — the contract; `loader.py` (same dir) — discovery and the load-and-skip-on-error behavior.
-- `python/protocol-conformance.md` — pinning a typed `create_plugin() -> IWinterPlugin` annotation with a conformance sentinel.
+- `../standards/protocol-conformance.md` — pinning a typed `create_plugin() -> IWinterPlugin` annotation with a conformance sentinel.

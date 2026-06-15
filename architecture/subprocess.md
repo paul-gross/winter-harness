@@ -2,9 +2,9 @@
 
 ## Rule
 
-- All `subprocess.run` / `subprocess.Popen` usage is confined to a repository or adapter under `internal/` — see `python/repository-pattern.md`.
+- All `subprocess.run` / `subprocess.Popen` usage is confined to a repository or adapter under `internal/` — see `./repository-pattern.md`.
 - Always `capture_output=True`, `text=True`, `check=False`. Inspect `returncode` explicitly.
-- Wrap non-zero exits and `OSError` into the feature's `RepoError` via the injected `RepoErrorFactory` (see `python/error-handling.md`). Capture `subcommand`, `cmd_args`, `cwd`, `exit_code`, and `stderr` as structured fields, not as a concatenated message.
+- Wrap non-zero exits and `OSError` into the feature's `RepoError` via the injected `RepoErrorFactory` (see `./error-handling.md`). Capture `subcommand`, `cmd_args`, `cwd`, `exit_code`, and `stderr` as structured fields, not as a concatenated message.
 - Never `shell=True` for any command whose tokens come from a variable. Pass `cmd` as a `list[str]`.
 
 ## Why
@@ -32,7 +32,7 @@ def fetch(self, cwd: Path, remote: str) -> None:
         )
 ```
 
-The factory extracts `subcommand`, `cmd_args`, `exit_code`, and `stderr` off `completed.args` and attaches them to the `RepoError` as structured fields — same shape as `from_git(exc, message, *, cwd)` in `python/error-handling.md`. Callers pass only the high-level `message` and don't repeat the extraction at every wrap site.
+The factory extracts `subcommand`, `cmd_args`, `exit_code`, and `stderr` off `completed.args` and attaches them to the `RepoError` as structured fields — same shape as `from_git(exc, message, *, cwd)` in `./error-handling.md`. Callers pass only the high-level `message` and don't repeat the extraction at every wrap site.
 
 **Method-name convention:** the factory has one method per underlying transport — `from_git` for `git.GitCommandError`, `from_subprocess` for `subprocess.CompletedProcess`, and so on. Production winter-cli currently exposes only `from_git`; `from_subprocess` is the canonical shape for new adapters that wrap raw `subprocess`.
 
@@ -51,8 +51,8 @@ subprocess.run(["git", "fetch", remote], cwd=cwd)
 
 ## See also
 
-- `python/error-handling.md` — structured errors via the injected factory; `from_<transport>(exc, message, *, cwd)` canonical shape.
-- `python/repository-pattern.md` — why subprocess lives in `internal/`.
-- `python/logging.md` — log levels for wrapped subprocess failures.
+- `./error-handling.md` — structured errors via the injected factory; `from_<transport>(exc, message, *, cwd)` canonical shape.
+- `./repository-pattern.md` — why subprocess lives in `internal/`.
+- `../standards/logging.md` — log levels for wrapped subprocess failures.
 - `winter/tools/winter-cli/src/winter_cli/core/internal/local_subprocess_runner.py` — the production `ISubprocessRunner` adapter (`run` + `popen` seams).
 - `winter/tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` — the production wrapping factory. Currently implements `from_git` only; `from_subprocess` is the canonical shape for new adapters.

@@ -123,7 +123,7 @@ The factory has one `from_<transport>(exc, message, *, cwd)` method per underlyi
 
 `RepoError` itself becomes a dataclass-shaped exception carrying those fields, not just a message string. See `winter-harness:/exemplars/python/repo_pattern.py` for the full example, and `winter:tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` for the production factory in winter-cli (which wraps `git.GitCommandError`, `subprocess.CalledProcessError`, and other transport-level exceptions).
 
-The factory is also where the **log-once-at-the-wrap-site** rule is enforced: it emits a single ERROR record with the structured fields before returning the wrapped exception. See `python/logging.md` for level conventions and why callers must not log it again.
+The factory is also where the **log-once-at-the-wrap-site** rule is enforced: it emits a single ERROR record with the structured fields before returning the wrapped exception. See `../standards/logging.md` for level conventions and why callers must not log it again.
 
 ## When `bool` is honest
 

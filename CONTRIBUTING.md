@@ -23,7 +23,7 @@ Example:
 
 ## Voice
 
-This repo's conventions are written in a specific voice — terse, opinionated, code-first, Do/Don't pairs over prose. Read `harness/writing-readme.md` before editing or adding a convention file; the "Voice — common pitfalls" section covers the habits to resist (describe outcomes not contents, no second supporting paragraph, no positioning relative to siblings, beware colon-then-elaboration). New convention files generally follow a `Rule` / `Why` / `Do` / `Don't` / `See also` skeleton with feature-specific sections inserted as needed — match the shape of the closest existing sibling in `python/`.
+This repo's conventions are written in a specific voice — terse, opinionated, code-first, Do/Don't pairs over prose. Read `harness/writing-readme.md` before editing or adding a convention file; the "Voice — common pitfalls" section covers the habits to resist (describe outcomes not contents, no second supporting paragraph, no positioning relative to siblings, beware colon-then-elaboration). New convention files generally follow a `Rule` / `Why` / `Do` / `Don't` / `See also` skeleton with feature-specific sections inserted as needed — match the shape of the closest existing sibling in `architecture/` or `standards/`.
 
 ## Pre-commit checks
 

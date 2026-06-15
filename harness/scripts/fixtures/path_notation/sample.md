@@ -13,7 +13,7 @@ default repo scan (it lives under `fixtures/`); the test targets it explicitly.
 
 ## Should NOT be flagged
 
-- Intra-repo relative: `./python/error-handling.md`
+- Intra-repo relative: `./architecture/error-handling.md`
 - Intra-repo relative: `tools/winter-cli/pyproject.toml`
 - Canonical notation: `workspace:/CLAUDE.md`
 - Canonical notation: `winter-harness:/harness/index.md`

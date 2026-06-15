@@ -100,7 +100,7 @@ mise run lint       # exits 0 on a clean tree
 mise run typecheck  # exits 0 on a clean tree
 ```
 
-Rules and canonical config: `./python/linting.md` (ruff) and `./python/typechecking.md` (pyright). Other languages document their own pre-push checks in their `CONTRIBUTING.md` or `ai/` — read the target repo's `CONTRIBUTING.md` before pushing.
+Rules and canonical config: `../standards/linting.md` (ruff) and `../standards/typechecking.md` (pyright). Other languages document their own pre-push checks in their `CONTRIBUTING.md` or `ai/` — read the target repo's `CONTRIBUTING.md` before pushing.
 
 If the env spans multiple repos, run pre-push checks in every repo that has uncommitted or unpushed changes, not just the one you happened to touch last.
 
@@ -150,7 +150,7 @@ The sections above are organized by topic; this is the ordered walkthrough that 
 
 - `workspace:/ai/project/contributing.md` — canonical commit format, `Closes #N` footer rules, push policy
 - `workspace:/ai/worktree-ops.md` — full reference for `winter ws init` / `sync` / `connect` / `pull` / `push` / `destroy`, including pinned-repo semantics
-- `./python/linting.md`, `./python/typechecking.md` — pre-push tools for Python repos
+- `../standards/linting.md`, `../standards/typechecking.md` — pre-push tools for Python repos
 - `../harness/writing-documentation.md` — the "no undocumented feature" invariant the pre-push doc-currency check enforces
 - `../canon/evaluating-harness-changes.md` — pre-push eval for any change that adds context an agent is expected to act on (new skill, agent, rule, feedforward doc, or routing)
 - `./workflows/upstream-tracking.md` — separate flow for workspaces that customize an upstream framework repo

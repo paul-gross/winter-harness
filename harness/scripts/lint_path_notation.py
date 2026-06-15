@@ -12,7 +12,7 @@ This lint flags raw cross-context paths that should carry a prefix. It is
 deliberately conservative: path notation has fuzzy edges, so it fires only on
 patterns that *unambiguously* cross a context boundary, and only inside inline
 code spans (where file references live in these docs). A repo's own files
-referred to with bare relative paths (`./python/error-handling.md`,
+referred to with bare relative paths (`./architecture/error-handling.md`,
 `tools/winter-cli/pyproject.toml`) are legitimate and never flagged. Findings
 are `warn` by default — raise to `fail` per consumer with `--severity fail`.
 

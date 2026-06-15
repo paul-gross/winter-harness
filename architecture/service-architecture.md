@@ -2,7 +2,7 @@
 
 Winter code is **service-based**: behavior lives in service classes whose collaborators are injected at construction, reached through Protocol seams. Module-level free functions are reserved for pure, dependency-free helpers — they are the exception, not the default.
 
-This is the principle the other Python conventions are facets of. Dependency injection (`python/dependency-injection.md`) is *how* a service receives its collaborators; module layout (`python/module-layout.md`) is *where* the service and its Protocol seam live; the repository pattern (`python/repository-pattern.md`) is the I/O-owning service shape. Read this first — it names the shape those three assume.
+This is the principle the other Python conventions are facets of. Dependency injection (`./dependency-injection.md`) is *how* a service receives its collaborators; module layout (`./module-layout.md`) is *where* the service and its Protocol seam live; the repository pattern (`./repository-pattern.md`) is the I/O-owning service shape. Read this first — it names the shape those three assume.
 
 ## Core tenet: interchangeability
 
@@ -13,7 +13,7 @@ This is the principle the other Python conventions are facets of. Dependency inj
 - **Do.** `winter service up <env>` exposes winter's fixed action set (`up` / `down` / `status` / `restart` / `logs`); each orchestrator adapter implements those actions. A different orchestrator slots in without changing the command surface.
 - **Don't.** A `winter service <action> <env> -- <raw backend args>` pass-through that forwards tmux-specific flags to the tmux adapter — callers that learned the tmux flags can't move to another orchestrator, so the orchestrators are no longer interchangeable.
 
-The contract is the abstraction the Dependency Inversion section below depends on: callers depend on winter's operation set (the Protocol), never on a concrete backend's argument surface. See `python/dependency-injection.md` for how the chosen adapter is wired and `python/protocol-conformance.md` for pinning each adapter to the seam it must satisfy.
+The contract is the abstraction the Dependency Inversion section below depends on: callers depend on winter's operation set (the Protocol), never on a concrete backend's argument surface. See `./dependency-injection.md` for how the chosen adapter is wired and `../standards/protocol-conformance.md` for pinning each adapter to the seam it must satisfy.
 
 ## Rule
 
@@ -33,7 +33,7 @@ The test is collaborators, not line count. A long pure transform is fine as a fr
 
 ## Why: dependency inversion
 
-The service shape exists to serve the **Dependency Inversion Principle** — high-level behavior depends on abstractions (Protocols, domain objects), never on concretes or global state. A free function that reaches for a collaborator hard-wires that dependency: it can't be substituted at the test boundary, can't be re-pointed at a different adapter, and hides what it consumes from its signature. Lifting it into a service whose `__init__` declares the Protocol inverts the arrow — the full reasoning, and the testability / pluggability / discoverability payoffs, are in `python/dependency-injection.md` and `python/module-layout.md`.
+The service shape exists to serve the **Dependency Inversion Principle** — high-level behavior depends on abstractions (Protocols, domain objects), never on concretes or global state. A free function that reaches for a collaborator hard-wires that dependency: it can't be substituted at the test boundary, can't be re-pointed at a different adapter, and hides what it consumes from its signature. Lifting it into a service whose `__init__` declares the Protocol inverts the arrow — the full reasoning, and the testability / pluggability / discoverability payoffs, are in `./dependency-injection.md` and `./module-layout.md`.
 
 ## Do
 
@@ -66,12 +66,12 @@ def sync(repo: ProjectRepository, env: FeatureWorktree) -> None:
 
 ## Enforcement
 
-In winter-cli, this rule is checked at `mise run test` time by `winter:tools/winter-cli/tests/conventions/test_service_based_behavior.py`. It flags the tractable, false-positive-free signal: a **module-level function whose parameter is annotated with an `I`-prefixed Protocol** — the form every injected collaborator takes (DI consumers depend on the Protocol seam, and the `I`-prefix is reserved for Protocols by the naming check). A free function receiving a Protocol is behavior that escaped its class. Matching the `I`-prefix rather than a concrete role suffix is deliberate: domain dataclasses share those nouns (`ProjectRepository` is a value, not a collaborator), so a suffix match would flag the pure helpers this principle permits. The check is also narrow on purpose — it catches the Protocol-param signal, not a function that *constructs* collaborators inside its body (that's `python/repository-pattern.md`'s territory). The `_conforms_*` conformance sentinels (`python/protocol-conformance.md`) take a concrete adapter, not an `I*` Protocol, so they fall outside the signal automatically.
+In winter-cli, this rule is checked at `mise run test` time by `winter:tools/winter-cli/tests/conventions/test_service_based_behavior.py`. It flags the tractable, false-positive-free signal: a **module-level function whose parameter is annotated with an `I`-prefixed Protocol** — the form every injected collaborator takes (DI consumers depend on the Protocol seam, and the `I`-prefix is reserved for Protocols by the naming check). A free function receiving a Protocol is behavior that escaped its class. Matching the `I`-prefix rather than a concrete role suffix is deliberate: domain dataclasses share those nouns (`ProjectRepository` is a value, not a collaborator), so a suffix match would flag the pure helpers this principle permits. The check is also narrow on purpose — it catches the Protocol-param signal, not a function that *constructs* collaborators inside its body (that's `./repository-pattern.md`'s territory). The `_conforms_*` conformance sentinels (`../standards/protocol-conformance.md`) take a concrete adapter, not an `I*` Protocol, so they fall outside the signal automatically.
 
 ## See also
 
-- `python/dependency-injection.md` — how collaborators get injected, and the no-whole-config rule.
-- `python/module-layout.md` — where the service, its Protocol seam, and its adapter live.
-- `python/repository-pattern.md` — the service that owns I/O against one external system.
-- `python/protocol-conformance.md` — pinning the Protocol/adapter seam each service depends on.
-- `architecture/winter-cli.md` — the principle applied end-to-end in winter-cli.
+- `./dependency-injection.md` — how collaborators get injected, and the no-whole-config rule.
+- `./module-layout.md` — where the service, its Protocol seam, and its adapter live.
+- `./repository-pattern.md` — the service that owns I/O against one external system.
+- `../standards/protocol-conformance.md` — pinning the Protocol/adapter seam each service depends on.
+- `./winter-cli.md` — the principle applied end-to-end in winter-cli.

@@ -2,7 +2,7 @@
 
 Dependency injection (DI) is the mechanism we use to achieve the **Dependency Inversion Principle**. By injecting dependencies at construction time rather than instantiating them inside a class, modules end up depending on abstractions (interfaces, domain objects, typed configs) rather than on concrete implementations or low-level schemas. The rules below — singletons via DI, per-call values via method args, no whole-config injection — all flow from that goal.
 
-DI is *how* a service receives its collaborators; `python/service-architecture.md` is the principle that says behavior belongs in a service class in the first place. Read that first if you're deciding whether a piece of code should be a class at all.
+DI is *how* a service receives its collaborators; `./service-architecture.md` is the principle that says behavior belongs in a service class in the first place. Read that first if you're deciding whether a piece of code should be a class at all.
 
 ## Rule
 

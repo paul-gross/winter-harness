@@ -4,12 +4,12 @@
 
 - One logger per module: `logger = logging.getLogger(__name__)` at module top, immediately under imports.
 - Levels:
-  - **ERROR** — wrapped exceptions at the boundary that transforms them. Logged once by the `RepoErrorFactory` (or equivalent), never again by callers (see `python/error-handling.md`).
+  - **ERROR** — wrapped exceptions at the boundary that transforms them. Logged once by the `RepoErrorFactory` (or equivalent), never again by callers (see `../architecture/error-handling.md`).
   - **WARNING** — recoverable conditions the caller continued past (skipped repo, missing optional config).
   - **INFO** — major lifecycle events (`init started`, `reconcile complete`). One line per event, not per item.
   - **DEBUG** — per-item traces (per-repo step, per-file action). Opt-in via `LOG_LEVEL=DEBUG`.
 - Structured fields go on the exception object (`RepoError(subcommand=..., exit_code=...)`), not interpolated into the log message. The wrap site reads them off the exception and emits one record.
-- No `print()` in service code. Use the injected reporter for user-facing output (see `python/dependency-injection.md`) or the logger for diagnostics. `print()` belongs in `__main__` or top-level CLI glue only.
+- No `print()` in service code. Use the injected reporter for user-facing output (see `../architecture/dependency-injection.md`) or the logger for diagnostics. `print()` belongs in `__main__` or top-level CLI glue only.
 
 ## Why
 
@@ -64,6 +64,6 @@ logger.error(f"git fetch failed cwd={cwd} exit={code} stderr={stderr}")
 
 ## See also
 
-- `python/error-handling.md` — log-once-at-the-wrap-site; structured errors via the injected factory.
-- `python/subprocess.md` — what to capture from a failed subprocess for the log record.
-- `python/dependency-injection.md` — reporters vs loggers; how user-facing output is routed.
+- `../architecture/error-handling.md` — log-once-at-the-wrap-site; structured errors via the injected factory.
+- `../architecture/subprocess.md` — what to capture from a failed subprocess for the log record.
+- `../architecture/dependency-injection.md` — reporters vs loggers; how user-facing output is routed.

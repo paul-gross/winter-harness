@@ -42,7 +42,7 @@ class PathNotationTest(unittest.TestCase):
     def test_leaves_legitimate_references_alone(self) -> None:
         joined = " ".join(self.spans)
         for ok in (
-            "python/error-handling.md",
+            "architecture/error-handling.md",
             "pyproject.toml",
             "workspace:/CLAUDE.md",
             "winter-harness:/harness/index.md",

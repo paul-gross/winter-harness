@@ -10,14 +10,14 @@ Refer to files in other repos or contexts using a `<context>:<path>` prefix. The
 |--------|-------------|---------|
 | `workspace:` | The current workspace root | `workspace:/CLAUDE.md` |
 | `<env>:` | A feature environment under the workspace (Greek-letter or feature name) | `alpha:/winter/tools/winter-cli/` |
-| `<extension-name>:` | An installed winter extension | `winter-harness:/python/error-handling.md` |
+| `<extension-name>:` | An installed winter extension | `winter-harness:/architecture/error-handling.md` |
 | `<standalone-name>:` | A standalone repository cloned in the workspace | `my-app:/ai/architecture.md` |
 
 Notes:
 
 - Extension and standalone notations resolve via the consuming workspace's `CLAUDE.winter.md` block — the on-disk path varies (e.g. `.winter/ext/<name>/` for adopted extensions, `<name>/` for top-level clones). Authors do not encode the on-disk path.
 - Do not write absolute paths or sibling-relative paths (`../winter-product/...`) when crossing a repo or context boundary. Always use a prefix so the reference survives directory and adoption changes. <!-- winter-lint:example -->
-- A repo's own files may be referred to with bare relative paths (`./python/error-handling.md` from inside `winter-harness/index.md`). The prefix is only required when *crossing* a context. <!-- winter-lint:example -->
+- A repo's own files may be referred to with bare relative paths (`./architecture/error-handling.md` from inside `winter-harness/index.md`). The prefix is only required when *crossing* a context. <!-- winter-lint:example -->
 
 ## Names for agents, skills, and slash commands
 

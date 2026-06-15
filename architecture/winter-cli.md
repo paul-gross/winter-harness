@@ -1,6 +1,6 @@
 # winter-cli architecture
 
-The architecture of the real `winter` (winter-cli) codebase — how the generic conventions in `../python/*.md` are realized here, plus the CLI's own argument conventions. Read this before adding or modifying a `winter` subcommand, so you build with the existing structure instead of reverse-engineering it.
+The architecture of the real `winter` (winter-cli) codebase — how the generic conventions in `../architecture/*.md` are realized here, plus the CLI's own argument conventions. Read this before adding or modifying a `winter` subcommand, so you build with the existing structure instead of reverse-engineering it.
 
 This is a **reference**, not a CLAUDE.md — it is not auto-loaded. Open it on demand from `winter-harness:/architecture/winter-cli.md` (reached via `architecture/index.md`).
 
@@ -41,19 +41,19 @@ src/winter_cli/
 tests/                     # pytest; DI-friendly via injected fixtures (see tests/conftest.py)
 ```
 
-The layout instantiates the `winter-harness:/python/*.md` rules at once:
+The layout instantiates the `winter-harness:/architecture/*.md` rules at once:
 
-- **`python/service-architecture.md`** — behavior lives in injected service classes (`*_service.py`), not module-level free functions; the other three rules below are facets of this one.
-- **`python/repository-pattern.md`** — `git`, `subprocess`, and other I/O libraries are confined to `modules/<feature>/internal/*.py` (and `core/internal/` for cross-cutting seams like `local_subprocess_runner.py`). The Protocol surface (`repo_repository.py`, `workspace_repository.py`) imports nothing from those libraries.
-- **`python/dependency-injection.md`** — every service receives its collaborators via constructor injection; everything is wired in `container.py`.
-- **`python/module-layout.md`** — Protocols at the feature root, adapters in `internal/`, cross-cutting Protocols in `core/`. Handlers may live as a flat `handler.py` or as a `handlers/` subpackage once the feature grows past one CLI surface (see [Handlers: flat vs. subpackage](#handlers-flat-vs-subpackage) below).
-- **`python/error-handling.md`** — library exceptions are wrapped at the call site via an injected concrete `RepoErrorFactory`, never via ad-hoc `raise X from Y`.
+- **`./service-architecture.md`** — behavior lives in injected service classes (`*_service.py`), not module-level free functions; the other three rules below are facets of this one.
+- **`./repository-pattern.md`** — `git`, `subprocess`, and other I/O libraries are confined to `modules/<feature>/internal/*.py` (and `core/internal/` for cross-cutting seams like `local_subprocess_runner.py`). The Protocol surface (`repo_repository.py`, `workspace_repository.py`) imports nothing from those libraries.
+- **`./dependency-injection.md`** — every service receives its collaborators via constructor injection; everything is wired in `container.py`.
+- **`./module-layout.md`** — Protocols at the feature root, adapters in `internal/`, cross-cutting Protocols in `core/`. Handlers may live as a flat `handler.py` or as a `handlers/` subpackage once the feature grows past one CLI surface (see [Handlers: flat vs. subpackage](#handlers-flat-vs-subpackage) below).
+- **`./error-handling.md`** — library exceptions are wrapped at the call site via an injected concrete `RepoErrorFactory`, never via ad-hoc `raise X from Y`.
 
 ## Handlers: flat vs. subpackage
 
 `modules/workspace/` outgrew a single `handler.py` and split into a `handlers/` subpackage organized by CLI surface (init, destroy, the workspace omnibus, repo). The split rule: keep a flat `handler.py` while a feature has one cohesive handler; promote to `handlers/<surface>_handler.py` files when distinct CLI surfaces start sharing little code. Re-export the handler classes from `handlers/__init__.py` so callers import from the subpackage root.
 
-`python/module-layout.md` shows the flat form as the default. This exemplar is the canonical reference for the split form.
+`./module-layout.md` shows the flat form as the default. This exemplar is the canonical reference for the split form.
 
 ## Argument conventions
 
@@ -79,9 +79,9 @@ Follow this order — each step builds on the previous:
 
 1. **click command** in `modules/workspace/command.py` — thin wrapper that parses click args and calls a handler.
 2. **Handler** in `modules/workspace/handlers/<surface>_handler.py` (or a new `foo_handler.py` if `foo` is its own surface) — receives parsed args, calls a service, renders output via `ICliOutputService` (or returns structured JSON for `--json`).
-3. **Service** — either extend `WorkspaceService` for read-shaped or env-spanning operations, or add `modules/workspace/foo_service.py` for a top-level lifecycle action (like `init` and `destroy`). Behavior goes in the service class, not module-level free functions — see `python/service-architecture.md` (enforced by `tests/conventions/test_service_based_behavior.py`). Services depend on Protocols, not concretes.
+3. **Service** — either extend `WorkspaceService` for read-shaped or env-spanning operations, or add `modules/workspace/foo_service.py` for a top-level lifecycle action (like `init` and `destroy`). Behavior goes in the service class, not module-level free functions — see `./service-architecture.md` (enforced by `tests/conventions/test_service_based_behavior.py`). Services depend on Protocols, not concretes.
 4. **New I/O seam** (only if needed) — Protocol at `modules/workspace/<seam>.py`, concrete adapter at `modules/workspace/internal/<seam>.py`. Apply the I-prefix rule (enforced by `tests/conventions/test_protocol_naming.py`).
-5. **Bind** the service and any new adapters in `container.py`. Services consume domain objects, not `WorkspaceConfig` directly — see `python/dependency-injection.md` for the carve-outs (enforced by `tests/conventions/test_no_whole_config_injection.py`).
+5. **Bind** the service and any new adapters in `container.py`. Services consume domain objects, not `WorkspaceConfig` directly — see `./dependency-injection.md` for the carve-outs (enforced by `tests/conventions/test_no_whole_config_injection.py`).
 6. **Unit test** under `tests/modules/workspace/` (service tests) or `tests/modules/workspace/internal/` (adapter tests) — inject fakes for the Protocols. See `tests/modules/workspace/internal/test_git_ops_service.py` and `tests/modules/workspace/internal/test_write_repo_repository.py` for the fixture pattern.
 7. **Surface the new command** in the docs so agents discover it from the docs, not from `--help`. Start at the usage index `workspace:/ai/winter-cli/usage/index.md` and follow it to the right per-topic file — for a `winter ws` subcommand that's its own file under `workspace:/ai/winter-cli/usage/ws/` (e.g. `usage/ws/checkout.md`), added to the `winter ws` hub's command table. If it's a whole new topic, add the file under `usage/` and a row routing to it from `usage/index.md`.
 
@@ -108,7 +108,7 @@ When adding a new lifecycle action, **extend an existing reporter's event vocabu
 
 ## Testing pattern
 
-Full testing conventions — directory layout, conftest scoping, fake-vs-mock guidance, and per-layer assertion patterns — live in `python/testing.md`. The winter-cli tree under `tests/` is its working reference; start at `tests/conftest.py` and `tests/modules/workspace/test_init_service.py`.
+Full testing conventions — directory layout, conftest scoping, fake-vs-mock guidance, and per-layer assertion patterns — live in `../standards/testing.md`. The winter-cli tree under `tests/` is its working reference; start at `tests/conftest.py` and `tests/modules/workspace/test_init_service.py`.
 
 ## Network resilience
 
@@ -125,7 +125,7 @@ Anything else is a hard failure on the first attempt. `is_transient_git_error` i
 
 ## Cross-references
 
-- Conventions this codebase instantiates: `python/service-architecture.md`, `python/dependency-injection.md`, `python/repository-pattern.md`, `python/error-handling.md`, `python/module-layout.md`.
+- Conventions this codebase instantiates: `./service-architecture.md`, `./dependency-injection.md`, `./repository-pattern.md`, `./error-handling.md`, `./module-layout.md`.
 - Repository-pattern reference implementation: `exemplars/python/repo_pattern.py`.
 - User-facing CLI command reference (hub): `workspace:/ai/winter-cli/index.md`.
 - Installation + extension hook contract: `workspace:/ai/winter-cli/setup.md`.

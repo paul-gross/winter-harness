@@ -4,7 +4,7 @@
 
 - **`pytest` only.** No `unittest.TestCase`, no `nose`. Tests live under `tests/`.
 - **Test paths mirror source paths.** `src/winter_cli/modules/workspace/init_service.py` is exercised by `tests/modules/workspace/test_init_service.py`.
-- **Prefer hand-rolled fakes against the I-prefix Protocol seams** (see `python/repository-pattern.md`). Reach for `unittest.mock.MagicMock` only at the orchestration edge.
+- **Prefer hand-rolled fakes against the I-prefix Protocol seams** (see `../architecture/repository-pattern.md`). Reach for `unittest.mock.MagicMock` only at the orchestration edge.
 - **Assertions match the layer**: services assert against event vocabularies on injected reporters; handlers assert exit codes and rendered output; adapters assert real I/O effects.
 - Run `pytest` (typically `mise run test`) before pushing, alongside `mise run lint` and `mise run typecheck`.
 
@@ -12,7 +12,7 @@
 
 The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/ai/project/contributing.md`). There is no PR/MR review and no CI gate yet, so a regression that compiles and type-checks still lands silently unless the test suite catches it locally.
 
-Hand-rolled fakes against Protocols (rather than `MagicMock` against concrete classes) keep the test surface aligned with the dependency-inversion seams already established by `python/dependency-injection.md` and `python/repository-pattern.md`. The test stays valid as long as the Protocol contract holds; refactors inside an adapter don't ripple into the suite.
+Hand-rolled fakes against Protocols (rather than `MagicMock` against concrete classes) keep the test surface aligned with the dependency-inversion seams already established by `../architecture/dependency-injection.md` and `../architecture/repository-pattern.md`. The test stays valid as long as the Protocol contract holds; refactors inside an adapter don't ripple into the suite.
 
 ## Directory layout
 
@@ -109,7 +109,7 @@ The fake satisfies the Protocol structurally — pyright/mypy will reject a dive
 
 - **Services** — assert against the **event vocabulary** captured by injected reporter fakes and against repository call logs. Example: `assert ("demo", path, "cloned", "") in init_reporter.actions` and `assert git.clones == [(url, dest)]`. Don't assert on stdout — services don't print.
 - **Handlers** — assert **exit codes** (`pytest.raises(SystemExit)`) and **rendered output** via `capsys`. Stub the underlying services with `MagicMock` since the handler's contract is "translate CLI args ↔ service calls ↔ output."
-- **Adapters (`internal/`)** — mock the underlying library at the adapter's import site (`monkeypatch.setattr(<adapter_module>, "<lib>", MagicMock())`); assert both the library-call shape and the adapter's return value. See `python/repository-pattern.md` for the full rule.
+- **Adapters (`internal/`)** — mock the underlying library at the adapter's import site (`monkeypatch.setattr(<adapter_module>, "<lib>", MagicMock())`); assert both the library-call shape and the adapter's return value. See `../architecture/repository-pattern.md` for the full rule.
 - **Container / DI** — `tests/test_container.py` resolves every provider to catch wiring regressions. One smoke test per Singleton is enough.
 
 ## Naming
@@ -148,11 +148,11 @@ Each rule file factors detection into a pure function — `find_<rule>_violation
 1. A top-level test that walks `src/` and `pytest.fail`s with the joined violation list. Each violation cites file:line and the convention doc.
 2. A regression test that parses the matching `fixtures/violating_<rule>.py` and asserts the function returns at least one violation. This keeps the lint honest — if a refactor silently disables detection, the fixture test fails.
 
-Failure messages follow the pattern `f"{file}:{line}: <rule restatement> ({winter-harness:/python/<conv>.md})"` so the offending line and the convention citation are both inline.
+Failure messages follow the pattern `f"{file}:{line}: <rule restatement> ({winter-harness:/architecture/<conv>.md})"` so the offending line and the convention citation are both inline.
 
 ### Carve-outs
 
-The literal convention may permit narrow exceptions (e.g. `python/dependency-injection.md` allows whole-`WorkspaceConfig` injection in translation services and workspace-lifecycle services). Encode those as an explicit `ALLOWED_FILES = frozenset({...})` at the top of the rule file, with each entry paired to the carve-out paragraph in the convention doc. New code that re-introduces the pattern outside the allowlist fails the test loudly. Mirror the existence of the test in the convention doc itself — add a short "Enforcement" pointer at the end of the convention so an agent reading the rule knows the gate exists.
+The literal convention may permit narrow exceptions (e.g. `../architecture/dependency-injection.md` allows whole-`WorkspaceConfig` injection in translation services and workspace-lifecycle services). Encode those as an explicit `ALLOWED_FILES = frozenset({...})` at the top of the rule file, with each entry paired to the carve-out paragraph in the convention doc. New code that re-introduces the pattern outside the allowlist fails the test loudly. Mirror the existence of the test in the convention doc itself — add a short "Enforcement" pointer at the end of the convention so an agent reading the rule knows the gate exists.
 
 ### Adding a fourth rule
 
@@ -166,8 +166,8 @@ The shortest path is to copy `test_protocol_naming.py` and adapt it. The contrac
 
 ## See also
 
-- `python/dependency-injection.md` — why services receive Protocols, not concretes.
-- `python/repository-pattern.md` — the I-prefix Protocol seam that makes fakes cheap to write.
+- `../architecture/dependency-injection.md` — why services receive Protocols, not concretes.
+- `../architecture/repository-pattern.md` — the I-prefix Protocol seam that makes fakes cheap to write.
 - `exemplars/python/repo_pattern.py` — canonical `IReadFooRepository` / `IWriteFooRepository` shape.
 - `architecture/winter-cli.md` — testing-pattern section, including the "lift to conftest" rule.
 - `winter/tools/winter-cli/tests/` — the working reference for all patterns above. Start at `tests/conftest.py` and `tests/modules/workspace/test_init_service.py`.

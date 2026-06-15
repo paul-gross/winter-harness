@@ -1,36 +1,23 @@
 # Topology
 
-Convention files in this extension live at the **top of the repo**, not under an `ai/` subdirectory. This is deliberate — `winter-harness` *is* the conventions repo, so its content is its public surface, addressed directly via the `winter-harness:` path notation (e.g. `winter-harness:/python/error-handling.md`). Do not look for these files under `ai/`.
+Convention files in this extension live at the **top of the repo**, not under an `ai/` subdirectory. This is deliberate — `winter-harness` *is* the conventions repo, so its content is its public surface, addressed directly via the `winter-harness:` path notation (e.g. `winter-harness:/architecture/error-handling.md`). Do not look for these files under `ai/`.
 
 Four layers, each in its own directory:
 
 - **Canon** (`canon/`) — the universal, enforceable substrate true of every harness, independent of language, project, or workflow. Self-contained: it references only itself. `canon/index.md` is the entry point.
 - **Markdown** (`harness/`) — winter-ecosystem conventions for writing the agent-facing markdown the framework is composed of (READMEs, extension `index.md` files, path references, agent / skill / command names). Rests on the Canon. `harness/index.md` is the entry point.
-- **Code** (`python/`, `exemplars/`, `architecture/`) — conventions for writing application code: `python/` for generic language-level rules, `exemplars/` for reference shapes in isolation, and `architecture/` for cross-cutting and application-specific architecture concerns. `architecture/index.md` is the entry point — read it before changing the code of any winter application.
-- **Process** (`workflows/`) — conventions for the day-to-day workflows by which changes are delivered.
+- **Code** (`architecture/`, `standards/`, `exemplars/`) — conventions for writing application code: `architecture/` for design and structural rules consulted at **PLAN/BUILD** time (how should this be written?), `standards/` for quality rules consulted at **REVIEW** time (is this finished code up to standard?), and `exemplars/` for reference shapes in isolation. `architecture/index.md` is the entry point for plan/build; `standards/index.md` for review.
+- **Process** (`workflows/`) — conventions for the day-to-day workflows by which changes are delivered. `workflows/index.md` is the entry point.
 
-| File | When to read |
-|------|--------------|
-| `canon/index.md` | Reasoning about a universal harness convention — cross-cutting authoring principles, the facts/methodology placement rule, the pre-push harness-change eval, or the four levers |
-| `harness/index.md` | Authoring or auditing winter-ecosystem agent-facing markdown (README, extension `index.md`, agent, skill, doc governance) |
-| `python/service-architecture.md` | Before authoring new behavior — the service-based principle the other Python conventions assume: behavior in injected service classes, free functions for pure helpers only |
-| `python/domain-modeling.md` | Adding a domain type, refactoring a function with many parameters |
-| `python/error-handling.md` | Writing any function that can fail |
-| `python/dependency-injection.md` | Adding a new service or wiring it into the container |
-| `python/repository-pattern.md` | Touching git, filesystem, or any external I/O |
-| `python/protocol-conformance.md` | Adding a Protocol/adapter pair — pin conformance with a typecheck-time sentinel |
-| `python/subprocess.md` | Shelling out — `subprocess.run` / `Popen` conventions and error wrapping |
-| `python/logging.md` | Adding a log call, picking a level, or deciding between logger / reporter / print |
-| `python/module-layout.md` | Adding a `core/` cross-cutting protocol or a `modules/<feature>/internal/` adapter |
-| `python/plugin-author.md` | Authoring a winter TUI plugin — a `plugin.py` that contributes dashboard badges, TUI screens, or keybound actions |
-| `python/linting.md` | Before pushing Python changes, or setting up ruff in a new project |
-| `python/typechecking.md` | Before pushing Python changes, or setting up pyright in a new project |
-| `python/testing.md` | Adding or refactoring tests — pytest layout, conftest scoping, fake-vs-mock guidance |
-| `exemplars/python/repo_pattern.py` | Reference for the repository pattern (I-prefix Protocol seam + `internal/` adapter + factory-injected errors) |
-| `architecture/index.md` | Before changing the code of any winter application — routes to the architecture doc for the surface you're touching |
-| `workflows/feature-delivery.md` | Decomposing a feature into phases — walk its surface checklist so each surface a change owes is a planned phase, not a pre-push catch; and the day-to-day landing flow: worktree model, branch naming, push target, rebase rule, pre-push checks |
-| `workflows/upstream-tracking.md` | When a workspace customizes an upstream framework repo — dual-remote layout, single-commit-on-top, sync via rebase + force-with-lease |
-| `CONTRIBUTING.md` | Before pushing — commit format, voice rules, link/reference validation |
+| Layer hub | When to read |
+|-----------|--------------|
+| [canon/index.md](./canon/index.md) | Reasoning about a universal harness convention — cross-cutting authoring principles, the facts/methodology placement rule, the pre-push harness-change eval, or the four levers |
+| [harness/index.md](./harness/index.md) | Authoring or auditing winter-ecosystem agent-facing markdown (README, extension `index.md`, agent, skill, doc governance) |
+| [architecture/index.md](./architecture/index.md) | Before writing new code or changing the code of any winter application — the plan/build-time rules for how the code should be designed and structured |
+| [standards/index.md](./standards/index.md) | Before pushing Python changes — the review-time checks for whether finished code is up to standard |
+| [workflows/index.md](./workflows/index.md) | Decomposing a feature into phases, or when a workspace customizes an upstream framework repo |
+| [exemplars/python/repo_pattern.py](./exemplars/python/repo_pattern.py) | Reference for the repository pattern (I-prefix Protocol seam + `internal/` adapter + factory-injected errors) |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Before pushing — commit format, voice rules, link/reference validation |
 
 ## Tooling
 
