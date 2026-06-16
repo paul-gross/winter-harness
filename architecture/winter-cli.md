@@ -7,7 +7,7 @@ This is a **reference**, not a CLAUDE.md — it is not auto-loaded. Open it on d
 ## Layout
 
 ```
-src/winter_cli/
+tools/winter-cli/src/winter_cli/
 ├── cli.py                 # click entry point — wires subcommand groups
 ├── cli_context.py         # shared CLI context object
 ├── container.py           # DI container — binds Protocol seams to concrete adapters
@@ -38,7 +38,7 @@ src/winter_cli/
 │   └── tui/               # textual-based dashboard (`winter dashboard`)
 ├── plugins/               # plugin loader — discovers extension click commands + TUI plugins
 └── util.py
-tests/                     # pytest; DI-friendly via injected fixtures (see tests/conftest.py)
+tools/winter-cli/tests/    # pytest; DI-friendly via injected fixtures (see tests/conftest.py)
 ```
 
 The layout instantiates the `winter-harness:/architecture/*.md` rules at once:
@@ -108,7 +108,7 @@ When adding a new lifecycle action, **extend an existing reporter's event vocabu
 
 ## Testing pattern
 
-Full testing conventions — directory layout, conftest scoping, fake-vs-mock guidance, and per-layer assertion patterns — live in `../standards/testing.md`. The winter-cli tree under `tests/` is its working reference; start at `tests/conftest.py` and `tests/modules/workspace/test_init_service.py`.
+Full testing conventions — directory layout, conftest scoping, fake-vs-mock guidance, and per-layer assertion patterns — live in `../standards/testing.md`. The winter-cli tree under `tests/` is its working reference; start at `tests/conftest.py` and `tests/modules/workspace/test_init_service.py`. Run the suite with `mise run test` from the package root (`mise run lint` / `mise run typecheck` likewise).
 
 ## Network resilience
 
