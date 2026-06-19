@@ -44,6 +44,67 @@ Every field defaults empty — populate only what the plugin contributes:
 
 A `TuiAction.key` is the action's **default** binding only: users can remap it from `.winter/config.toml` under `[keybindings.bindings]` via the action id `plugin.<name>` (where `<name>` is your `TuiAction.name`), and may even bind it to a multi-key chord. Pick a sensible single-key default and keep `name` stable — it is the user-facing config id. Set `key` as a raw Textual key token (`"e"`, `"ctrl+e"`, `"enter"`); the config-override grammar is documented in `winter:/ai/winter-cli/usage/dashboard.md#keybindings`.
 
+## Keybound actions (`TuiAction`)
+
+A `TuiAction` binds a key to a handler that runs against a **dashboard area**. Declare the area(s) it applies to with `scope`; winter routes the keypress to the focused area and hands your handler the selection there.
+
+```python
+@dataclasses.dataclass
+class TuiAction:
+    name: str                                    # stable id -> `plugin.<name>`
+    scope: ActionScope | Sequence[ActionScope]   # one area, or several
+    key: str                                     # default keybinding
+    description: str                             # footer label
+    handler: Callable[[ActionInvocation], None]
+```
+
+`ActionScope` names the four areas a key can fire in, each with the selection context your handler receives for it:
+
+| Scope | Area | Selection context |
+|-------|------|-------------------|
+| `workspace` | the workspace as a whole | `WorkspaceContext` |
+| `feature_environment` | a feature env (alpha, beta, …) | `FeatureEnvironmentContext` |
+| `feature_worktree` | one repo worktree within an env | `FeatureWorktreeContext` |
+| `standalone_repository` | a standalone repo in the standalone panel | `StandaloneRepoContext` |
+
+### One command across several areas, one key
+
+`scope` accepts a **single** `ActionScope` or a **sequence** of them. Pass several to make one command — one `name`, one `action_id` (`plugin.<name>`), one key — work in multiple areas. The areas never hold focus simultaneously, so the same key in each is unambiguous; winter dispatches to whichever area is focused. Two same-key plugin actions collide only when their declared areas **overlap** — disjoint areas (e.g. one `standalone_repository`, one `feature_worktree`) coexist on the same key, and a single multi-scope action never collides with itself. A plugin key also collides with any **built-in** action bound to the same key, regardless of area — this is the more common real-world conflict when picking a default `key`, so consult the built-in action table in `winter:/ai/winter-cli/usage/dashboard.md#keybindings` before committing to a default.
+The workspace screen routes a multi-scope action to the **focused area** (standalone panel vs. feature grid); the detail screens (worktree detail, standalone detail) route to the **most-specific declared scope** they can host — so a `[feature_worktree, standalone_repository]` action fires with a `FeatureWorktreeContext` on the worktree detail screen and with a `StandaloneRepoContext` on the standalone detail screen, regardless of what is focused.
+
+```python
+TuiAction(
+    name="codediff",
+    scope=[ActionScope.standalone_repository, ActionScope.feature_worktree],
+    key="d",
+    description="Open diff",
+    handler=on_diff,
+)
+```
+
+### The handler receives an `ActionInvocation`
+
+Your handler is called with an `ActionInvocation`, not a bare context:
+
+```python
+@dataclasses.dataclass
+class ActionInvocation:
+    scope: ActionScope       # which area the key was pressed in
+    context: ActionContext   # that area's selection (one of the *Context types above)
+```
+
+Read `inv.scope` to branch on **where** the key fired, and `inv.context` for the selection. Attribute access falls through to the inner context, so `inv.repo` / `inv.worktree` / `inv.suspend` resolve directly — a single-area handler written against the bare context keeps working unchanged.
+Prefer `inv.context.repo` / `inv.context.worktree` for type-checked access: pyright can verify the field exists on the concrete `*Context` type, whereas `inv.repo` goes through `__getattr__` and is typed as `Any`, so your own typecheck stops being a meaningful gate.
+
+```python
+def on_diff(inv: ActionInvocation) -> None:
+    if inv.scope is ActionScope.standalone_repository:
+        repo = inv.context.repo                  # StandaloneRepository (or inv.repo)
+    else:
+        repo = inv.context.worktree.repository   # the focused worktree's repo
+    ...
+```
+
 ## Decorator Protocols
 
 Both are `__call__(status, path) -> None` callables that **mutate** the status object's `extensions` dict in place; whatever you store there is appended to the rendered cell verbatim, joined by spaces.
@@ -94,7 +155,7 @@ Two behaviors the screen guarantees, so author to them:
 
 These names are the plugin author's API surface — an author typechecks `create_plugin() -> IWinterPlugin` against them. Renaming any of them is a breaking change for external plugins and **must update this doc in the same change** (the analog of `../standards/protocol-conformance.md` pinning Protocol/adapter pairs):
 
-`IWinterPlugin`, `PluginRegistration`, `IWorktreeRepoDecorator`, `IEnvironmentDecorator`, `IDetailPanel`, `DetailPanelContext`, `TuiAction`, `ActionScope`, and the `create_plugin` / `plugin.py` discovery names.
+`IWinterPlugin`, `PluginRegistration`, `IWorktreeRepoDecorator`, `IEnvironmentDecorator`, `IDetailPanel`, `DetailPanelContext`, `TuiAction`, `ActionScope`, `ActionInvocation`, and the `create_plugin` / `plugin.py` discovery names.
 
 ## See also
 
