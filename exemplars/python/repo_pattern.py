@@ -27,6 +27,7 @@ Read variant where they aren't — the Protocol type is the contract.
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -88,8 +89,45 @@ class RepoErrorFactory:
     (different field schema, different log policy); until then the concrete
     is the seam, and tests substitute a fake by type.
     """
+
+    def __init__(self, logger: logging.Logger) -> None:
+        self._logger = logger
+
     def from_io(self, exc: Exception, message: str, *,
-                cwd: Path | None = None) -> RepoError: ...
+                cwd: Path | None = None) -> RepoError:
+        """Wrap `exc` into a structured `RepoError` and log it once.
+
+        Extracts subcommand / exit_code / stderr off the exception so
+        the reporter can render structured context without re-parsing the
+        message string. Logs at ERROR before returning — this is the
+        single log site; callers must not log the error again.
+        """
+        subcommand = getattr(exc, "subcommand", "")
+        cmd_args: tuple[str, ...] = tuple(
+            str(a) for a in getattr(exc, "cmd_args", ())
+        )
+        exit_code: int | None = getattr(exc, "exit_code", None)
+        stderr: str = str(getattr(exc, "stderr", "") or "").strip()
+        cwd_str = str(cwd) if cwd is not None else ""
+        err = RepoError(
+            message,
+            subcommand=subcommand,
+            cmd_args=cmd_args,
+            cwd=cwd,
+            exit_code=exit_code,
+            stderr=stderr,
+        )
+        self._logger.error(
+            message,
+            extra={
+                "subcommand": subcommand,
+                "cmd_args": cmd_args,
+                "cwd": cwd_str,
+                "exit_code": exit_code,
+                "stderr": stderr,
+            },
+        )
+        return err
 
 
 # --- Public Protocols (the seam services depend on) -----------------------
@@ -121,14 +159,14 @@ class ReadFooRepository:
         try:
             raw = some_io_library.fetch(thing_id)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, f"fetch failed for {thing_id}")
+            raise self._errors.from_io(exc, f"fetch failed for {thing_id}") from exc
         return self._parse(thing_id, raw)
 
     def list_things(self, prefix: str) -> list[Thing]:
         try:
             entries = some_io_library.list(prefix)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, f"list failed for prefix {prefix!r}")
+            raise self._errors.from_io(exc, f"list failed for prefix {prefix!r}") from exc
         return [self._parse(e.id, e.raw) for e in entries]
 
     @staticmethod
@@ -144,13 +182,13 @@ class WriteFooRepository(ReadFooRepository):
         try:
             some_io_library.write(thing.id, thing.payload)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, f"save failed for {thing.id}")
+            raise self._errors.from_io(exc, f"save failed for {thing.id}") from exc
 
     def delete_thing(self, thing_id: str) -> None:
         try:
             some_io_library.delete(thing_id)
         except some_io_library.IOError as exc:
-            raise self._errors.from_io(exc, f"delete failed for {thing_id}")
+            raise self._errors.from_io(exc, f"delete failed for {thing_id}") from exc
 
 
 # Typecheck-time Protocol/adapter conformance sentinel. Pyright rejects the
