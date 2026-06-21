@@ -105,6 +105,32 @@ def on_diff(inv: ActionInvocation) -> None:
     ...
 ```
 
+### What each context carries
+
+The selection context exposes everything winter already loaded for that area at dispatch — so an env-wide action never has to re-derive the repo set by scanning `env.path` or parsing `.winter/config.toml`:
+
+| Context | Fields |
+|---------|--------|
+| `WorkspaceContext` | `workspace: Workspace` |
+| `FeatureEnvironmentContext` | `environment: FeatureEnvironment`; `worktrees: list[FeatureWorktree]` — every project-repo worktree in the env (each carries `path`, `repository.name`, and `environment`/`workspace` handles) |
+| `FeatureWorktreeContext` | `worktree: FeatureWorktree`; `environment_worktrees: FeatureEnvironmentWorktrees \| None` — the env's sibling worktrees (`.environment` + `.worktrees`), so a worktree cell can drive an env-wide action; `workspace: Workspace \| None` — explicit handle (also reachable via `worktree.workspace`) |
+| `StandaloneRepoContext` | `repo: StandaloneRepository` |
+
+Every context also carries an optional `suspend` (a context manager that pauses the TUI while a handler shells out). The `worktrees` / `environment_worktrees` / `workspace` fields are **additive** — older plugins that ignore them are unaffected. Use them to act across the whole feature env without extra git or filesystem I/O:
+
+```python
+def on_diff_all(inv: ActionInvocation) -> None:
+    if inv.scope is ActionScope.feature_environment:
+        worktrees = inv.context.worktrees                       # env-scoped: the full set
+    else:
+        siblings = inv.context.environment_worktrees            # worktree-scoped: reach env-wide
+        worktrees = siblings.worktrees if siblings else [inv.context.worktree]
+    paths = [str(wt.path) for wt in worktrees]                  # each repo's worktree path
+    ...
+```
+
+`environment_worktrees` and `workspace` are typed `| None` so a context can be hand-constructed in a test without them, but the dashboard always populates them when it dispatches a real keypress.
+
 ## Decorator Protocols
 
 Both are `__call__(status, path) -> None` callables that **mutate** the status object's `extensions` dict in place; whatever you store there is appended to the rendered cell verbatim, joined by spaces.
