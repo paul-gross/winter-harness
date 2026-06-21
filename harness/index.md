@@ -12,4 +12,5 @@ Paired reviewers: `context-reviewer` enforces these conventions and the [Canon](
 | `./writing-documentation.md` | Landing a feature — the "no undocumented feature" invariant: a change to user-facing surface updates the docs that render it, in the same commit |
 | `./writing-extension-index.md` | Writing, editing, or auditing a winter extension's top-level `index.md` — what belongs there vs. what's behind-the-scenes (the file is auto-loaded into every agent context) |
 | `./writing-readme.md` | Writing or editing a `README.md` for any winter ecosystem repo |
+| `./writing-agent.md` | Authoring an agent — the frontmatter contract (`name`, `description`, `model`, `tools`) and the canonical-name rule |
 | `./writing-skill.md` | Authoring a skill — picking between the self-contained and thin (`SKILL.md` + `ai/<name>/process.md`) shapes |
