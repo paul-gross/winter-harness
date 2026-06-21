@@ -1,6 +1,26 @@
 # Authoring a winter TUI plugin
 
-A **winter TUI plugin** extends the `winter` dashboard from outside the CLI's own source tree — it contributes dashboard badges, TUI screens, and keybound actions. (Distinct from a **winter extension**, which integrates with the *workspace* via `winter-ext.toml` lifecycle hooks; an extension may ship a TUI plugin alongside its hooks — `winter-service-tmux` does both.) The contract lives in `winter:/tools/winter-cli/src/winter_cli/plugins/types.py` (the Protocols and the registration dataclass) and is enforced by the loader at `winter:/tools/winter-cli/src/winter_cli/plugins/loader.py`. Worked example: `winter-service-tmux:/plugin.py` — a single-file plugin that paints a tmux-session badge on each feature-env header.
+A **winter TUI plugin** extends the `winter` dashboard from outside the CLI's own source tree — it contributes dashboard badges, TUI screens, and keybound actions. (Distinct from a **winter extension**, which integrates with the *workspace* via `winter-ext.toml` lifecycle hooks; an extension may ship a TUI plugin alongside its hooks — `winter-service-tmux` does both.)
+
+The contract a plugin codes against is the **`winter-plugin-api`** package ([github.com/paul-gross/winter-plugin-api](https://github.com/paul-gross/winter-plugin-api)) — a narrow, semver-versioned, typed surface with **zero dependency on winter-cli**. A plugin imports its entire contribution surface from `winter_plugin_api` and typechecks `create_plugin() -> IWinterPlugin` in its own repo. winter-cli keeps its own runtime copy of the seam (`winter:/tools/winter-cli/src/winter_cli/plugins/types.py`, enforced by `loader.py`) and is kept in sync with the package by hand (see [Versioning](#versioning)). Worked example: `winter-service-tmux:/plugin.py` — a single-file plugin that paints a tmux-session badge on each feature-env header (it ships in-tree and imports winter-cli directly rather than depending on the package).
+
+## Depending on the package
+
+Add `winter-plugin-api` as a **dev dependency** pinned to a tag, then import the contract directly:
+
+```toml
+# pyproject.toml
+[dependency-groups]
+dev = [
+    "winter-plugin-api @ git+https://github.com/paul-gross/winter-plugin-api@v0.1.0",
+]
+```
+
+```python
+from winter_plugin_api import IWinterPlugin, PluginRegistration, IEnvironmentStatusView
+```
+
+It is a **dev/test** dependency, not a runtime one: winter supplies the contract in its own process when it loads your `plugin.py` (winter runs winter-cli via `uv run`, so the package is present). You pin it only so your own typechecker resolves the imports — which is why the old lazy-`import`-inside-`register()` workaround is no longer needed. Pin the **lowest** version exposing every name you use, so your plugin stays loadable against the widest range of winter builds.
 
 ## The `create_plugin()` discovery contract
 
@@ -16,7 +36,7 @@ A plugin that has no `create_plugin()`, or whose `create_plugin()` / `register()
 
 ## `IWinterPlugin`
 
-All three Protocols below are `@runtime_checkable`; snippets show the signatures only.
+All Protocols below are imported from `winter_plugin_api`; the behavioral ones are `@runtime_checkable`; snippets show the signatures only.
 
 ```python
 class IWinterPlugin(Protocol):
@@ -43,6 +63,38 @@ Every field defaults empty — populate only what the plugin contributes:
 `commands` is part of the dataclass but is **not wired**: click resolves the subcommand before the plugin registry is built (the registry is constructed inside the `_cli_group` callback). Wiring it means building the registry at group-construction time. Until then, ship behavior through the dashboard surfaces above.
 
 A `TuiAction.key` is the action's **default** binding only: users can remap it from `.winter/config.toml` under `[keybindings.bindings]` via the action id `plugin.<name>` (where `<name>` is your `TuiAction.name`), and may even bind it to a multi-key chord. Pick a sensible single-key default and keep `name` stable — it is the user-facing config id. Set `key` as a raw Textual key token (`"e"`, `"ctrl+e"`, `"enter"`); the config-override grammar is documented in `workspace:/ai/winter-cli/usage/dashboard.md#keybindings`.
+
+## Decorator Protocols
+
+Both are `__call__(status, path) -> None` callables that **mutate** the status object's `extensions` dict in place; whatever you store there is appended to the rendered cell verbatim, joined by spaces. The `status` payload is a **narrow read-only view**, not winter-cli's concrete model — you can read the view's properties and write its `extensions`, and the typechecker rejects anything off-contract.
+
+```python
+class IWorktreeRepoDecorator(Protocol):
+    def __call__(self, repo_status: IWorktreeRepoStatusView, repo_path: Path) -> None: ...
+
+class IEnvironmentDecorator(Protocol):
+    def __call__(self, env_status: IEnvironmentStatusView, env_path: Path) -> None: ...
+```
+
+- `IWorktreeRepoDecorator` fires **once per repo per refresh**; write `repo_status.extensions[<key>] = <value>` for a per-repo badge. The view exposes `worktree` (an `IFeatureWorktreeView`), `branch`, `ahead`, `behind`, `dirty_count`, and the writable `extensions`.
+- `IEnvironmentDecorator` fires **once per environment per refresh**; write `env_status.extensions[<key>] = <value>` for a badge in the env's matrix-grid column header and detail-screen header. The view exposes `environment` (an `IEnvironmentView`, with `.name`, `.index`, `.path`, and `.workspace`) and the writable `extensions`.
+
+Keep the `<key>` short and plugin-unique (the worked example uses `"wst"`).
+
+### The view Protocols
+
+Decorator and panel payloads are typed as **view Protocols** — narrow, read-only windows onto winter-cli's domain and status models. They expose only what a plugin may read, so the package needs no dependency on winter-cli and a model rename can't quietly change what you receive:
+
+| View | Exposes |
+|------|---------|
+| `IWorkspaceView` | `root_path`, `session_prefix`, `main_branch` |
+| `IEnvironmentView` | `name`, `index`, `path`, `workspace: IWorkspaceView` |
+| `IProjectRepositoryView` | `name` |
+| `IFeatureWorktreeView` | `path`, `repository: IProjectRepositoryView`, `environment: IEnvironmentView`, `workspace: IWorkspaceView` |
+| `IStandaloneRepositoryView` | `name`, `path` |
+| `IEnvironmentWorktreesView` | `environment: IEnvironmentView`, `worktrees: Sequence[IFeatureWorktreeView]` |
+| `IEnvironmentStatusView` | `environment: IEnvironmentView`, writable `extensions: dict[str, str]` |
+| `IWorktreeRepoStatusView` | `worktree: IFeatureWorktreeView`, `branch`, `ahead`, `behind`, `dirty_count`, writable `extensions: dict[str, object]` |
 
 ## Keybound actions (`TuiAction`)
 
@@ -99,22 +151,22 @@ Prefer `inv.context.repo` / `inv.context.worktree` for type-checked access: pyri
 ```python
 def on_diff(inv: ActionInvocation) -> None:
     if inv.scope is ActionScope.standalone_repository:
-        repo = inv.context.repo                  # StandaloneRepository (or inv.repo)
+        repo = inv.context.repo                  # IStandaloneRepositoryView (or inv.repo)
     else:
-        repo = inv.context.worktree.repository   # the focused worktree's repo
+        repo = inv.context.worktree.repository   # the focused worktree's repository view
     ...
 ```
 
 ### What each context carries
 
-The selection context exposes everything winter already loaded for that area at dispatch — so an env-wide action never has to re-derive the repo set by scanning `env.path` or parsing `.winter/config.toml`:
+The selection context exposes everything winter already loaded for that area at dispatch — so an env-wide action never has to re-derive the repo set by scanning `env.path` or parsing `.winter/config.toml`. Each model field is a **view**, not a concrete winter-cli model:
 
 | Context | Fields |
 |---------|--------|
-| `WorkspaceContext` | `workspace: Workspace` |
-| `FeatureEnvironmentContext` | `environment: FeatureEnvironment`; `worktrees: list[FeatureWorktree]` — every project-repo worktree in the env (each carries `path`, `repository.name`, and `environment`/`workspace` handles) |
-| `FeatureWorktreeContext` | `worktree: FeatureWorktree`; `environment_worktrees: FeatureEnvironmentWorktrees \| None` — the env's sibling worktrees (`.environment` + `.worktrees`), so a worktree cell can drive an env-wide action; `workspace: Workspace \| None` — explicit handle (also reachable via `worktree.workspace`) |
-| `StandaloneRepoContext` | `repo: StandaloneRepository` |
+| `WorkspaceContext` | `workspace: IWorkspaceView` |
+| `FeatureEnvironmentContext` | `environment: IEnvironmentView`; `worktrees: Sequence[IFeatureWorktreeView]` — every project-repo worktree in the env (each carries `path`, `repository.name`, and `environment`/`workspace` handles) |
+| `FeatureWorktreeContext` | `worktree: IFeatureWorktreeView`; `environment_worktrees: IEnvironmentWorktreesView \| None` — the env's sibling worktrees (`.environment` + `.worktrees`), so a worktree cell can drive an env-wide action; `workspace: IWorkspaceView \| None` — explicit handle (also reachable via `worktree.workspace`) |
+| `StandaloneRepoContext` | `repo: IStandaloneRepositoryView` |
 
 Every context also carries an optional `suspend` (a context manager that pauses the TUI while a handler shells out). The `worktrees` / `environment_worktrees` / `workspace` fields are **additive** — older plugins that ignore them are unaffected. Use them to act across the whole feature env without extra git or filesystem I/O:
 
@@ -131,23 +183,6 @@ def on_diff_all(inv: ActionInvocation) -> None:
 
 `environment_worktrees` and `workspace` are typed `| None` so a context can be hand-constructed in a test without them, but the dashboard always populates them when it dispatches a real keypress.
 
-## Decorator Protocols
-
-Both are `__call__(status, path) -> None` callables that **mutate** the status object's `extensions` dict in place; whatever you store there is appended to the rendered cell verbatim, joined by spaces.
-
-```python
-class IWorktreeRepoDecorator(Protocol):
-    def __call__(self, repo_status: object, repo_path: object) -> None: ...
-
-class IEnvironmentDecorator(Protocol):
-    def __call__(self, env_status: object, env_path: object) -> None: ...
-```
-
-- `IWorktreeRepoDecorator` fires **once per repo per refresh**; write `repo_status.extensions[<key>] = <value>` for a per-repo badge.
-- `IEnvironmentDecorator` fires **once per environment per refresh**; write `env_status.extensions[<key>] = <value>` for a badge in the env's matrix-grid column header and detail-screen header.
-
-Keep the `<key>` short and plugin-unique (the worked example uses `"wst"`).
-
 ## Detail panels (`IDetailPanel`)
 
 Decorators contribute terse badge *strings*; a **detail panel** contributes a whole named pane of read-only info in the detail screen, surfaced as a tab alongside the built-in repo info. The same panels render in **both** the feature-environment detail view (`WorktreeDetailScreen`) and the standalone-repo detail view (`StandaloneDetailScreen`).
@@ -159,13 +194,13 @@ class IDetailPanel(Protocol):
     def render(self, context: DetailPanelContext) -> object: ...
 ```
 
-`render` is called on each detail refresh and returns **rich-console markup** (a `str`) or any Rich renderable — that becomes the panel body. It is handed a `DetailPanelContext` describing the focused repo the screen is showing — the focused worktree in a feature-env view, the standalone repo in a standalone view:
+`render` is called on each detail refresh and returns **rich-console markup** (a `str`) or any Rich renderable — that becomes the panel body. It is handed a `DetailPanelContext` describing the focused repo the screen is showing — the focused worktree in a feature-env view, the standalone repo in a standalone view. Its fields are **views**, not concrete models:
 
 ```python
 @dataclasses.dataclass
 class DetailPanelContext:
-    worktree: FeatureWorktree | None = None  # set in a feature-env detail view
-    repo: StandaloneRepository | None = None  # set in a standalone detail view
+    worktree: IFeatureWorktreeView | None = None   # set in a feature-env detail view
+    repo: IStandaloneRepositoryView | None = None  # set in a standalone detail view
 ```
 
 Exactly one field is set. Branch on whichever you need; treat it as read-only.
@@ -177,14 +212,19 @@ Two behaviors the screen guarantees, so author to them:
 
 `render` runs on the dashboard's refresh worker thread and must not touch Textual widgets — return a renderable and let the screen mount it.
 
-## Pinned public names
+## Versioning
 
-These names are the plugin author's API surface — an author typechecks `create_plugin() -> IWinterPlugin` against them. Renaming any of them is a breaking change for external plugins and **must update this doc in the same change** (the analog of `../standards/protocol-conformance.md` pinning Protocol/adapter pairs):
+The contract is **semver-versioned in the `winter-plugin-api` package**, independent of winter-cli's *unversioned* internal model. That separation is the whole point: winter-cli's domain model evolves freely; only the narrow seam carries a version.
 
-`IWinterPlugin`, `PluginRegistration`, `IWorktreeRepoDecorator`, `IEnvironmentDecorator`, `IDetailPanel`, `DetailPanelContext`, `TuiAction`, `ActionScope`, `ActionInvocation`, and the `create_plugin` / `plugin.py` discovery names.
+- **Major bump** — a breaking change: a removed/renamed public name, a narrowed view, a changed `__call__` / `register` signature, a removed dataclass field. Update your plugin before moving to the new major.
+- **Minor bump** — a backward-compatible addition: a new view property, a new optional `PluginRegistration` field, a new decorator/panel Protocol, a new `ActionScope` member. Existing plugins keep working. (Pre-1.0, treat a `0.x` minor as potentially breaking.)
+- **Patch bump** — docs / typing-only, no surface change.
+
+winter-cli keeps its **own runtime copy** of the seam (`plugins/types.py`); the package is a deliberate hand-curated copy of it, not a re-export. The two are **kept in sync by hand**: a seam rename in winter-cli must be mirrored into the package as a major bump and reflected here, in the same change. There is no automated conformance check wiring the two together today — pinning winter-cli to the package with conformance sentinels (the `../standards/protocol-conformance.md` pattern), so a model rename would fail winter-cli's own typecheck, is a possible future addition.
 
 ## See also
 
-- `winter-service-tmux:/plugin.py` — the canonical single-file worked example.
-- `winter:/tools/winter-cli/src/winter_cli/plugins/types.py` — the contract; `loader.py` (same dir) — discovery and the load-and-skip-on-error behavior.
-- `../standards/protocol-conformance.md` — pinning a typed `create_plugin() -> IWinterPlugin` annotation with a conformance sentinel.
+- [github.com/paul-gross/winter-plugin-api](https://github.com/paul-gross/winter-plugin-api) — the contract package: `views` (read-only view Protocols) and `seam` (the dataclasses/Protocols a plugin constructs), plus the full versioning policy.
+- `winter-service-tmux:/plugin.py` — the canonical single-file worked example (an in-tree extension that imports winter-cli directly; an external plugin would import `winter_plugin_api` instead).
+- `winter:/tools/winter-cli/src/winter_cli/plugins/types.py` — winter-cli's runtime copy of the seam; `loader.py` (same dir) — discovery and the load-and-skip-on-error behavior.
+- `../standards/protocol-conformance.md` — the conformance-sentinel pattern that could pin winter-cli's models and seam against the package (a possible future addition; not wired today).
