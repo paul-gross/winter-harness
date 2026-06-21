@@ -11,7 +11,7 @@
 
 The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/ai/project/contributing.md`). There is no PR/MR review and no CI gate yet, so lint/format drift lands silently unless the agent runs the tasks locally before push.
 
-Single-tool ruff replaces the legacy `black + isort + flake8` triple — same coverage, one config block, one invocation, no tool-version skew.
+Single-tool ruff provides the same coverage as separate linting and formatting tools — one config block, one invocation, no tool-version skew.
 
 ## Do
 

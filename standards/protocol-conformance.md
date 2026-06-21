@@ -53,7 +53,7 @@ Skip the sentinel for Protocols that have no canonical adapter:
 
 ## Why this beats a runtime test
 
-A runtime test using `inspect.signature` equality (the previous approach in this codebase) only checks the Protocols it's explicitly parametrized over, compares raw annotation strings (so it misses variance, defaults, kw-only differences, and overloads), and costs test-suite time. A Pyright sentinel uses the real subtype logic, covers any seam you write one for, costs zero runtime, and lives next to the code it pins so the next reader finds it.
+A runtime test using `inspect.signature` equality only checks the Protocols it's explicitly parametrized over, compares raw annotation strings (so it misses variance, defaults, kw-only differences, and overloads), and costs test-suite time. A Pyright sentinel uses the real subtype logic, covers any seam you write one for, costs zero runtime, and lives next to the code it pins so the next reader finds it.
 
 ## See also
 

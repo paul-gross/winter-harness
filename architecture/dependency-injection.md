@@ -87,4 +87,4 @@ Everything else — handlers, per-feature services, status services — consumes
 
 ## Enforcement
 
-In winter-cli, this rule is checked at `mise run test` time by `winter:tools/winter-cli/tests/conventions/test_no_whole_config_injection.py`. The two carve-outs above are encoded as an `ALLOWED_FILES` frozenset at the top of that file. Adding a new service that legitimately falls under one of the carve-outs requires extending the frozenset (with a one-line rationale citing this doc); anything outside it fails loudly with file:line and a back-link here.
+In winter-cli, this rule is checked at `mise run test` time by `winter:/tools/winter-cli/tests/conventions/test_no_whole_config_injection.py`. The two carve-outs above are encoded as an `ALLOWED_FILES` frozenset at the top of that file. Adding a new service that legitimately falls under one of the carve-outs requires extending the frozenset (with a one-line rationale citing this doc); anything outside it fails loudly with file:line and a back-link here.

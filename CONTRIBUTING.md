@@ -30,7 +30,7 @@ This repo's conventions are written in a specific voice — terse, opinionated, 
 No linters, formatters, or tests are wired in. Before pushing, manually validate:
 
 - **Internal links** — every `winter-harness:/path/file.md` reference, every relative link inside this repo, resolves to an existing file.
-- **Code references** — any production example cited via path notation (e.g. `winter:tools/winter-cli/...`) still exists at that path with the claimed shape. Conventions go stale when winter-cli refactors; if you spot drift while reading, fix it.
+- **Code references** — any production example cited via path notation (e.g. `winter:/tools/winter-cli/...`) still exists at that path with the claimed shape. Conventions go stale when winter-cli refactors; if you spot drift while reading, fix it.
 - **Cross-repo refs** — `winter-harness:/...`, `winter-workflow:/...` etc. point at real files in those repos.
 
 ## Delivery

@@ -1,6 +1,6 @@
 # Authoring a winter TUI plugin
 
-A **winter TUI plugin** extends the `winter` dashboard from outside the CLI's own source tree — it contributes dashboard badges, TUI screens, and keybound actions. (Distinct from a **winter extension**, which integrates with the *workspace* via `winter-ext.toml` lifecycle hooks; an extension may ship a TUI plugin alongside its hooks — `winter-service-tmux` does both.) The contract lives in `winter:tools/winter-cli/src/winter_cli/plugins/types.py` (the Protocols and the registration dataclass) and is enforced by the loader at `winter:tools/winter-cli/src/winter_cli/plugins/loader.py`. Worked example: `winter-service-tmux:/plugin.py` — a single-file plugin that paints a tmux-session badge on each feature-env header.
+A **winter TUI plugin** extends the `winter` dashboard from outside the CLI's own source tree — it contributes dashboard badges, TUI screens, and keybound actions. (Distinct from a **winter extension**, which integrates with the *workspace* via `winter-ext.toml` lifecycle hooks; an extension may ship a TUI plugin alongside its hooks — `winter-service-tmux` does both.) The contract lives in `winter:/tools/winter-cli/src/winter_cli/plugins/types.py` (the Protocols and the registration dataclass) and is enforced by the loader at `winter:/tools/winter-cli/src/winter_cli/plugins/loader.py`. Worked example: `winter-service-tmux:/plugin.py` — a single-file plugin that paints a tmux-session badge on each feature-env header.
 
 ## The `create_plugin()` discovery contract
 
@@ -42,7 +42,7 @@ Every field defaults empty — populate only what the plugin contributes:
 
 `commands` is part of the dataclass but is **not wired**: click resolves the subcommand before the plugin registry is built (the registry is constructed inside the `_cli_group` callback). Wiring it means building the registry at group-construction time. Until then, ship behavior through the dashboard surfaces above.
 
-A `TuiAction.key` is the action's **default** binding only: users can remap it from `.winter/config.toml` under `[keybindings.bindings]` via the action id `plugin.<name>` (where `<name>` is your `TuiAction.name`), and may even bind it to a multi-key chord. Pick a sensible single-key default and keep `name` stable — it is the user-facing config id. Set `key` as a raw Textual key token (`"e"`, `"ctrl+e"`, `"enter"`); the config-override grammar is documented in `winter:/ai/winter-cli/usage/dashboard.md#keybindings`.
+A `TuiAction.key` is the action's **default** binding only: users can remap it from `.winter/config.toml` under `[keybindings.bindings]` via the action id `plugin.<name>` (where `<name>` is your `TuiAction.name`), and may even bind it to a multi-key chord. Pick a sensible single-key default and keep `name` stable — it is the user-facing config id. Set `key` as a raw Textual key token (`"e"`, `"ctrl+e"`, `"enter"`); the config-override grammar is documented in `workspace:/ai/winter-cli/usage/dashboard.md#keybindings`.
 
 ## Keybound actions (`TuiAction`)
 
@@ -69,7 +69,7 @@ class TuiAction:
 
 ### One command across several areas, one key
 
-`scope` accepts a **single** `ActionScope` or a **sequence** of them. Pass several to make one command — one `name`, one `action_id` (`plugin.<name>`), one key — work in multiple areas. The areas never hold focus simultaneously, so the same key in each is unambiguous; winter dispatches to whichever area is focused. Two same-key plugin actions collide only when their declared areas **overlap** — disjoint areas (e.g. one `standalone_repository`, one `feature_worktree`) coexist on the same key, and a single multi-scope action never collides with itself. A plugin key also collides with any **built-in** action bound to the same key, regardless of area — this is the more common real-world conflict when picking a default `key`, so consult the built-in action table in `winter:/ai/winter-cli/usage/dashboard.md#keybindings` before committing to a default.
+`scope` accepts a **single** `ActionScope` or a **sequence** of them. Pass several to make one command — one `name`, one `action_id` (`plugin.<name>`), one key — work in multiple areas. The areas never hold focus simultaneously, so the same key in each is unambiguous; winter dispatches to whichever area is focused. Two same-key plugin actions collide only when their declared areas **overlap** — disjoint areas (e.g. one `standalone_repository`, one `feature_worktree`) coexist on the same key, and a single multi-scope action never collides with itself. A plugin key also collides with any **built-in** action bound to the same key, regardless of area — this is the more common real-world conflict when picking a default `key`, so consult the built-in action table in `workspace:/ai/winter-cli/usage/dashboard.md#keybindings` before committing to a default.
 The workspace screen routes a multi-scope action to the **focused area** (standalone panel vs. feature grid); the detail screens (worktree detail, standalone detail) route to the **most-specific declared scope** they can host — so a `[feature_worktree, standalone_repository]` action fires with a `FeatureWorktreeContext` on the worktree detail screen and with a `StandaloneRepoContext` on the standalone detail screen, regardless of what is focused.
 
 ```python
@@ -186,5 +186,5 @@ These names are the plugin author's API surface — an author typechecks `create
 ## See also
 
 - `winter-service-tmux:/plugin.py` — the canonical single-file worked example.
-- `winter:tools/winter-cli/src/winter_cli/plugins/types.py` — the contract; `loader.py` (same dir) — discovery and the load-and-skip-on-error behavior.
+- `winter:/tools/winter-cli/src/winter_cli/plugins/types.py` — the contract; `loader.py` (same dir) — discovery and the load-and-skip-on-error behavior.
 - `../standards/protocol-conformance.md` — pinning a typed `create_plugin() -> IWinterPlugin` annotation with a conformance sentinel.

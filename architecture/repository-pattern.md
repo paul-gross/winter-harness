@@ -107,7 +107,7 @@ Use the real exception class for error-path tests (`OSError`, `git.GitCommandErr
 
 **Tradeoff**: this pattern catches contract bugs in the adapter — wrong arguments, missing keyword, wrong exception wrapping. It does not catch library-version drift (the real `subprocess.run` signature changing, or GitPython changing a method name). Library-version drift requires an integration or smoke test that runs the real library against real I/O.
 
-**Future integration harness**: a smoke harness that exercises adapters against real external systems (a real git repo, a real filesystem, a live subprocess) lives outside `pytest` and is not yet established. When it is, it supplements adapter unit tests; it does not replace them.
+**Integration coverage**: adapter unit tests do not catch library-version drift. A smoke harness that exercises adapters against real external systems (a real git repo, a real filesystem, a live subprocess) supplements adapter unit tests and lives outside `pytest`; it does not replace them.
 
 ## See also
 
