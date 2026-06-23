@@ -14,3 +14,4 @@ Paired reviewers: `context-reviewer` enforces these conventions and the [Canon](
 | `./writing-readme.md` | Writing or editing a `README.md` for any winter ecosystem repo |
 | `./writing-agent.md` | Authoring an agent — the frontmatter contract (`name`, `description`, `model`, `tools`) and the canonical-name rule |
 | `./writing-skill.md` | Authoring a skill — picking between the self-contained and thin (`SKILL.md` + `ai/<name>/process.md`) shapes |
+| `./tooling.md` | Workspace tooling conventions — GitHub CLI (`gh`) rule |
