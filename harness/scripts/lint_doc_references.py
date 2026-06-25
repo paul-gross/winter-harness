@@ -8,16 +8,18 @@ degrade that:
 1. **Broken links.** A relative markdown link whose target no longer exists is
    a dead end — `fail`.
 2. **Orphans.** An `ai/**/*.md` file that exists but is unreachable from any
-   routing table (no index/README/CLAUDE.md link chain leads to it) is content
-   an agent will never be routed to — `warn` (raise or silence per consumer).
+   routing table or skill (no index/README/CLAUDE.md or SKILL.md link chain
+   leads to it) is content an agent will never be routed to — `warn` (raise or
+   silence per consumer).
 
 Reachability and orphan detection are whole-repo properties, so this lint always
 operates over the full repo (the `--repo` root), not a changed-file subset.
 
 Link targets that carry a scheme or a path-notation prefix (`https:`,
-`mailto:`, `workspace:/…`, `winter-<name>:/…`) are skipped here — a single-repo
-lint can't resolve a cross-context reference, and the extractability lint
-already validates `<context>:/…` targets against the dependency graph.
+`mailto:`, `workspace:/…`, `winter-<name>:/…`) are skipped for broken-link
+checking — a single-repo lint can't resolve cross-context references.  For
+orphan reachability, path-notation targets in `SKILL.md` files are resolved
+against `repo_root` so that docs linked from a skill are not falsely orphaned.
 
 This is a `winter lint` check following the standard script contract: NDJSON
 findings on stdout, exit 0. It is also runnable standalone:
@@ -42,12 +44,20 @@ CHECK = "doc-references"
 # Files that anchor the routing graph — reachability BFS starts from these.
 SEED_NAMES = frozenset({"index.md", "CLAUDE.md", "CLAUDE.winter.md", "README.md"})
 
+# Skills are a second class of reachability entrypoint: the BFS also seeds from
+# any SKILL.md found in the repo and follows their outbound links transitively.
+SKILL_NAME = "SKILL.md"
+
 # Routing files whose outbound links are checked for breakage. Scoped to the
 # routing tables (per the issue): a broken link in a navigation table strands an
 # agent mid-disclosure. Links in body docs (skills, agents) often use a
 # workspace-root-relative convention this single-repo lint can't model, so they
 # are out of scope here.
 LINK_CHECK_NAMES = frozenset({"index.md", "CLAUDE.md", "CLAUDE.winter.md"})
+
+# Captures the path portion of a path-notation ref like `workspace:/ai/foo.md`
+# or `winter-harness:/architecture/index.md` — everything after `<scheme>:/`.
+_PATHNOTATION_RE = re.compile(r"^[a-z][a-z0-9+.-]*:/(.+)$")
 
 # A target with a scheme or path-notation prefix: `https:`, `mailto:`,
 # `workspace:/…`, `winter-harness:/…`. Not resolvable in a single-repo lint.
@@ -106,6 +116,41 @@ class DocReferenceLint:
                     out.append(target)
         return out
 
+    def _skill_pathnotation_targets(self, file: Path, repo_root: Path) -> list[Path]:
+        """Repo-local paths referenced via path-notation in a skill file.
+
+        Extracts targets of the form `<context>:/path` from `file` — both from
+        markdown link targets and from inline code spans (the typical skill
+        authoring style is to write `` `workspace:/ai/foo.md` ``).  Strips the
+        context prefix, resolves the remainder against `repo_root`, and returns
+        only paths that actually exist inside the repo.
+        """
+        lines = self._scanner.read_lines(file)
+        if lines is None:
+            return []
+        root = repo_root.resolve()
+        out: list[Path] = []
+        seen: set[Path] = set()
+        for _, line in self._scanner.iter_content_lines("\n".join(lines)):
+            candidates = (
+                self._scanner.link_targets(line)
+                + self._scanner.import_targets(line)
+                + self._scanner.code_spans(line)
+            )
+            for target in candidates:
+                m = _PATHNOTATION_RE.match(target)
+                if not m:
+                    continue
+                candidate = (root / m.group(1)).resolve()
+                try:
+                    candidate.relative_to(root)
+                except ValueError:
+                    continue  # resolves outside the repo — skip
+                if candidate.suffix == ".md" and candidate.exists() and candidate not in seen:
+                    seen.add(candidate)
+                    out.append(candidate)
+        return out
+
     def _broken_link_findings(self, files: list[Path], base: Path) -> list[dl.Finding]:
         findings: list[dl.Finding] = []
         for file in files:
@@ -135,13 +180,18 @@ class DocReferenceLint:
         return findings
 
     def _reachable_md(self, files: list[Path], repo_root: Path) -> set[Path]:
-        """Resolved `.md` paths reachable from the routing seeds by link-following."""
+        """Resolved `.md` paths reachable from the routing seeds by link-following.
+
+        Seeds from both routing-table files (`SEED_NAMES`) and skill entrypoints
+        (`SKILL_NAME`).  Skill files additionally contribute path-notation targets
+        (e.g. `workspace:/ai/foo.md`) resolved against `repo_root`.
+        """
         by_path = {f.resolve(): f for f in files}
         root = repo_root.resolve()
         visited: set[Path] = set()
         queue: deque[Path] = deque()
         for resolved, _ in by_path.items():
-            if resolved.name in SEED_NAMES:
+            if resolved.name in SEED_NAMES or resolved.name == SKILL_NAME:
                 visited.add(resolved)
                 queue.append(resolved)
         while queue:
@@ -157,6 +207,11 @@ class DocReferenceLint:
                 if resolved.exists():
                     visited.add(resolved)
                     queue.append(resolved)
+            if current.name == SKILL_NAME:
+                for resolved in self._skill_pathnotation_targets(current, repo_root):
+                    if resolved not in visited:
+                        visited.add(resolved)
+                        queue.append(resolved)
         return visited
 
     def _under_ai_dir(self, file: Path, repo_root: Path) -> bool:
@@ -185,10 +240,10 @@ class DocReferenceLint:
                 dl.Finding(
                     check=CHECK,
                     status=self._orphan_severity,
-                    message=f"orphaned doc — `{repo_rel}` exists but no routing table links to it",
+                    message=f"orphaned doc — `{repo_rel}` exists but no routing table or skill links to it",
                     file=rel,
-                    remediation="Link it from an index/routing table (a `index.md`, `README.md`, or "
-                    "`CLAUDE.md`), or allow-list it with `--allow` if it is intentionally unrouted.",
+                    remediation="Link it from an index/routing table (`index.md`, `README.md`, or "
+                    "`CLAUDE.md`) or from a `SKILL.md`, or allow-list it with `--allow` if it is intentionally unrouted.",
                 )
             )
         return findings

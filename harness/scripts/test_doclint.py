@@ -126,6 +126,43 @@ class DocReferencesTest(unittest.TestCase):
         self.assertEqual(lint._orphan_findings(self.files, self.root, self.root), [])
 
 
+class DocReferencesSkillsTest(unittest.TestCase):
+    """Skills (`SKILL.md`) are reachability entrypoints alongside routing tables."""
+
+    def setUp(self) -> None:
+        self.root = FIXTURES / "doc_references_skills"
+        self.scanner = dl.MarkdownScanner()
+        self.files = self.scanner.collect_markdown([self.root])
+
+    def _make_lint(self) -> docs.DocReferenceLint:
+        return docs.DocReferenceLint(self.scanner, "warn", [])
+
+    def test_skill_relative_link_not_orphaned(self) -> None:
+        # ai/via-relative.md is linked only from SKILL.md via a relative path —
+        # it must not be reported as an orphan.
+        lint = self._make_lint()
+        orphans = lint._orphan_findings(self.files, self.root, self.root)
+        messages = " ".join(f.message for f in orphans)
+        self.assertNotIn("via-relative.md", messages)
+
+    def test_skill_pathnotation_link_not_orphaned(self) -> None:
+        # ai/via-pathnotation.md is linked only from SKILL.md via
+        # `workspace:/ai/via-pathnotation.md` path-notation — it must not be
+        # reported as an orphan.
+        lint = self._make_lint()
+        orphans = lint._orphan_findings(self.files, self.root, self.root)
+        messages = " ".join(f.message for f in orphans)
+        self.assertNotIn("via-pathnotation.md", messages)
+
+    def test_unreachable_doc_still_orphaned(self) -> None:
+        # ai/skill-orphan.md is linked from neither a routing table nor any
+        # skill — it must still be reported as an orphan.
+        lint = self._make_lint()
+        orphans = lint._orphan_findings(self.files, self.root, self.root)
+        messages = " ".join(f.message for f in orphans)
+        self.assertIn("skill-orphan.md", messages)
+
+
 class CollectMarkdownTest(unittest.TestCase):
     def test_prunes_nested_checkouts(self) -> None:
         # A subdirectory carrying its own `.git` (clone dir or worktree file) is

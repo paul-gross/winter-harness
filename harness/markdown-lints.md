@@ -33,7 +33,9 @@ Two checks over the routing files (`CLAUDE.md`, `CLAUDE.winter.md`, and every `i
 - **Broken links** (`fail`) — a relative markdown link whose target does not exist strands an agent mid-disclosure.
   Targets with a scheme or path-notation prefix (`https:`, `workspace:/…`) are skipped — a single-repo lint can't resolve a cross-context reference, and extractability already validates those.
   Body docs (skills, agents) are out of scope here: their links often use a workspace-root-relative convention this lint can't model.
-- **Orphans** (`warn`) — an `ai/**/*.md` file that exists but is unreachable from any routing table by link or `@import` chain is content no agent will be routed to.
+- **Orphans** (`warn`) — an `ai/**/*.md` file that exists but is unreachable from any routing table or skill by link or `@import` chain is content no agent will be routed to.
+  Reachability seeds from both routing-table files (`index.md`, `CLAUDE.md`, `CLAUDE.winter.md`, `README.md`) and from every `SKILL.md` found in the repo.
+  Path-notation references inside a `SKILL.md` (e.g. `` `workspace:/ai/foo.md` ``) are resolved against the repo root so that docs linked only from a skill are not falsely orphaned.
   `warn` by default; `--orphan-severity fail|off` to change it, `--allow '<glob>'` (repeatable, repo-relative) to exempt intentionally-unrouted files.
 
 Reachability and orphan detection are whole-repo properties, so this lint always scans the full `--repo` root, not a changed-file subset.
