@@ -2,7 +2,7 @@
 
 `lint_path_notation.py` and `lint_doc_references.py` both ship here in the
 winter-harness Meta layer and both follow the `winter lint` script contract
-(see `workspace:/ai/winter-cli/setup.md` "Lint checks"): NDJSON findings on stdout, one JSON
+(see `workspace:/ai/winter-cli/configuration/lint.md`): NDJSON findings on stdout, one JSON
 object per line, exit 0 regardless of verdict so the dispatcher aggregates the
 statuses. Each is *also* runnable standalone against an arbitrary checkout.
 

@@ -4,7 +4,7 @@ Two conventions for agent-facing markdown are documented but otherwise enforced 
 The lints here mechanically check both.
 They ship in the winter-harness Markdown layer because they enforce *its* conventions, so any ecosystem repo can run them against its own docs.
 
-Both live in [`./scripts/`](./scripts/) and follow the `winter lint` script contract (NDJSON findings on stdout, exit 0 — see `workspace:/ai/winter-cli/setup.md` "Lint checks"), so each is also registerable as a `winter lint` check.
+Both live in [`./scripts/`](./scripts/) and follow the `winter lint` script contract (NDJSON findings on stdout, exit 0 — see `workspace:/ai/winter-cli/configuration/lint.md`), so each is also registerable as a `winter lint` check.
 They are graph-free, which is what distinguishes them from the extractability lint at `winter:/tools/winter-lint/extractability.py`: extractability asks whether a reference *already in* `<context>:/` notation points at a declared dependency, while these ask whether a raw path *should be* in notation and whether a routing link resolves at all.
 They reuse extractability's `<!-- winter-lint:example -->` line marker and fenced-code-block skip — see that lint's README (`winter:/tools/winter-lint/README.md`) for the marker semantics.
 

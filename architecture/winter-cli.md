@@ -128,4 +128,4 @@ Anything else is a hard failure on the first attempt. `is_transient_git_error` i
 - Conventions this codebase instantiates: `./service-architecture.md`, `./dependency-injection.md`, `./repository-pattern.md`, `./error-handling.md`, `./module-layout.md`.
 - Repository-pattern reference implementation: `exemplars/python/repo_pattern.py`.
 - User-facing CLI command reference (hub): `workspace:/ai/winter-cli/index.md`.
-- Installation + extension hook contract: `workspace:/ai/winter-cli/setup.md`.
+- Installation: `workspace:/ai/winter-cli/setup.md`. Extension hook contract: `workspace:/ai/winter-cli/configuration/extensions.md#extension-hooks`.

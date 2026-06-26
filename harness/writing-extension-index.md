@@ -20,7 +20,7 @@ In scope:
 
 Out of scope — these belong elsewhere:
 - **Lifecycle-hook tables** (`on_env_init` / `on_env_destroy` script names, what each does). Behind-the-scenes — the user doesn't invoke these; `winter ws init/destroy` does. The manifest at `winter-ext.toml` is self-documenting for anyone modifying the extension.
-- **Doctor probe internals** (which probes the script emits, the NDJSON shape, exit-code semantics). The user reads `winter doctor`'s rendered output, not the probe internals. The contract lives in `workspace:/ai/winter-cli/setup.md#doctor-probes`.
+- **Doctor probe internals** (which probes the script emits, the NDJSON shape, exit-code semantics). The user reads `winter doctor`'s rendered output, not the probe internals. The contract lives in `workspace:/ai/winter-cli/configuration/doctor.md#probe-output-contract`.
 - **Manifest schema, plugin internals, hook-script implementation details.** All behind-the-scenes.
 - **Installation steps.** Those belong in `README.md` (see `winter-harness:/harness/writing-readme.md`).
 - **Setup walkthroughs.** Those belong in `ai/` (e.g. `ai/workflow-setup.md`) and are referenced *from* `index.md` with a one-line pointer.
