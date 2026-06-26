@@ -7,7 +7,7 @@ Paired reviewers: `context-reviewer` enforces these conventions and the [Canon](
 | File | When to read |
 |------|--------------|
 | `./documentation-governance.md` | Authoring or auditing the public framework docs (docs site, READMEs) — the consumable-extension catalog vs. the Examples list, and the consumable-extension vs. example/reference distinction |
-| `./markdown-lints.md` | Mechanically checking the path-notation and routing-reference conventions — the two `winter lint` scripts in `./scripts/`, what each flags, and how to run them |
+| `./markdown-lints.md` | Mechanically checking the path-notation, routing-reference, and link-anchor conventions — the three `winter lint` scripts in `./scripts/`, what each flags, and how to run them |
 | `./winter-references.md` | Writing a cross-context path reference, naming an agent / skill / slash command, or reviewing any document that does so |
 | `./writing-documentation.md` | Landing a feature — the "no undocumented feature" invariant: a change to user-facing surface updates the docs that render it, in the same commit |
 | `./writing-extension-index.md` | Writing, editing, or auditing a winter extension's top-level `index.md` — what belongs there vs. what's behind-the-scenes (the file is auto-loaded into every agent context) |

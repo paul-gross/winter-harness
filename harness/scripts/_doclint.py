@@ -147,13 +147,26 @@ class MarkdownScanner:
         what to resolve.
         """
         out: list[str] = []
+        for t in self.raw_link_targets(line):
+            file_part = t.split("#", 1)[0]
+            if file_part:
+                out.append(file_part)
+        return out
+
+    def raw_link_targets(self, line: str) -> list[str]:
+        """Targets of every markdown link on a line, preserving any #fragment.
+
+        Same as `link_targets` but does not strip the fragment — the caller
+        receives the full target string (e.g. `path/to/file.md#heading` or
+        `#same-file-anchor`) and is responsible for splitting on `#`.
+        """
+        out: list[str] = []
         for raw in _LINK_RE.findall(line):
             target = raw.strip()
             if target.startswith("<") and ">" in target:
                 target = target[1 : target.index(">")]
             else:
                 target = target.split()[0] if target.split() else ""
-            target = target.split("#", 1)[0]
             if target:
                 out.append(target)
         return out

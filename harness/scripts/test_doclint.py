@@ -14,6 +14,7 @@ from pathlib import Path
 
 import _doclint as dl
 import lint_doc_references as docs
+import lint_link_anchors as anchors
 import lint_path_notation as paths
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
@@ -209,6 +210,188 @@ class LintCliTest(unittest.TestCase):
     def test_base_dir_prefers_workspace_dir(self) -> None:
         self.assertEqual(dl.LintCli(env={"WINTER_WORKSPACE_DIR": "/ws"}).base_dir(Path("/repo")), Path("/ws"))
         self.assertEqual(dl.LintCli(env={}).base_dir(Path("/repo")), Path("/repo"))
+
+
+class LinkAnchorSlugTest(unittest.TestCase):
+    """Unit tests for the GitHub-style slug helper."""
+
+    def test_basic_heading(self) -> None:
+        self.assertEqual(anchors._compute_slug("Hello World"), "hello-world")
+
+    def test_punctuation_stripped(self) -> None:
+        self.assertEqual(anchors._compute_slug("Type (Scope): Description"), "type-scope-description")
+
+    def test_backtick_spans_inlined(self) -> None:
+        self.assertEqual(anchors._compute_slug("With `Code` Span"), "with-code-span")
+
+    def test_multi_space_produces_multiple_hyphens(self) -> None:
+        # GitHub slugger replaces each space individually — two spaces → two hyphens.
+        self.assertEqual(anchors._compute_slug("Hello,  World"), "hello--world")
+
+    def test_leading_emoji_keeps_leading_hyphen(self) -> None:
+        # The emoji is stripped (non-word), leaving a leading space → leading hyphen.
+        # GitHub does not strip leading/trailing hyphens from the result.
+        self.assertEqual(anchors._compute_slug("🎉 Celebrate"), "-celebrate")
+
+    def test_duplicate_disambiguation(self) -> None:
+        target = FIXTURES / "link_anchors" / "target.md"
+        slugs = anchors.file_heading_slugs(target)
+        self.assertIn("alpha", slugs)
+        self.assertIn("beta", slugs)
+        self.assertIn("beta-1", slugs)
+        self.assertIn("with-code-span", slugs)
+
+    def test_fenced_headings_not_counted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Path(tmp) / "fenced.md"
+            f.write_text("```\n# Not A Heading\n```\n\n# Real Heading\n")
+            slugs = anchors.file_heading_slugs(f)
+            self.assertIn("real-heading", slugs)
+            self.assertNotIn("not-a-heading", slugs)
+
+
+class LinkAnchorLintFixtureTest(unittest.TestCase):
+    """Tests against the link_anchors fixture directory."""
+
+    def setUp(self) -> None:
+        self.root = FIXTURES / "link_anchors"
+        self.scanner = dl.MarkdownScanner()
+        self.lint = anchors.LinkAnchorLint(self.scanner)
+
+    def test_target_file_has_expected_slugs(self) -> None:
+        target = self.root / "target.md"
+        slugs = anchors.file_heading_slugs(target)
+        self.assertIn("alpha", slugs)
+        self.assertIn("beta", slugs)
+
+    def test_dangling_same_file_anchor_is_flagged(self) -> None:
+        check = self.root / "check.md"
+        findings = self.lint.check([check], self.root)
+        messages = [f.message for f in findings]
+        # #nonexistent-heading is in check.md which has no such slug
+        self.assertTrue(any("nonexistent-heading" in m for m in messages))
+
+    def test_dangling_other_file_anchor_is_flagged(self) -> None:
+        check = self.root / "check.md"
+        findings = self.lint.check([check], self.root)
+        messages = [f.message for f in findings]
+        self.assertTrue(any("nonexistent" in m for m in messages))
+
+    def test_dead_file_target_is_flagged(self) -> None:
+        check = self.root / "check.md"
+        findings = self.lint.check([check], self.root)
+        messages = [f.message for f in findings]
+        self.assertTrue(any("nonexistent.md" in m for m in messages))
+
+    def test_valid_links_produce_no_findings(self) -> None:
+        check = self.root / "check.md"
+        findings = self.lint.check([check], self.root)
+        for f in findings:
+            # Valid anchors (alpha, beta-1, with-code-span) must not be flagged
+            self.assertNotIn("#alpha", f.message)
+            self.assertNotIn("#beta-1", f.message)
+            self.assertNotIn("#with-code-span", f.message)
+            self.assertNotIn("#check-fixture", f.message)
+
+    def test_example_marked_line_is_skipped(self) -> None:
+        check = self.root / "check.md"
+        findings = self.lint.check([check], self.root)
+        # The bad-anchor link is example-marked and must not produce a finding
+        self.assertFalse(any("bad-anchor" in f.message for f in findings))
+
+    def test_all_findings_are_fail(self) -> None:
+        check = self.root / "check.md"
+        findings = self.lint.check([check], self.root)
+        self.assertTrue(findings)
+        self.assertTrue(all(f.status == "fail" for f in findings))
+
+    def test_exact_finding_count(self) -> None:
+        # Expect exactly three failures: same-file dangling, other-file dangling,
+        # and the dead relative link.
+        check = self.root / "check.md"
+        findings = self.lint.check([check], self.root)
+        self.assertEqual(len(findings), 3)
+
+
+class LinkAnchorCrossRepoTest(unittest.TestCase):
+    """Tests for cross-repo `winter-<name>:/` and `workspace:/` anchor resolution."""
+
+    def _make_lint(self, ws: Path) -> anchors.LinkAnchorLint:
+        return anchors.LinkAnchorLint(dl.MarkdownScanner(), workspace_dir=ws)
+
+    def test_cross_repo_valid_anchor(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ws = Path(tmp)
+            ext = ws / ".winter" / "ext" / "foo"
+            ext.mkdir(parents=True)
+            (ext / "topic.md").write_text("# Real Heading\n\nContent.\n")
+            src = ws / "myrepo"
+            src.mkdir()
+            doc = src / "doc.md"
+            doc.write_text("[link](winter-foo:/topic.md#real-heading)\n")
+            findings = self._make_lint(ws).check([doc], ws)
+            self.assertEqual(findings, [])
+
+    def test_cross_repo_dangling_anchor(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ws = Path(tmp)
+            ext = ws / ".winter" / "ext" / "foo"
+            ext.mkdir(parents=True)
+            (ext / "topic.md").write_text("# Real Heading\n\nContent.\n")
+            src = ws / "myrepo"
+            src.mkdir()
+            doc = src / "doc.md"
+            doc.write_text("[link](winter-foo:/topic.md#nope)\n")
+            findings = self._make_lint(ws).check([doc], ws)
+            self.assertEqual(len(findings), 1)
+            self.assertIn("nope", findings[0].message)
+
+    def test_cross_repo_workspace_prefix(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ws = Path(tmp)
+            (ws / "ai").mkdir()
+            (ws / "ai" / "guide.md").write_text("# Guide Heading\n")
+            src = ws / "myrepo"
+            src.mkdir()
+            doc = src / "doc.md"
+            doc.write_text("[link](workspace:/ai/guide.md#guide-heading)\n")
+            findings = self._make_lint(ws).check([doc], ws)
+            self.assertEqual(findings, [])
+
+    def test_cross_repo_unknown_context_skipped_without_workspace(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            doc = Path(tmp) / "doc.md"
+            doc.write_text("[link](winter-foo:/topic.md#heading)\n")
+            lint = anchors.LinkAnchorLint(dl.MarkdownScanner(), workspace_dir=None)
+            findings = lint.check([doc], Path(tmp))
+            self.assertEqual(findings, [])
+
+
+class RawLinkTargetsTest(unittest.TestCase):
+    """Tests for the new MarkdownScanner.raw_link_targets method."""
+
+    def setUp(self) -> None:
+        self.scanner = dl.MarkdownScanner()
+
+    def test_preserves_fragment(self) -> None:
+        targets = self.scanner.raw_link_targets("[text](path/to/file.md#heading)")
+        self.assertEqual(targets, ["path/to/file.md#heading"])
+
+    def test_same_file_anchor(self) -> None:
+        targets = self.scanner.raw_link_targets("[text](#anchor)")
+        self.assertEqual(targets, ["#anchor"])
+
+    def test_no_fragment_unchanged(self) -> None:
+        targets = self.scanner.raw_link_targets("[text](path/to/file.md)")
+        self.assertEqual(targets, ["path/to/file.md"])
+
+    def test_title_stripped_fragment_kept(self) -> None:
+        targets = self.scanner.raw_link_targets('[text](path#frag "Title")')
+        self.assertEqual(targets, ["path#frag"])
+
+    def test_angle_bracket_form(self) -> None:
+        targets = self.scanner.raw_link_targets("[text](<path#frag>)")
+        self.assertEqual(targets, ["path#frag"])
 
 
 if __name__ == "__main__":

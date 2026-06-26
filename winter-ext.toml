@@ -7,6 +7,7 @@ prefix = "wh"
 lint = [
     "harness/scripts/lint_path_notation.py",
     "harness/scripts/lint_doc_references.py",
+    "harness/scripts/lint_link_anchors.py",
 ]
 
 # winter-harness is the governance layer: it documents conventions for the
