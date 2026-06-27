@@ -13,7 +13,7 @@ Each rule follows a `Rule` / `Why` / `Do` / `Don't` shape.
 **Do.**
 
 - A command reference where each command has its own file: a hub `index.md` with a routing row per command, and `init.md`, `destroy.md`, `status.md` beside it. A command group with many sub-commands earns its own sub-directory with its own hub.
-- A convention area: a hub `index.md` whose rows route to one convention file each, and which itself names its parent layer for the reader climbing back up.
+- A convention area: a hub `index.md` whose rows route to one convention file each, and which itself names its parent domain for the reader climbing back up.
 
 **Don't.**
 

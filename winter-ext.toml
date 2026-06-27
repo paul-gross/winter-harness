@@ -2,12 +2,12 @@ name = "winter-harness"
 prefix = "wh"
 
 # Markdown-convention lint checks contributed to `winter lint` (see
-# harness/markdown-lints.md). The field takes a list, so each check ships as its
+# agent-context/linting.md). The field takes a list, so each check ships as its
 # own script and runs over the selected scope, emitting NDJSON findings.
 lint = [
-    "harness/scripts/lint_path_notation.py",
-    "harness/scripts/lint_doc_references.py",
-    "harness/scripts/lint_link_anchors.py",
+    "agent-context/scripts/lint_path_notation.py",
+    "agent-context/scripts/lint_doc_references.py",
+    "agent-context/scripts/lint_link_anchors.py",
 ]
 
 # winter-harness is the governance layer: it documents conventions for the

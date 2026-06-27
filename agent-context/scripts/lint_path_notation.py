@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Path-notation lint for agent-facing markdown.
 
-`workspace:/CLAUDE.md` and `winter-harness:/harness/winter-references.md` define
+`workspace:/CLAUDE.md` and `winter-harness:/agent-context/references.md` define
 the canonical way to address a file in another repo or context: a
 `<context>:/path` prefix (`workspace:/…`, `winter-<name>:/…`, `alpha:/…`). A
 *raw* cross-context path — `.winter/ext/github/context/issue-format.md`,

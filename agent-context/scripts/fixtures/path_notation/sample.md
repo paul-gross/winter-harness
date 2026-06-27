@@ -16,7 +16,7 @@ default repo scan (it lives under `fixtures/`); the test targets it explicitly.
 - Intra-repo relative: `./architecture/error-handling.md`
 - Intra-repo relative: `tools/winter-cli/pyproject.toml`
 - Canonical notation: `workspace:/CLAUDE.md`
-- Canonical notation: `winter-harness:/harness/index.md`
+- Canonical notation: `winter-harness:/agent-context/index.md`
 - Marked as illustration: `.winter/ext/foo/bar.md` <!-- winter-lint:example -->
 
 A fenced block holds sample commands, so its raw paths are correct:

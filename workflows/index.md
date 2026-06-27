@@ -2,7 +2,7 @@
 
 Process conventions for the day-to-day workflows by which changes are delivered in the winter ecosystem.
 
-Parent layer: `../index.md` (root topology).
+Parent: `../index.md` (root topology).
 
 | Workflow | When to read |
 |----------|--------------|

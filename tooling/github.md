@@ -1,6 +1,4 @@
-# Tooling conventions
-
-## GitHub CLI
+# GitHub CLI
 
 **GitHub interactions** must use the [`gh`](https://cli.github.com/) CLI — issues, PRs, releases, repo management. Never script against the web UI.
 

@@ -46,7 +46,7 @@ class PathNotationTest(unittest.TestCase):
             "architecture/error-handling.md",
             "pyproject.toml",
             "workspace:/CLAUDE.md",
-            "winter-harness:/harness/index.md",
+            "winter-harness:/agent-context/index.md",
             "foo/bar.md",  # the example-marked line
         ):
             self.assertNotIn(ok, joined)

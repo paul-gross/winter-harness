@@ -1,8 +1,8 @@
 # Standards
 
-Review-time conventions for finished Python code — consulted when asking "is this code up to standard?" rather than when designing it. Where `architecture/` shapes how code is structured while it is being written, this layer is reached after the code exists and before it lands.
+Review-time conventions for finished Python code — consulted when asking "is this code up to standard?" rather than when designing it. Where `architecture/` shapes how code is structured while it is being written, this domain is reached after the code exists and before it lands.
 
-Parent layer: `../index.md` (root topology).
+Parent: `../index.md` (root topology).
 
 | Standard | When to read |
 |----------|--------------|

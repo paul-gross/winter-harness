@@ -6,7 +6,7 @@ How to author a skill across the winter ecosystem. Skills come in two shapes; th
 
 **Self-contained.** The entire procedure lives in `SKILL.md`. The body is the procedure. The only way to execute it is to invoke the slash command. Examples: `winter-workflow:/skills/blizzard/SKILL.md`, `winter-workflow:/skills/thaw/SKILL.md`, `winter-workflow:/skills/commit/SKILL.md`.
 
-**Thin SKILL.md backed by a `context/` procedure doc.** `SKILL.md` is a small entry point that names a `context/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `context/<name>/process.md`. Other agents (a `blizzard` snowflake, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/context/harness-score/process.md`.
+**Thin SKILL.md backed by an `context/` procedure doc.** `SKILL.md` is a small entry point that names an `context/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `context/<name>/process.md`. Other agents (a `blizzard` snowflake, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/context/harness-score/process.md`.
 
 ## When to pick the thin shape
 
@@ -38,9 +38,9 @@ Body — one short paragraph plus one execute line. Two jobs:
 
 The body is declarative. No meta-commentary on the convention, no rationale for the file layout — the executing agent does not need to be told why; it needs to be told what to do. Do not paraphrase the steps; the procedure doc is the source of truth.
 
-When the body needs to refer to the skill itself, use the **bare canonical name** (the directory name) — e.g. `foo`, not `/foo`, not `/<prefix>-foo`, not `/wf-foo`. The prefix is workspace-configurable per [`./winter-references.md`](./winter-references.md); hard-coding a specific prefix pins the file to one workspace.
+When the body needs to refer to the skill itself, use the **bare canonical name** (the directory name) — e.g. `foo`, not `/foo`, not `/<prefix>-foo`, not `/wf-foo`. The prefix is workspace-configurable per [`./references.md`](./references.md); hard-coding a specific prefix pins the file to one workspace.
 
-All references from `SKILL.md` to files in the source extension — the procedure doc, shared assets, sibling skills — use the `<extension>:/...` path notation, never relative paths. `SKILL.md` is symlinked into the consuming workspace's `.claude/skills/<name>/SKILL.md`; a relative path like `../../context/<name>/process.md` resolves against the symlinked location and breaks. The extension-prefix path resolves through the workspace's `CLAUDE.winter.md` block and survives the symlink. See [`./winter-references.md`](./winter-references.md) for the full notation.
+All references from `SKILL.md` to files in the source extension — the procedure doc, shared assets, sibling skills — use the `<extension>:/...` path notation, never relative paths. `SKILL.md` is symlinked into the consuming workspace's `.claude/skills/<name>/SKILL.md`; a relative path like `../../context/<name>/process.md` resolves against the symlinked location and breaks. The extension-prefix path resolves through the workspace's `CLAUDE.winter.md` block and survives the symlink. See [`./references.md`](./references.md) for the full notation.
 
 ### `context/<name>/process.md`
 
@@ -66,7 +66,7 @@ References point **downward only** — from the caller to the procedure, never b
 - **`SKILL.md` → anything in the source extension:** always use `<extension>:/...` notation (e.g. `winter-workflow:/context/harness-score/process.md`). `SKILL.md` is symlinked into the consuming workspace, so relative paths from it resolve against the symlink target and break. The extension-prefix path resolves through `CLAUDE.winter.md` and survives.
 - **Within `context/<name>/`:** the procedure doc and its shared assets (`rubric.md`, `template.html`, etc.) live together and are not symlinked. Relative links (`./rubric.md`) are fine here.
 - **`context/<name>/process.md` → `SKILL.md`:** don't. The procedure stands alone; callers reference it, not the other way around.
-- **Cross-extension references** follow [`./winter-references.md`](./winter-references.md) regardless of file shape.
+- **Cross-extension references** follow [`./references.md`](./references.md) regardless of file shape.
 
 ## Do
 
@@ -109,7 +109,7 @@ Ask the user to confirm the score.                                     ← "the 
 - **Procedure doc that links back to its `SKILL.md`.** Dependency inversion: the procedure is the reusable abstraction; callers depend on it, not vice versa. A back-reference pins the procedure to one caller (the slash command) and silently lies to every other caller that reads it. The procedure must stand alone — anything it needs (frontmatter, argument hints, "who calls this") goes in its own header, not in a pointer back to one specific consumer.
 - **Relative paths out of `SKILL.md`.** `../../context/<name>/process.md` looks fine until `SKILL.md` is symlinked into the consuming workspace, then resolves against the wrong directory. Use `<extension>:/context/<name>/process.md`.
 - **`name:` in frontmatter.** The directory name is the canonical identifier; a `name:` field restates it (drift risk) or contradicts it (loader confusion). Omit it.
-- **Hard-coded prefixed name in the body.** `/wf-foo`, `wf-foo`, or `/<prefix>-foo` pins the file to one workspace's prefix; another workspace installs with a different prefix and the reference goes stale. Use the bare canonical name (`foo`) per [`./winter-references.md`](./winter-references.md).
+- **Hard-coded prefixed name in the body.** `/wf-foo`, `wf-foo`, or `/<prefix>-foo` pins the file to one workspace's prefix; another workspace installs with a different prefix and the reference goes stale. Use the bare canonical name (`foo`) per [`./references.md`](./references.md).
 - **Shared assets outside `context/<name>/`.** A rubric at `context/rubric.md` or `skills/<name>/rubric.md` invites the next author to put a sibling somewhere else again. Keep the cluster together.
 - **Splitting a self-contained skill that has no second caller.** The thin shape costs a directory and a level of indirection; pay it only when a non-slash-command caller is plausible.
 

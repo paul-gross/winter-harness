@@ -9,7 +9,9 @@ A [winter](https://github.com/paul-gross/winter) extension curated for the meta 
 - **Exemplar for others** — serves as an example harness project, a reference others can pull ideas from when assembling their own harness.
 - **Architecture conventions** (`architecture/`) — an opinionated guide for structuring Python applications, read at plan/build time: the generic design and structure rules plus application-specific architecture docs (e.g. `architecture/winter-cli.md`, the live tour of how the conventions are applied in winter-cli today). `architecture/index.md` is the entry point.
 - **Standards conventions** (`standards/`) — an opinionated guide for reviewing finished Python code, read at review time.
-- **Agent-facing markdown conventions** (`harness/`) — an opinionated guide for writing the markdown that agents read across the winter ecosystem.
+- **Agent-context conventions** (`agent-context/`) — an opinionated guide for writing the agent-facing markdown of the ecosystem: agents, skills, extension indexes, path references, and the lints that enforce them.
+- **Documentation conventions** (`documentation/`) — an opinionated guide for the public, adopter-facing docs: README form, the no-undocumented-feature invariant, and the consumable-vs-example catalog.
+- **Tooling conventions** (`tooling/`) — cross-cutting rules for the external development tools the ecosystem drives, such as the `gh` CLI.
 - **Canonical exemplars** (`exemplars/python/`) — reference `.py` files showing the expected shape of recurring patterns (repository class, domain object).
 
 ## 🚀 Installation

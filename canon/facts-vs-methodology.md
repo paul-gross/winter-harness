@@ -27,7 +27,7 @@ governing facts — a shared harness plus the target project's own
 harness/conventions — and report violations against what it finds there.
 ```
 
-The facts (`documentation-governance.md`, `writing-readme.md`, the target's invariants) live in the harness. The skill supplies only methodology: cold spawn, scope, output format.
+The facts (`governance.md`, `writing-readme.md`, the target's invariants) live in the harness. The skill supplies only methodology: cold spawn, scope, output format.
 
 ## Don't
 

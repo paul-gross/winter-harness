@@ -1,10 +1,10 @@
 # Architecture
 
-Plan/build-time conventions for the winter ecosystem — how to structure and design Python code, how the generic rules are realized in concrete winter applications. Consulted when writing new code or designing a feature; the companion `standards/` layer is consulted at review time.
+Plan/build-time conventions for the winter ecosystem — how to structure and design Python code, how the generic rules are realized in concrete winter applications. Consulted when writing new code or designing a feature; the companion `standards/` domain is consulted at review time.
 
 **Read this index before changing the code of any winter application** — the `winter` CLI, an extension's Python, a service orchestrator. It routes you to the doc for the surface you're touching so you build with the existing structure rather than reverse-engineering it. Follow the one row that matches your change; don't read the whole tree.
 
-Parent layer: `../index.md` (root topology).
+Parent: `../index.md` (root topology).
 
 | Architecture doc | When to read |
 |------------------|--------------|

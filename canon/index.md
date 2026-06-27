@@ -1,6 +1,8 @@
-# The Canon layer
+# The Canon domain
 
-The **Canon layer**: the universal, enforceable substrate true of *every* harness, independent of language, project, or workflow. These conventions hold for any harness.
+The **Canon domain**: the universal, enforceable substrate true of *every* harness, independent of language, project, or workflow. These conventions hold for any harness.
+
+Parent: `../index.md` (root topology).
 
 | File | When to read |
 |------|--------------|
