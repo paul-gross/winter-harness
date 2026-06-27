@@ -32,9 +32,9 @@ class PathNotationTest(unittest.TestCase):
         self.assertCountEqual(
             self.spans,
             [
-                ".winter/ext/codeberg/ai/issue-format.md",
+                ".winter/ext/codeberg/context/issue-format.md",
                 "projects/winter-cli/README.md",
-                "../winter-product/ai/todos.md",
+                "../winter-product/context/todos.md",
                 "winter-service-tmux/index.md",
                 "/home/alice/notes.md",
             ],
@@ -80,10 +80,10 @@ class ClassifySpanTest(unittest.TestCase):
         self.assertIsNone(self.lint.classify_span("winter-lint/extractability.py"))
 
     def test_bare_repo_name_is_flagged(self) -> None:
-        self.assertIsNotNone(self.lint.classify_span("winter-product/ai/todos.md"))
+        self.assertIsNotNone(self.lint.classify_span("winter-product/context/todos.md"))
 
     def test_multi_level_sibling_is_flagged(self) -> None:
-        self.assertIsNotNone(self.lint.classify_span("../../winter-product/ai/todos.md"))
+        self.assertIsNotNone(self.lint.classify_span("../../winter-product/context/todos.md"))
 
 
 class DocReferencesTest(unittest.TestCase):
@@ -118,7 +118,7 @@ class DocReferencesTest(unittest.TestCase):
         self.assertNotIn("deep.md", " ".join(f.message for f in orphans))
 
     def test_orphan_allow_list_silences(self) -> None:
-        lint = self._make_lint(allow=["ai/orphan.md"])
+        lint = self._make_lint(allow=["context/orphan.md"])
         orphans = lint._orphan_findings(self.files, self.root, self.root)
         self.assertEqual(orphans, [])
 
@@ -139,7 +139,7 @@ class DocReferencesSkillsTest(unittest.TestCase):
         return docs.DocReferenceLint(self.scanner, "warn", [])
 
     def test_skill_relative_link_not_orphaned(self) -> None:
-        # ai/via-relative.md is linked only from SKILL.md via a relative path —
+        # context/via-relative.md is linked only from SKILL.md via a relative path —
         # it must not be reported as an orphan.
         lint = self._make_lint()
         orphans = lint._orphan_findings(self.files, self.root, self.root)
@@ -147,8 +147,8 @@ class DocReferencesSkillsTest(unittest.TestCase):
         self.assertNotIn("via-relative.md", messages)
 
     def test_skill_pathnotation_link_not_orphaned(self) -> None:
-        # ai/via-pathnotation.md is linked only from SKILL.md via
-        # `workspace:/ai/via-pathnotation.md` path-notation — it must not be
+        # context/via-pathnotation.md is linked only from SKILL.md via
+        # `workspace:/context/via-pathnotation.md` path-notation — it must not be
         # reported as an orphan.
         lint = self._make_lint()
         orphans = lint._orphan_findings(self.files, self.root, self.root)
@@ -156,7 +156,7 @@ class DocReferencesSkillsTest(unittest.TestCase):
         self.assertNotIn("via-pathnotation.md", messages)
 
     def test_unreachable_doc_still_orphaned(self) -> None:
-        # ai/skill-orphan.md is linked from neither a routing table nor any
+        # context/skill-orphan.md is linked from neither a routing table nor any
         # skill — it must still be reported as an orphan.
         lint = self._make_lint()
         orphans = lint._orphan_findings(self.files, self.root, self.root)
@@ -349,12 +349,12 @@ class LinkAnchorCrossRepoTest(unittest.TestCase):
     def test_cross_repo_workspace_prefix(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             ws = Path(tmp)
-            (ws / "ai").mkdir()
-            (ws / "ai" / "guide.md").write_text("# Guide Heading\n")
+            (ws / "context").mkdir()
+            (ws / "context" / "guide.md").write_text("# Guide Heading\n")
             src = ws / "myrepo"
             src.mkdir()
             doc = src / "doc.md"
-            doc.write_text("[link](workspace:/ai/guide.md#guide-heading)\n")
+            doc.write_text("[link](workspace:/context/guide.md#guide-heading)\n")
             findings = self._make_lint(ws).check([doc], ws)
             self.assertEqual(findings, [])
 

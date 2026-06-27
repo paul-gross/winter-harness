@@ -11,7 +11,7 @@ Refer to files in other repos or contexts using a `<context>:<path>` prefix. The
 | `workspace:` | The current workspace root | `workspace:/CLAUDE.md` |
 | `<env>:` | A feature environment under the workspace (Greek-letter or feature name) | `alpha:/winter/tools/winter-cli/` |
 | `<extension-name>:` | An installed winter extension | `winter-harness:/architecture/error-handling.md` |
-| `<standalone-name>:` | A standalone repository cloned in the workspace | `my-app:/ai/architecture.md` |
+| `<standalone-name>:` | A standalone repository cloned in the workspace | `my-app:/context/architecture.md` |
 
 Notes:
 

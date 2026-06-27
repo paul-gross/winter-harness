@@ -1,6 +1,6 @@
 # Principles for agent-facing markdown
 
-Cross-cutting principles that apply to every agent-facing markdown file in the winter ecosystem — READMEs, extension `index.md`, skills, agents, `CLAUDE.md`, `ai/` convention docs. Principles that apply to one specific file shape live in their own convention file (`writing-readme.md`, `writing-skill.md`, etc.) and are not duplicated here.
+Cross-cutting principles that apply to every agent-facing markdown file in the winter ecosystem — READMEs, extension `index.md`, skills, agents, `CLAUDE.md`, `context/` convention docs. Principles that apply to one specific file shape live in their own convention file (`writing-readme.md`, `writing-skill.md`, etc.) and are not duplicated here.
 
 Each principle follows a `Rule` / `Why` / `Do` / `Don't` shape.
 
@@ -66,7 +66,7 @@ Prose reflowed to a fixed column — a one-word edit churns every wrapped line b
 **Do.**
 
 - Index / "when to read" row described by read-trigger: `| ./principles.md | Cross-cutting principles for any agent-facing markdown file — read before authoring or editing one |`
-- `CLAUDE.md` navigation row described by destination: `| Worktree git operations | ai/worktree-ops.md |` — names where to go, not the steps the target lists.
+- `CLAUDE.md` navigation row described by destination: `| Worktree git operations | context/worktree-ops.md |` — names where to go, not the steps the target lists.
 
 Describe the destination; let the reader follow the link for the contents.
 

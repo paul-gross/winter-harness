@@ -44,7 +44,7 @@ If `git log --oneline <upstream-name>/master..HEAD` prints more than one line, t
 
 ## Inherited copies
 
-Every file the customization commit does not own is an **inherited copy** — it lives in the upstream repo and travels downstream on the next *Sync flow*. The edit-time rule for these (check before editing; fix at the source repo, never hand-edit the downstream copy) belongs where an agent looks before touching a file, so it lives in `workspace:/ai/workspace-layout.md` §"Inherited docs at the workspace root" rather than being restated here.
+Every file the customization commit does not own is an **inherited copy** — it lives in the upstream repo and travels downstream on the next *Sync flow*. The edit-time rule for these (check before editing; fix at the source repo, never hand-edit the downstream copy) belongs where an agent looks before touching a file, so it lives in `workspace:/context/workspace-layout.md` §"Inherited docs at the workspace root" rather than being restated here.
 
 ## Sync flow
 
@@ -64,7 +64,7 @@ If the rebase reports conflicts, the upstream has changed something the customiz
 
 ## Amend vs new commit
 
-**Amend the customization commit** whenever you change workspace config — `.winter/config.toml`, `CLAUDE.md`, extension registrations, `ai/project/*.md`, anything that's part of the customization layer:
+**Amend the customization commit** whenever you change workspace config — `.winter/config.toml`, `CLAUDE.md`, extension registrations, `context/project/*.md`, anything that's part of the customization layer:
 
 ```bash
 git add <files>
@@ -81,5 +81,5 @@ Project repos are governed separately — see `./workflows/feature-delivery.md`.
 ## See also
 
 - `./workflows/feature-delivery.md` — the flow for landing changes in project repos (linear history via rebase, push direct to `origin/master`, pre-push checks)
-- `workspace:/ai/project/contributing.md` — commit format and `Closes #N` footer rules
-- `workspace:/ai/worktree-ops.md` — `winter ws fetch` / `pull` / `push` reference (these operate on **project repos** inside the workspace, not on the workspace repo itself)
+- `workspace:/context/project/contributing.md` — commit format and `Closes #N` footer rules
+- `workspace:/context/worktree-ops.md` — `winter ws fetch` / `pull` / `push` reference (these operate on **project repos** inside the workspace, not on the workspace repo itself)

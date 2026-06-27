@@ -2,7 +2,7 @@
 
 `lint_path_notation.py` and `lint_doc_references.py` both ship here in the
 winter-harness Meta layer and both follow the `winter lint` script contract
-(see `workspace:/ai/winter-cli/configuration/lint.md`): NDJSON findings on stdout, one JSON
+(see `workspace:/context/winter-cli/configuration/lint.md`): NDJSON findings on stdout, one JSON
 object per line, exit 0 regardless of verdict so the dispatcher aggregates the
 statuses. Each is *also* runnable standalone against an arbitrary checkout.
 
@@ -44,7 +44,7 @@ _CODE_SPAN_RE = re.compile(r"`([^`]+)`")
 # by the caller via `link_target`.
 _LINK_RE = re.compile(r"\[(?:[^\]]*)\]\(([^)]+)\)")
 
-# A Claude `@import` at the start of a line — `@ai/project/index.md`. A routing
+# A Claude `@import` at the start of a line — `@context/project/index.md`. A routing
 # mechanism alongside markdown links, so reachability must follow it.
 _IMPORT_RE = re.compile(r"^\s*@(\S+)")
 

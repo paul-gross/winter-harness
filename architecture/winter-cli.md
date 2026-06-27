@@ -83,7 +83,7 @@ Follow this order — each step builds on the previous:
 4. **New I/O seam** (only if needed) — Protocol at `modules/workspace/<seam>.py`, concrete adapter at `modules/workspace/internal/<seam>.py`. Apply the I-prefix rule (enforced by `tests/conventions/test_protocol_naming.py`).
 5. **Bind** the service and any new adapters in `container.py`. Services consume domain objects, not `WorkspaceConfig` directly — see `./dependency-injection.md` for the carve-outs (enforced by `tests/conventions/test_no_whole_config_injection.py`).
 6. **Unit test** under `tests/modules/workspace/` (service tests) or `tests/modules/workspace/internal/` (adapter tests) — inject fakes for the Protocols. See `tests/modules/workspace/internal/test_git_ops_service.py` and `tests/modules/workspace/internal/test_write_repo_repository.py` for the fixture pattern.
-7. **Surface the new command** in the docs so agents discover it from the docs, not from `--help`. Start at the usage index `workspace:/ai/winter-cli/usage/index.md` and follow it to the right per-topic file — for a `winter ws` subcommand that's its own file under `workspace:/ai/winter-cli/usage/ws/` (e.g. `usage/ws/checkout.md`), added to the `winter ws` hub's command table. If it's a whole new topic, add the file under `usage/` and a row routing to it from `usage/index.md`.
+7. **Surface the new command** in the docs so agents discover it from the docs, not from `--help`. Start at the usage index `workspace:/context/winter-cli/usage/index.md` and follow it to the right per-topic file — for a `winter ws` subcommand that's its own file under `workspace:/context/winter-cli/usage/ws/` (e.g. `usage/ws/checkout.md`), added to the `winter ws` hub's command table. If it's a whole new topic, add the file under `usage/` and a row routing to it from `usage/index.md`.
 
 ## Startup latency: lazy imports
 
@@ -127,5 +127,5 @@ Anything else is a hard failure on the first attempt. `is_transient_git_error` i
 
 - Conventions this codebase instantiates: `./service-architecture.md`, `./dependency-injection.md`, `./repository-pattern.md`, `./error-handling.md`, `./module-layout.md`.
 - Repository-pattern reference implementation: `exemplars/python/repo_pattern.py`.
-- User-facing CLI command reference (hub): `workspace:/ai/winter-cli/index.md`.
-- Installation: `workspace:/ai/winter-cli/setup.md`. Extension hook contract: `workspace:/ai/winter-cli/configuration/extensions.md#extension-hooks`.
+- User-facing CLI command reference (hub): `workspace:/context/winter-cli/index.md`.
+- Installation: `workspace:/context/winter-cli/setup.md`. Extension hook contract: `workspace:/context/winter-cli/configuration/extensions.md#extension-hooks`.

@@ -4,8 +4,8 @@
 `workspace:/CLAUDE.md` and `winter-harness:/harness/winter-references.md` define
 the canonical way to address a file in another repo or context: a
 `<context>:/path` prefix (`workspace:/…`, `winter-<name>:/…`, `alpha:/…`). A
-*raw* cross-context path — `.winter/ext/github/ai/issue-format.md`,
-`projects/winter-cli/README.md`, `../winter-product/ai/todos.md` — is a dead
+*raw* cross-context path — `.winter/ext/github/context/issue-format.md`,
+`projects/winter-cli/README.md`, `../winter-product/context/todos.md` — is a dead
 pointer the moment an extension is renamed or its on-disk install path changes.
 
 This lint flags raw cross-context paths that should carry a prefix. It is

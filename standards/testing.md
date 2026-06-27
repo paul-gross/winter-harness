@@ -10,7 +10,7 @@
 
 ## Why
 
-The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/ai/project/contributing.md`). There is no PR/MR review and no CI gate yet, so a regression that compiles and type-checks still lands silently unless the test suite catches it locally.
+The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/context/project/contributing.md`). There is no PR/MR review and no CI gate yet, so a regression that compiles and type-checks still lands silently unless the test suite catches it locally.
 
 Hand-rolled fakes against Protocols (rather than `MagicMock` against concrete classes) keep the test surface aligned with the dependency-inversion seams already established by `../architecture/dependency-injection.md` and `../architecture/repository-pattern.md`. The test stays valid as long as the Protocol contract holds; refactors inside an adapter don't ripple into the suite.
 

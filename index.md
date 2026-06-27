@@ -1,6 +1,6 @@
 # Topology
 
-Convention files live at the **top of the repo**, not under `ai/`. `winter-harness` *is* the conventions repo; its content is its public surface, addressed via the `winter-harness:` path notation (e.g. `winter-harness:/architecture/error-handling.md`).
+Convention files live at the **top of the repo**, not under `context/`. `winter-harness` *is* the conventions repo; its content is its public surface, addressed via the `winter-harness:` path notation (e.g. `winter-harness:/architecture/error-handling.md`).
 
 Four layers — Canon (universal substrate), Markdown (winter-ecosystem agent-facing docs), Code (application code conventions), and Process (delivery workflows) — each in its own directory. Start at the layer hub for the topic you need.
 

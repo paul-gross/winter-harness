@@ -1,11 +1,11 @@
 # My Skill
 
-A skill that links into ai/ docs.
+A skill that links into context/ docs.
 
 ## Relative link
 
-Read [via-relative](../../ai/via-relative.md) before proceeding.
+Read [via-relative](../../context/via-relative.md) before proceeding.
 
 ## Path-notation link
 
-Also consult `workspace:/ai/via-pathnotation.md` for the setup steps.
+Also consult `workspace:/context/via-pathnotation.md` for the setup steps.

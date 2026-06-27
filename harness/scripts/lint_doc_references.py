@@ -7,7 +7,7 @@ degrade that:
 
 1. **Broken links.** A relative markdown link whose target no longer exists is
    a dead end — `fail`.
-2. **Orphans.** An `ai/**/*.md` file that exists but is unreachable from any
+2. **Orphans.** A `context/**/*.md` file that exists but is unreachable from any
    routing table or skill (no index/README/CLAUDE.md or SKILL.md link chain
    leads to it) is content an agent will never be routed to — `warn` (raise or
    silence per consumer).
@@ -25,7 +25,7 @@ This is a `winter lint` check following the standard script contract: NDJSON
 findings on stdout, exit 0. It is also runnable standalone:
 
     python3 lint_doc_references.py --repo /path/to/checkout
-    python3 lint_doc_references.py --repo /path/to/checkout --allow 'ai/scratch/*'
+    python3 lint_doc_references.py --repo /path/to/checkout --allow 'context/scratch/*'
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ SKILL_NAME = "SKILL.md"
 # are out of scope here.
 LINK_CHECK_NAMES = frozenset({"index.md", "CLAUDE.md", "CLAUDE.winter.md"})
 
-# Captures the path portion of a path-notation ref like `workspace:/ai/foo.md`
+# Captures the path portion of a path-notation ref like `workspace:/context/foo.md`
 # or `winter-harness:/architecture/index.md` — everything after `<scheme>:/`.
 _PATHNOTATION_RE = re.compile(r"^[a-z][a-z0-9+.-]*:/(.+)$")
 
@@ -121,7 +121,7 @@ class DocReferenceLint:
 
         Extracts targets of the form `<context>:/path` from `file` — both from
         markdown link targets and from inline code spans (the typical skill
-        authoring style is to write `` `workspace:/ai/foo.md` ``).  Strips the
+        authoring style is to write `` `workspace:/context/foo.md` ``).  Strips the
         context prefix, resolves the remainder against `repo_root`, and returns
         only paths that actually exist inside the repo.
         """
@@ -184,7 +184,7 @@ class DocReferenceLint:
 
         Seeds from both routing-table files (`SEED_NAMES`) and skill entrypoints
         (`SKILL_NAME`).  Skill files additionally contribute path-notation targets
-        (e.g. `workspace:/ai/foo.md`) resolved against `repo_root`.
+        (e.g. `workspace:/context/foo.md`) resolved against `repo_root`.
         """
         by_path = {f.resolve(): f for f in files}
         root = repo_root.resolve()
@@ -214,12 +214,12 @@ class DocReferenceLint:
                         queue.append(resolved)
         return visited
 
-    def _under_ai_dir(self, file: Path, repo_root: Path) -> bool:
+    def _under_context_dir(self, file: Path, repo_root: Path) -> bool:
         try:
             rel = file.resolve().relative_to(repo_root.resolve())
         except ValueError:
             return False
-        return "ai" in rel.parts[:-1]
+        return "context" in rel.parts[:-1]
 
     def _orphan_findings(self, files: list[Path], repo_root: Path, base: Path) -> list[dl.Finding]:
         if self._orphan_severity == "off":
@@ -227,7 +227,7 @@ class DocReferenceLint:
         visited = self._reachable_md(files, repo_root)
         findings: list[dl.Finding] = []
         for file in files:
-            if not self._under_ai_dir(file, repo_root):
+            if not self._under_context_dir(file, repo_root):
                 continue
             resolved = file.resolve()
             if resolved in visited:

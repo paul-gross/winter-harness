@@ -12,7 +12,7 @@ Conventional Commits with a scope:
 
 - Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `style`, `ai`. `docs` is the common case here.
 - Scope: `harness` (or a subsystem like `python`, `exemplars`).
-- Use `Closes #N` to link a GitHub issue this commit finishes (workspace-level rules at `workspace:/ai/project/contributing.md`).
+- Use `Closes #N` to link a GitHub issue this commit finishes (workspace-level rules at `workspace:/context/project/contributing.md`).
 - The `/wf-commit` skill from [winter-workflow](https://github.com/paul-gross/winter-workflow) generates commits in this format.
 
 Example:

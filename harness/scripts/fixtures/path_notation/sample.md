@@ -5,9 +5,9 @@ default repo scan (it lives under `fixtures/`); the test targets it explicitly.
 
 ## Should be flagged (raw cross-context paths in code spans)
 
-- An extension-install path: `.winter/ext/codeberg/ai/issue-format.md`
+- An extension-install path: `.winter/ext/codeberg/context/issue-format.md`
 - A source-checkout path: `projects/winter-cli/README.md`
-- A sibling-relative path: `../winter-product/ai/todos.md`
+- A sibling-relative path: `../winter-product/context/todos.md`
 - A bare repo-name path: `winter-service-tmux/index.md`
 - A machine-absolute path: `/home/alice/notes.md`
 

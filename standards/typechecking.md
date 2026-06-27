@@ -9,7 +9,7 @@
 
 ## Why
 
-The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/ai/project/contributing.md`). There is no PR/MR review and no CI gate yet, so type drift lands silently unless the agent runs the task locally before push.
+The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/context/project/contributing.md`). There is no PR/MR review and no CI gate yet, so type drift lands silently unless the agent runs the task locally before push.
 
 `pyright` is orthogonal to `ruff`: lint catches style and obvious bugs; the type checker catches wrong arg types, `None` deref, missing return paths, and incompatible overrides — bugs that only surface at runtime otherwise. Pydantic v2 models, click commands, and dependency-injector containers carry rich type information, and the checker validates it for free.
 

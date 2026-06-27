@@ -82,7 +82,7 @@ Each flavor below is one instance of the same scenario shape.
 **Discoverability** — the destroy flow is already documented; the change adds the `CLAUDE.md` cross-link that makes it reachable from a teardown cue.
 
 - **cue** — "Tear down the gamma environment."
-- **via** — workspace `CLAUDE.md` §"Tearing down a feature environment" → `ai/worktree-ops.md` §"Destroying a feature environment".
+- **via** — workspace `CLAUDE.md` §"Tearing down a feature environment" → `context/worktree-ops.md` §"Destroying a feature environment".
 - **reached** — the agent opens the destroy section.
 - **behaved** — it runs `winter ws destroy gamma` rather than `rm -rf gamma/`.
 - **control** — without the cross-link, the agent reaches for `rm -rf gamma/` and orphans extension state.

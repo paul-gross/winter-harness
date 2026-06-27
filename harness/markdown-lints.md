@@ -1,7 +1,7 @@
 # Markdown convention lints
 
 Three conventions for agent-facing markdown are enforced mechanically here: the canonical path notation in [`./winter-references.md`](./winter-references.md), the reference integrity of the routing tables an agent navigates by, and the anchor validity of every `#fragment` link.
-The three lint scripts in [`./scripts/`](./scripts/) check each convention in turn and follow the `winter lint` script contract (NDJSON findings on stdout, exit 0 — see `workspace:/ai/winter-cli/configuration/lint.md`), so each is also registerable as a `winter lint` check.
+The three lint scripts in [`./scripts/`](./scripts/) check each convention in turn and follow the `winter lint` script contract (NDJSON findings on stdout, exit 0 — see `workspace:/context/winter-cli/configuration/lint.md`), so each is also registerable as a `winter lint` check.
 They ship in the winter-harness Markdown layer because they enforce *its* conventions, so any ecosystem repo can run them against its own docs.
 They are graph-free, which is what distinguishes them from the extractability lint at `winter:/tools/winter-lint/extractability.py`: extractability asks whether a reference *already in* `<context>:/` notation points at a declared dependency, while these ask whether a raw path *should be* in notation, whether a routing link resolves at all, and whether a link's `#fragment` matches a real heading.
 They reuse extractability's `<!-- winter-lint:example -->` line marker and fenced-code-block skip — see that lint's README (`winter:/tools/winter-lint/README.md`) for the marker semantics.
@@ -58,9 +58,9 @@ Two checks over the routing files (`CLAUDE.md`, `CLAUDE.winter.md`, and every `i
 - **Broken links** (`fail`) — a relative markdown link whose target does not exist strands an agent mid-disclosure.
   Targets with a scheme or path-notation prefix (`https:`, `workspace:/…`) are skipped — a single-repo lint can't resolve a cross-context reference, and extractability already validates those.
   Body docs (skills, agents) are out of scope here: their links often use a workspace-root-relative convention this lint can't model.
-- **Orphans** (`warn`) — an `ai/**/*.md` file that exists but is unreachable from any routing table or skill by link or `@import` chain is content no agent will be routed to.
+- **Orphans** (`warn`) — a `context/**/*.md` file that exists but is unreachable from any routing table or skill by link or `@import` chain is content no agent will be routed to.
   Reachability seeds from both routing-table files (`index.md`, `CLAUDE.md`, `CLAUDE.winter.md`, `README.md`) and from every `SKILL.md` found in the repo.
-  Path-notation references inside a `SKILL.md` (e.g. `` `workspace:/ai/foo.md` ``) are resolved against the repo root so that docs linked only from a skill are not falsely orphaned.
+  Path-notation references inside a `SKILL.md` (e.g. `` `workspace:/context/foo.md` ``) are resolved against the repo root so that docs linked only from a skill are not falsely orphaned.
   `warn` by default; `--orphan-severity fail|off` to change it, `--allow '<glob>'` (repeatable, repo-relative) to exempt intentionally-unrouted files.
 
 Reachability and orphan detection are whole-repo properties, so this lint always scans the full `--repo` root, not a changed-file subset.

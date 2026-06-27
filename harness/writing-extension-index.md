@@ -16,18 +16,18 @@ In scope:
 - What the extension contributes to a workspace at runtime (commands the user runs, files in env roots, conventions to follow while developing in a feature env).
 - Rules and invariants the user / agent must respect while the workspace is live (`./up` not `nohup &`, capture-pane not `tail -f`, etc.).
 - Naming conventions and identifiers the user will see or type — session names, file paths in env roots, pane targets, env-var names.
-- Pointers to the project-specific configuration the extension reads (`workspace:/ai/project/foo.sh`).
+- Pointers to the project-specific configuration the extension reads (`workspace:/context/project/foo.sh`).
 
 Out of scope — these belong elsewhere:
 - **Lifecycle-hook tables** (`on_env_init` / `on_env_destroy` script names, what each does). Behind-the-scenes — the user doesn't invoke these; `winter ws init/destroy` does. The manifest at `winter-ext.toml` is self-documenting for anyone modifying the extension.
-- **Doctor probe internals** (which probes the script emits, the NDJSON shape, exit-code semantics). The user reads `winter doctor`'s rendered output, not the probe internals. The contract lives in `workspace:/ai/winter-cli/configuration/doctor.md#probe-output-contract`.
+- **Doctor probe internals** (which probes the script emits, the NDJSON shape, exit-code semantics). The user reads `winter doctor`'s rendered output, not the probe internals. The contract lives in `workspace:/context/winter-cli/configuration/doctor.md#probe-output-contract`.
 - **Manifest schema, plugin internals, hook-script implementation details.** All behind-the-scenes.
 - **Installation steps.** Those belong in `README.md` (see `winter-harness:/harness/writing-readme.md`).
-- **Setup walkthroughs.** Those belong in `ai/` (e.g. `ai/workflow-setup.md`) and are referenced *from* `index.md` with a one-line pointer.
+- **Setup walkthroughs.** Those belong in `context/` (e.g. `context/workflow-setup.md`) and are referenced *from* `index.md` with a one-line pointer.
 
 ## Structure
 
-How an `index.md` is shaped for discovery — when to split it into a hub plus per-topic files, and how to write its routing rows as read-triggers rather than contents summaries — is the canon's [`../canon/progressive-disclosure.md`](../canon/progressive-disclosure.md). This file does not restate it. The extension-specific overlay is scope: an extension `index.md` is the hub for the extension's *workspace-runtime* surface only (the Rule above), so its routing rows point at the deeper `ai/<topic>.md` walkthroughs and project-config files an operator descends to, not at the behind-the-scenes detail.
+How an `index.md` is shaped for discovery — when to split it into a hub plus per-topic files, and how to write its routing rows as read-triggers rather than contents summaries — is the canon's [`../canon/progressive-disclosure.md`](../canon/progressive-disclosure.md). This file does not restate it. The extension-specific overlay is scope: an extension `index.md` is the hub for the extension's *workspace-runtime* surface only (the Rule above), so its routing rows point at the deeper `context/<topic>.md` walkthroughs and project-config files an operator descends to, not at the behind-the-scenes detail.
 
 ## Where the rejected content goes
 
@@ -36,7 +36,7 @@ If you're tempted to add a section that's out-of-scope per the rule above:
 | Content type | Home |
 |--------------|------|
 | Hook tables, probe internals, manifest details | The extension's source — `winter-ext.toml`, the hook script's header comment, the probe script's header comment. Self-documenting code beats redundant markdown. |
-| Setup walkthroughs and interactive guides | `ai/<topic>.md` inside the extension. Reference from `index.md` with one line. |
+| Setup walkthroughs and interactive guides | `context/<topic>.md` inside the extension. Reference from `index.md` with one line. |
 | User-facing feature pitch, installation, scope | `README.md`. See `winter-harness:/harness/writing-readme.md`. |
 | Cross-cutting engineering conventions | `winter-harness:/`. |
 
@@ -51,15 +51,15 @@ multiple envs can run side-by-side without port conflicts.
 
 ## Feature environment setup steps
 
-This extension needs `workspace:/ai/project/setup-tmux.sh`. Walk the user
-through [ai/workflow-setup.md](./ai/workflow-setup.md) to generate it.
+This extension needs `workspace:/context/project/setup-tmux.sh`. Walk the user
+through [context/workflow-setup.md](./context/workflow-setup.md) to generate it.
 
 ## Service management rules
 
 - Never start services as background processes — always go through `./up`.
 - Never kill services directly — always `./down`.
 - Read pane output with `tmux capture-pane` against the targets in
-  `workspace:/ai/project/setup-tmux.md`.
+  `workspace:/context/project/setup-tmux.md`.
 ```
 
 Every section is something the user (or an agent acting for the user) must know to operate the workspace correctly.

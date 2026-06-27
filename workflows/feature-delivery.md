@@ -1,6 +1,6 @@
 # Feature delivery
 
-Day-to-day flow for landing a change in any winter ecosystem repo (the framework, its extensions, standalone repos). Covers where work happens on disk, what branch it sits on, how it gets onto `origin/master`, and what to run before pushing. This doc is the ecosystem default; workspaces may override in `workspace:/ai/project/contributing.md`.
+Day-to-day flow for landing a change in any winter ecosystem repo (the framework, its extensions, standalone repos). Covers where work happens on disk, what branch it sits on, how it gets onto `origin/master`, and what to run before pushing. This doc is the ecosystem default; workspaces may override in `workspace:/context/project/contributing.md`.
 
 ## Where work happens
 
@@ -25,10 +25,10 @@ The surfaces:
 
 - **Code** — the implementation, in the repo that owns the surface.
 - **Tests** — coverage for the new or changed behaviour, in the same unit of work. A feature commit with no test is the anti-pattern.
-- **Canonical `ai/` docs** — the agent-facing source of truth for the surface: the owning repo's `ai/` reference, an extension `index.md`, or a `winter-harness` convention file. This is the *currency* half of the no-undocumented-feature invariant.
+- **Canonical `context/` docs** — the agent-facing source of truth for the surface: the owning repo's `context/` reference, an extension `index.md`, or a `winter-harness` convention file. This is the *currency* half of the no-undocumented-feature invariant.
 - **Public docs site** — the human-facing documentation site, which for this ecosystem is its **own repo, `winter-docs`** (a separate repo, *not* an in-repo `docs/` tree — see `../harness/documentation-governance.md` for what it is). If any page there narrates the surface you changed, plan its update as its own work-item, and reference rather than restate the canonical detail. This is the *non-duplication* half of the invariant.
 
-The documentation surfaces span repos: a change in `winter` or an extension that alters user-facing surface usually owes a `winter-docs` edit too, even though `winter-docs` is a separate repo with no commits of its own yet. **`winter-docs` is the surface most easily missed** — structurally, not for lack of attention: it is a separate repo with no artifact co-located with the code change to trigger the thought. The in-repo `ai/` docs get pulled in because they sit next to the code; the separate public-docs repo does not. That is exactly why it must be enumerated at planning time — so a `winter-docs` phase is a first-class planning output rather than a pre-push catch. The full invariant and the canonical-source-vs-rendered-site relationship live in `../harness/writing-documentation.md`; which repo the public site is is recorded in `../harness/documentation-governance.md`.
+The documentation surfaces span repos: a change in `winter` or an extension that alters user-facing surface usually owes a `winter-docs` edit too, even though `winter-docs` is a separate repo with no commits of its own yet. **`winter-docs` is the surface most easily missed** — structurally, not for lack of attention: it is a separate repo with no artifact co-located with the code change to trigger the thought. The in-repo `context/` docs get pulled in because they sit next to the code; the separate public-docs repo does not. That is exactly why it must be enumerated at planning time — so a `winter-docs` phase is a first-class planning output rather than a pre-push catch. The full invariant and the canonical-source-vs-rendered-site relationship live in `../harness/writing-documentation.md`; which repo the public site is is recorded in `../harness/documentation-governance.md`.
 
 When a surface genuinely doesn't apply (an internal refactor with no adopter-facing angle, a change no `winter-docs` page narrates), the absence is a deliberate, reviewable call — note it at planning time rather than leaving it silent.
 
@@ -48,7 +48,7 @@ winter ws push <env>/<repo> --include-pinned  # one specific repo's worktree
 git push                                      # from inside <env>/<repo>/, single repo
 ```
 
-`winter ws push` only pushes repos that are ahead of their upstream — clean repos are skipped silently. Full reference: `workspace:/ai/worktree-ops.md`.
+`winter ws push` only pushes repos that are ahead of their upstream — clean repos are skipped silently. Full reference: `workspace:/context/worktree-ops.md`.
 
 ## Linear history — always rebase, never merge
 
@@ -75,7 +75,7 @@ Use Conventional Commits with a scope, and include a `Closes #N` footer for any 
 
     Closes #12
 
-Full rules — type vocabulary, scope choice, `Closes` / `Fixes` / `Refs` keywords, cross-repo `owner/repo#N` form — live in `workspace:/ai/project/contributing.md`. Don't restate them here; read that doc when drafting a commit message.
+Full rules — type vocabulary, scope choice, `Closes` / `Fixes` / `Refs` keywords, cross-repo `owner/repo#N` form — live in `workspace:/context/project/contributing.md`. Don't restate them here; read that doc when drafting a commit message.
 
 The `commit` skill (from `winter-workflow`) generates commits in this exact format from the staged diff and the current conversation. Prefer it over hand-writing messages.
 
@@ -100,11 +100,11 @@ mise run lint       # exits 0 on a clean tree
 mise run typecheck  # exits 0 on a clean tree
 ```
 
-Rules and canonical config: `../standards/linting.md` (ruff) and `../standards/typechecking.md` (pyright). Other languages document their own pre-push checks in their `CONTRIBUTING.md` or `ai/` — read the target repo's `CONTRIBUTING.md` before pushing.
+Rules and canonical config: `../standards/linting.md` (ruff) and `../standards/typechecking.md` (pyright). Other languages document their own pre-push checks in their `CONTRIBUTING.md` or `context/` — read the target repo's `CONTRIBUTING.md` before pushing.
 
 If the env spans multiple repos, run pre-push checks in every repo that has uncommitted or unpushed changes, not just the one you happened to touch last.
 
-**No undocumented feature.** A change to user-facing surface — a `winter` subcommand or flag, an extension capability, a skill or agent, an env-root file or a convention — carries its documentation delta in the same unit of work, the same way it carries its tests. Before pushing, walk the *Anatomy of feature delivery* checklist above: confirm the canonical `ai/` / `index.md` / convention source for the changed surface is current, **and** confirm the public docs site (`winter-docs`) is current — if a page there narrates the changed surface, it is updated and still references rather than restates the canonical detail. The full invariant is `../harness/writing-documentation.md`; a pre-push review gate surfaces a missing-docs delta the same way it surfaces a missing test — but such a gate only sees repos with commits, so the `winter-docs` currency check is yours to run even when `winter-docs` has none.
+**No undocumented feature.** A change to user-facing surface — a `winter` subcommand or flag, an extension capability, a skill or agent, an env-root file or a convention — carries its documentation delta in the same unit of work, the same way it carries its tests. Before pushing, walk the *Anatomy of feature delivery* checklist above: confirm the canonical `context/` / `index.md` / convention source for the changed surface is current, **and** confirm the public docs site (`winter-docs`) is current — if a page there narrates the changed surface, it is updated and still references rather than restates the canonical detail. The full invariant is `../harness/writing-documentation.md`; a pre-push review gate surfaces a missing-docs delta the same way it surfaces a missing test — but such a gate only sees repos with commits, so the `winter-docs` currency check is yours to run even when `winter-docs` has none.
 
 **Behavioral-expectation eval.** A change that adds context an agent is expected to act on — a new skill, agent, rule, feedforward doc, or routing change — carries a cold eval the same way it carries its tests: declare the behavior it expects and confirm a fresh agent, holding only the discovery chain, both reaches the context and acts on it. Before pushing, run the eval for the changed context and fix what fails — an unreached scenario is a discoverability defect, a reached-but-not-behaved one a content defect. The full procedure, the trigger threshold, and who runs the cold spawn are in `../canon/evaluating-harness-changes.md`.
 
@@ -125,7 +125,7 @@ Fast-forward the source checkout in `projects/<repo>/` after a push lands. `wint
 winter ws fetch <env>    # refreshes remote refs and fast-forwards every projects/<repo>/master to origin/master
 ```
 
-Run it against the env you just pushed from — `winter ws fetch` fast-forwards every source checkout to `origin/master`; the feature worktrees are left untouched. Full reference: `workspace:/ai/worktree-ops.md`.
+Run it against the env you just pushed from — `winter ws fetch` fast-forwards every source checkout to `origin/master`; the feature worktrees are left untouched. Full reference: `workspace:/context/worktree-ops.md`.
 
 For single-repo work, the raw equivalent is:
 
@@ -148,8 +148,8 @@ The sections above are organized by topic; this is the ordered walkthrough that 
 
 ## See also
 
-- `workspace:/ai/project/contributing.md` — canonical commit format, `Closes #N` footer rules, push policy
-- `workspace:/ai/worktree-ops.md` — full reference for `winter ws init` / `sync` / `connect` / `pull` / `push` / `destroy`, including pinned-repo semantics
+- `workspace:/context/project/contributing.md` — canonical commit format, `Closes #N` footer rules, push policy
+- `workspace:/context/worktree-ops.md` — full reference for `winter ws init` / `sync` / `connect` / `pull` / `push` / `destroy`, including pinned-repo semantics
 - `../standards/linting.md`, `../standards/typechecking.md` — pre-push tools for Python repos
 - `../harness/writing-documentation.md` — the "no undocumented feature" invariant the pre-push doc-currency check enforces
 - `../canon/evaluating-harness-changes.md` — pre-push eval for any change that adds context an agent is expected to act on (new skill, agent, rule, feedforward doc, or routing)
