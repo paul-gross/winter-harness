@@ -1,8 +1,8 @@
 # Agent convention
 
 How to author an agent definition across the winter ecosystem.
-Agents are `.md` files whose frontmatter is read by the Claude Code `Agent` tool to build a subagent spawn.
-This file documents the frontmatter contract and the canonical-name rule.
+An agent is a single **canonical** `.md` file: winter projects it into each harness's native artifact (Claude Code, Codex, OpenCode) at `winter ws init`.
+This file documents the frontmatter contract common to every harness and the canonical-name rule; [`./cross-harness-projection.md`](./cross-harness-projection.md) covers the per-harness override blocks, the model-tier→id table, and lossy projection.
 
 ## Frontmatter contract
 
@@ -38,6 +38,8 @@ The field is not redundant — it is the resolution key.
 Keep the `name:` value identical to the filename stem (`developer.md` → `name: developer`).
 When they diverge the filename is silently bypassed and the canonical value is whatever the frontmatter says; the filename becomes a misleading label.
 
+If an agent omits `name`, winter's transform derives it from the filename stem so the agent still projects rather than being dropped (the same fallback OpenCode uses; see [`./cross-harness-projection.md`](./cross-harness-projection.md)). That fallback exists to adopt vanilla or not-yet-migrated agents gracefully — authored agents declare `name` explicitly.
+
 ### `description:` — what the agent does and when to use it
 
 The description must cover **what the agent does and when to spawn it** — the same two-part contract as skills.
@@ -52,8 +54,9 @@ Pick the tier appropriate for the role's reasoning load:
 - `sonnet` — balanced default; suitable for implementation, exploration, most review roles
 - `opus` — heavyweight; reserve for roles that need deep reasoning (architecture, adversarial review)
 
-Do not use a full model ID string.
+Do not use a full model ID string at the top level.
 `winter lint` accepts only the three tier names.
+A per-harness override block *may* pin a vendor-specific model id when the tier default is wrong for that harness — see [`./cross-harness-projection.md`](./cross-harness-projection.md).
 
 ### `tools:` — permissive grant for the role
 
