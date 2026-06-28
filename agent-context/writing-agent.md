@@ -38,7 +38,7 @@ The field is not redundant — it is the resolution key.
 Keep the `name:` value identical to the filename stem (`developer.md` → `name: developer`).
 When they diverge the filename is silently bypassed and the canonical value is whatever the frontmatter says; the filename becomes a misleading label.
 
-If an agent omits `name`, winter's transform derives it from the filename stem so the agent still projects rather than being dropped (the same fallback OpenCode uses; see [`./cross-harness-projection.md`](./cross-harness-projection.md)). That fallback exists to adopt vanilla or not-yet-migrated agents gracefully — authored agents declare `name` explicitly.
+`name` is technically optional: an agent that omits it falls back to the filename stem. Authored agents declare it explicitly. For the transform mechanism and why the fallback exists, see [`./cross-harness-projection.md`](./cross-harness-projection.md) §"Omitted names".
 
 ### `description:` — what the agent does and when to use it
 

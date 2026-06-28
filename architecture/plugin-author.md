@@ -214,13 +214,7 @@ Two behaviors the screen guarantees, so author to them:
 
 ## Versioning
 
-The contract is **semver-versioned in the `winter-plugin-api` package**, independent of winter-cli's *unversioned* internal model. That separation is the whole point: winter-cli's domain model evolves freely; only the narrow seam carries a version.
-
-- **Major bump** — a breaking change: a removed/renamed public name, a narrowed view, a changed `__call__` / `register` signature, a removed dataclass field. Update your plugin before moving to the new major.
-- **Minor bump** — a backward-compatible addition: a new view property, a new optional `PluginRegistration` field, a new decorator/panel Protocol, a new `ActionScope` member. Existing plugins keep working. (Pre-1.0, treat a `0.x` minor as potentially breaking.)
-- **Patch bump** — docs / typing-only, no surface change.
-
-winter-cli keeps its **own runtime copy** of the seam (`plugins/types.py`); the package is a deliberate hand-curated copy of it, not a re-export. The two are **kept in sync by hand**: a seam rename in winter-cli must be mirrored into the package as a major bump and reflected here, in the same change. There is no automated conformance check wiring the two together today — pinning winter-cli to the package with conformance sentinels (the `../standards/protocol-conformance.md` pattern), so a model rename would fail winter-cli's own typecheck, is a possible future addition.
+The contract is **semver-versioned in the `winter-plugin-api` package**, independent of winter-cli's *unversioned* internal model. That separation is the whole point: winter-cli's domain model evolves freely; only the narrow seam carries a version. The package README owns the bump policy (what counts as a major / minor / patch change) and the winter-cli hand-sync relationship — read it there before depending on a tag: [github.com/paul-gross/winter-plugin-api](https://github.com/paul-gross/winter-plugin-api). For which tag to pin, see [Depending on the package](#depending-on-the-package).
 
 ## See also
 
