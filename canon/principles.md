@@ -14,6 +14,8 @@ Phrases the pattern wears: *"earlier drafts..."*, *"previously this was..."*, *"
 
 **Exception.** History-by-design files keep their framing — `CHANGELOG.md`, `retrospective.md`, migration notes, post-mortem reports. There the change history *is* the content.
 
+**Where superseded history goes.** The framing rule has a placement complement: a current reference page describes only the supported present and its forward-looking rationale. Superseded behavior, before/after examples, upgrade steps, and breaking-change narratives are not rewritten in place — they move to a changelog or an explicitly named migration document, and the current page links there only while an active migration still needs the reader to find it. When no active migration needs it, the dead history is deleted outright, not relocated to preserve it: a reference page carries the present, and the commit history already carries the past.
+
 **Do.**
 
 - *"Each prompt is inlined to keep step 4 self-contained — no cross-file step-number references."*
@@ -57,7 +59,27 @@ line beneath it.
 
 Prose reflowed to a fixed column — a one-word edit churns every wrapped line below it.
 
+## One canonical owner per fact
+
+**Rule.** Every behavioral rule, schema field, default, protocol requirement, or operational invariant has exactly one authoritative document — its canonical owner. Any other document that needs the fact links to the owner and may state *why* the reader should follow the link, but never restates the detail. When two files describe the same fact, exactly one is canonical and the rest are pointers; "for convenience" is not a second owner.
+
+**Why.** A fact written in two places is a fact that will be edited in one. The unedited copy keeps asserting the superseded value, and nothing flags the divergence until a reader follows the stale copy and acts on it. Single ownership makes the canonical value the only value: every reader resolves to the same place, and an edit there reaches all of them at once. Which document *is* the owner follows the reader's task — see [`./organization.md`](./organization.md) §"Classify content by the reader's task".
+
+**Do.**
+
+- Pick the owner, name it, and point every other mention at it: *"Binding a provider is a configuration concern — see `capabilities.md`."* The pointer carries the stake, not the option list.
+- When you find the same fact in two files, make one canonical and reduce the other to a pointer in the same change.
+
+**Don't.**
+
+- Repeat a table, option list, default set, or contract clause in a second file so a reader "doesn't have to follow the link" — the convenience lasts until the first edit, then the copy lies.
+- Leave two files each describing the schema with neither marked as the owner, so the next editor changes whichever they happened to open.
+
+**For reviewers.** Flag repeated tables, option lists, defaults, contract wording, and exhaustive summaries; identify which file remains canonical and reduce the rest to pointers.
+
 ## Point, don't duplicate
+
+The reference-shape corollary of one-canonical-owner: that rule says a fact lives in one place; this one says what the *other* places may say about it.
 
 **Rule.** When one agent-facing doc points at another file or section — an index or "when to read" table row, a `CLAUDE.md` navigation entry, an extension `index.md` line, a cross-reference — describe the target by what the reader gets there or when to go, not by enumerating or copying its contents. A pointer that restates its target's contents is a second copy of them, and the copy drifts the moment the target changes.
 
@@ -78,3 +100,20 @@ Describe the destination; let the reader follow the link for the contents.
 The enumerated list reads as complete, so the next author trusts it instead of the target — and it is wrong the first time the target changes.
 
 **See also.** [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping this principle; its enforcement instance applies, since `context-reviewer` enforces it.
+
+## Examples are illustrative, not normative
+
+**Rule.** An example shows the smallest surface that makes the canonical rule concrete. It never reproduces a whole schema, template, exhaustive option set, or second specification already owned elsewhere. If an example would have to change every time the canonical contract changes, it is too big: cut it to the part that illustrates the point and link to the owner for the rest.
+
+**Why.** A full-schema "example" is a second copy of the schema wearing an example's clothes. It drifts from its canonical owner exactly like any other duplicate (the one-canonical-owner rule), but the word "example" disguises the duplication so a reviewer waves it through and the field list now lives in two places. A minimal example carries no contract of its own — there is nothing in it to keep in sync.
+
+**Do.**
+
+- Show one representative entry, enough to make the shape concrete, and link to the canonical schema for the full field set.
+- When an example must demonstrate a non-obvious or counter-example form, mark it so a lint or reviewer does not mistake it for a live reference (`<!-- winter-lint:example -->`; see [`../agent-context/references.md`](../agent-context/references.md)).
+
+**Don't.**
+
+- Paste an entire manifest block with every field "as an example" into a file that does not own the schema — the field list is now duplicated, and it is wrong the first time the schema changes.
+
+**For reviewers.** Flag an example that must be synchronized whenever the canonical contract changes; it is a disguised duplicate, not an illustration.

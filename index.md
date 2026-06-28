@@ -6,9 +6,9 @@ The repo is organized by **convention domain**: each directory names the subject
 
 | Domain hub | When to read |
 |------------|--------------|
-| [canon/index.md](./canon/index.md) | A universal harness convention true of *every* harness, independent of language, project, or workflow — cross-cutting authoring principles, progressive disclosure, the facts/methodology placement rule, the pre-push harness-change eval, the four levers |
-| [agent-context/index.md](./agent-context/index.md) | Authoring or validating material an agent loads or traverses — agents, skills, extension `index.md`, routing, path notation, references, and the agent-context Markdown lints |
-| [documentation/index.md](./documentation/index.md) | Public/adopter-facing documentation — README form, the no-undocumented-feature currency invariant, the canonical-source-vs-rendered-view rule, and consumable-vs-example catalog classification |
+| [canon/index.md](./canon/index.md) | A universal harness convention true of *every* harness, independent of language, project, or workflow — read when authoring or organizing any agent-facing markdown, or building any agentic feature |
+| [agent-context/index.md](./agent-context/index.md) | Authoring or validating material an agent loads or traverses — read when writing or reviewing an agent, skill, extension `index.md`, routing table, or cross-context path reference |
+| [documentation/index.md](./documentation/index.md) | Public / adopter-facing documentation — read when writing or auditing a README or the docs site, or classifying a repo for the public catalog |
 | [architecture/index.md](./architecture/index.md) | Before writing or changing the code of any winter application — the plan/build-time rules for how the code should be designed and structured |
 | [standards/index.md](./standards/index.md) | Before pushing Python changes — the review-time checks for whether finished code is up to standard |
 | [workflows/index.md](./workflows/index.md) | Decomposing a feature into phases, the day-to-day landing flow, or when a workspace customizes an upstream framework repo |
