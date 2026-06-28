@@ -31,6 +31,19 @@ Do not declare a `model:` field. A skill runs inline in the calling session and 
 
 The `description` field must cover **what the skill does and when to use it** — the skill picker reads it to decide whether to fire on a given user prompt, so a description that says only "what" loses to one that also says "when". Pattern: "<one-clause what>. Use when <trigger / cadence / context>." See [`winter-workflow:/skills/harness-score/SKILL.md`](https://github.com/paul-gross/winter-workflow/src/branch/master/skills/harness-score/SKILL.md) for an exemplar — it ends `… Use weekly to track progress or divergence.`
 
+#### What a description must not contain
+
+The description is loaded into context for **every** session — it is the always-on routing key, not documentation. The body (or procedure doc) is loaded only when the skill is invoked, so anything the picker does not need to *route* belongs there, not here. This same rule governs an agent's `description` (see [`./writing-agent.md`](./writing-agent.md)). A description must **not** contain:
+
+- **How the work is done** — the concrete procedure: which subagents it spawns, in what step sequence, the internal mechanics. That is the body's job. (The *high-level orchestration shape* that distinguishes a skill from its siblings — one sequential track vs. parallel across environments vs. a coordinated team — is part of the routing "what" and may be named; the banned part is the step-by-step procedure, not the shape.)
+- **Rationale** — "so that…", "because…", why the approach is sound.
+- **Restatement of the body** — identity, decision rules, output format.
+- **Disambiguation lists** — "Do NOT use for X — that's `other`" enumerations against sibling skills/agents. Instead, name the *object the skill acts on* (the diff, agent-facing markdown, public docs, the harness seam) precisely enough that its scope stands alone. Add at most one "not X" pointer only if two siblings genuinely still collide after that.
+- **Workflow-participation detail** — what coordinates it, what calls it, where it sits in a larger workflow.
+- **Hard-coded workspace prefixes** — `/wf-foo`, `/ws-push`. Name the bare canonical skill or describe the action ("before pushing"); see [`./references.md`](./references.md).
+
+There is no fixed token ceiling, but treat every clause as rent paid on every session: if a clause does not change the routing decision, cut it.
+
 Body — one short paragraph plus one execute line. Two jobs:
 
 1. Point at the procedure: `The procedure for this skill is at \`<extension>:/context/<name>/process.md\`.`

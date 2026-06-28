@@ -45,6 +45,7 @@ If an agent omits `name`, winter's transform derives it from the filename stem s
 The description must cover **what the agent does and when to spawn it** — the same two-part contract as skills.
 The caller reads this field to decide whether to spawn the agent for a given sub-task.
 Pattern: `"<one-clause what>. Use this agent when <trigger / context>."`.
+The `description` is loaded into every session that can reach the agent — it is a routing key, not documentation. The exclusion rules — including distinguishing confusable reviewers by the *object each acts on* rather than by "Do NOT use" lists — are shared with skills: see [what a description must not contain](./writing-skill.md#what-a-description-must-not-contain).
 
 ### `model:` — `haiku`, `sonnet`, or `opus`
 
