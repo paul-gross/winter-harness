@@ -11,6 +11,7 @@ Parent: `../index.md` (root topology).
 | Architecture doc | When to read |
 |------------------|--------------|
 | [./service-architecture.md](./service-architecture.md) | Before authoring new behavior — the service-based principle the other conventions assume: behavior in injected service classes, free functions for pure helpers only |
+| [./system-architecture.md](./system-architecture.md) | Designing or reviewing boundaries between winter and other systems or extensions — the winter-owned contract over swappable backends, and the no-pass-through rule |
 | [./dependency-injection.md](./dependency-injection.md) | Adding a new service or wiring it into the container |
 | [./module-layout.md](./module-layout.md) | Adding a `core/` cross-cutting protocol or a `modules/<feature>/internal/` adapter |
 | [./repository-pattern.md](./repository-pattern.md) | Touching git, filesystem, or any external I/O |

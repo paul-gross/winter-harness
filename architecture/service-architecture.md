@@ -2,24 +2,13 @@
 
 Winter code is **service-based**: behavior lives in service classes whose collaborators are injected at construction, reached through Protocol seams. Module-level free functions are reserved for pure, dependency-free helpers — they are the exception, not the default.
 
-This is the principle the other Python conventions are facets of. Dependency injection (`./dependency-injection.md`) is *how* a service receives its collaborators; module layout (`./module-layout.md`) is *where* the service and its Protocol seam live; the repository pattern (`./repository-pattern.md`) is the I/O-owning service shape. Read this first — it names the shape those three assume.
-
-## Core tenet: interchangeability
-
-**Adapters behind a Protocol seam are interchangeable, and the seam keeps them that way.** Any code that drives a swappable backend — a service orchestrator, a git provider, a config source — depends on a **winter-defined, stable contract**: a fixed, documented set of operations and options that *winter* owns, not the backend. Swapping the adapter behind the seam must not change what callers can ask for. This is the *why* behind the protocol-seam pattern the other conventions describe: the seam exists so the thing behind it can be replaced.
-
-**Define the contract; never pass arguments through.** A command surface over a swappable backend exposes exactly the options winter defines and maps them onto whatever adapter is plugged in. It does not forward arbitrary caller arguments down to the backend. Pass-through couples every caller to one backend's flag vocabulary — the moment a caller passes a backend-specific flag, swapping the backend breaks them, and the seam stops being a seam. The contract does exactly what winter defines, and each adapter is responsible for realizing that contract on its own terms.
-
-- **Do.** `winter service up <env>` exposes winter's fixed action set (`up` / `down` / `status` / `restart` / `logs`); each orchestrator adapter implements those actions. A different orchestrator slots in without changing the command surface.
-- **Don't.** A `winter service <action> <env> -- <raw backend args>` pass-through that forwards tmux-specific flags to the tmux adapter — callers that learned the tmux flags can't move to another orchestrator, so the orchestrators are no longer interchangeable.
-
-The contract is the abstraction the Dependency Inversion section below depends on: callers depend on winter's operation set (the Protocol), never on a concrete backend's argument surface. See `./dependency-injection.md` for how the chosen adapter is wired and `../standards/protocol-conformance.md` for pinning each adapter to the seam it must satisfy.
+This is the principle the other Python conventions are facets of. Dependency injection (`./dependency-injection.md`) is *how* a service receives its collaborators; module layout (`./module-layout.md`) is *where* the service and its Protocol seam live; the repository pattern (`./repository-pattern.md`) is the I/O-owning service shape. Read this first — it names the shape those three assume. The system-level counterpart — how winter's command surface relates to a swappable backend behind the seam — is `./system-architecture.md`.
 
 ## Rule
 
 - **Behavior belongs in a class.** Anything that orchestrates collaborators — calls a repository, drives another service, picks an adapter, emits to a reporter — is a method on a service class. The class declares its collaborators in `__init__` and receives them via the container.
 - **Collaborators are injected, never reached for.** A service depends on a Protocol (`IReadFooRepository`, `ICliOutputService`), not a concrete class and not a module-level singleton. It never constructs its own collaborators or imports them at module scope to call them directly.
-- **Free functions are pure helpers only.** A module-level function is legitimate when it takes plain values (stdlib types, domain dataclasses) and returns a value with no injected collaborator and no I/O — `is_transient_git_error(stderr: str) -> bool`, a parsing or formatting helper, a small predicate. The moment a function needs a collaborator, it is behavior, and behavior is a service method.
+- **Free functions are pure helpers only, and a last resort.** A module-level function is legitimate when it takes plain values (stdlib types, domain dataclasses) and returns a value with no injected collaborator and no I/O — `is_transient_git_error(stderr: str) -> bool`, a parsing or formatting helper, a small predicate. The moment a function needs a collaborator, it is behavior, and behavior is a service method. Reach for a free function only after the two better homes don't fit: if the logic is intrinsic to a domain type, it belongs on that type as a property or method; if it's a step in a service's work, it belongs in a private method on the service. A free function is what's left when the logic fits neither — a genuinely standalone pure transform.
 
 ## The boundary
 
@@ -70,6 +59,7 @@ In winter-cli, this rule is checked at `mise run test` time by `winter:/tools/wi
 
 ## See also
 
+- `./system-architecture.md` — the system-level counterpart: winter-owned contracts over swappable backends, and the no-pass-through rule.
 - `./dependency-injection.md` — how collaborators get injected, and the no-whole-config rule.
 - `./module-layout.md` — where the service, its Protocol seam, and its adapter live.
 - `./repository-pattern.md` — the service that owns I/O against one external system.
