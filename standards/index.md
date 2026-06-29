@@ -11,3 +11,4 @@ Parent: `../index.md` (root topology).
 | [./testing.md](./testing.md) | Adding or refactoring tests — pytest layout, conftest scoping, fake-vs-mock guidance |
 | [./logging.md](./logging.md) | Adding a log call, picking a level, or deciding between logger / reporter / print |
 | [./protocol-conformance.md](./protocol-conformance.md) | Adding a Protocol/adapter pair — pin conformance with a typecheck-time sentinel |
+| [./verifiability-matrix.md](./verifiability-matrix.md) | Verifying a winter change — the concrete commands and CLI probes a skill or agent may run |
