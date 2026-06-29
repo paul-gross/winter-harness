@@ -4,7 +4,7 @@ Conventions for the top-level `index.md` of a winter extension (the file resolve
 
 ## Why this matters
 
-A workspace's `CLAUDE.md` `@`-includes each installed extension's `index.md` via `CLAUDE.winter.md`, so the file is loaded into **every agent context** opened against the workspace. That makes it an auto-loaded entry point, and the canon's [`../canon/organization.md`](../canon/organization.md) §"Charge auto-loaded entry points a higher context cost" sets what such a file may hold: only universally-required operational rules and navigation, everything else behind links. The rule below is that principle applied to an extension `index.md` — the "universally required" surface here is what the user needs to *run* the workspace.
+A workspace's `AGENTS.md` `@`-includes each installed extension's `index.md` via `AGENTS.winter.md` (and `CLAUDE.md` is the committed shim that reaches it), so the file is loaded into **every agent context** opened against the workspace. That makes it an auto-loaded entry point, and the canon's [`../canon/organization.md`](../canon/organization.md) §"Charge auto-loaded entry points a higher context cost" sets what such a file may hold: only universally-required operational rules and navigation, everything else behind links. The rule below is that principle applied to an extension `index.md` — the "universally required" surface here is what the user needs to *run* the workspace.
 
 ## Rule
 

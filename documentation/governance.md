@@ -8,7 +8,7 @@ This file governs the **public framework-docs surface** — the published docume
 
 It is deliberately narrow, and it does **not** enumerate every place documentation lives — `context/` docs, the harness conventions themselves, agent and skill definitions, and `architecture/`/`standards/` guides all carry documentation and are governed elsewhere. The adjacent surfaces a change commonly touches have their own owners: a repo's `README.md` structure → [`./writing-readme.md`](./writing-readme.md); an extension's auto-loaded `index.md` → [`../agent-context/writing-extension-index.md`](../agent-context/writing-extension-index.md); keeping any doc current with the code it describes → [`./feature-documentation.md`](./feature-documentation.md). This contract's only concern is that a reference implementation is classified and placed correctly on the public surface.
 
-`CLAUDE.winter.md` is **not** an authored surface. The CLI generates it by listing every installed standalone that has a root `index.md`, so each extension's `<name>:` path notation resolves. It is runtime state, not curated documentation — the consumable-vs-example classification is **not** expressed there. Do not hand-edit it, and do not treat its uniform list as a statement that every entry is a consumable product.
+`AGENTS.winter.md` is **not** an authored surface. The CLI generates it by listing every installed standalone that has a root `index.md`, so each extension's `<name>:` path notation resolves. It is runtime state, not curated documentation — the consumable-vs-example classification is **not** expressed there. Do not hand-edit it, and do not treat its uniform list as a statement that every entry is a consumable product.
 
 ## Consumable extensions vs. examples
 

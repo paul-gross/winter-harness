@@ -53,7 +53,7 @@ The body is declarative. No meta-commentary on the convention, no rationale for 
 
 When the body needs to refer to the skill itself, use the **bare canonical name** (the directory name) — e.g. `foo`, not `/foo`, not `/<prefix>-foo`, not `/wf-foo`. The prefix is workspace-configurable per [`./references.md`](./references.md); hard-coding a specific prefix pins the file to one workspace.
 
-All references from `SKILL.md` to files in the source extension — the procedure doc, shared assets, sibling skills — use the `<extension>:/...` path notation, never relative paths. `SKILL.md` is symlinked into the consuming workspace's `.claude/skills/<name>/SKILL.md`; a relative path like `../../context/<name>/process.md` resolves against the symlinked location and breaks. The extension-prefix path resolves through the workspace's `CLAUDE.winter.md` block and survives the symlink. See [`./references.md`](./references.md) for the full notation.
+All references from `SKILL.md` to files in the source extension — the procedure doc, shared assets, sibling skills — use the `<extension>:/...` path notation, never relative paths. `SKILL.md` is symlinked into the consuming workspace's `.claude/skills/<name>/SKILL.md`; a relative path like `../../context/<name>/process.md` resolves against the symlinked location and breaks. The extension-prefix path resolves through the workspace's `AGENTS.winter.md` block and survives the symlink. See [`./references.md`](./references.md) for the full notation.
 
 ### `context/<name>/process.md`
 
@@ -76,7 +76,7 @@ The procedure doc is read by whoever is executing the procedure — sometimes th
 
 References point **downward only** — from the caller to the procedure, never back. `SKILL.md` depends on `context/<name>/process.md`; the procedure does not depend on any of its callers. This is dependency inversion: the procedure is the reusable abstraction, every caller (the slash command, a snowflake, another skill) is one consumer among many. A back-reference inverts the direction and pins the procedure to one specific caller — see the anti-pattern in [Anti-patterns](#anti-patterns).
 
-- **`SKILL.md` → anything in the source extension:** always use `<extension>:/...` notation (e.g. `winter-workflow:/context/harness-score/process.md`). `SKILL.md` is symlinked into the consuming workspace, so relative paths from it resolve against the symlink target and break. The extension-prefix path resolves through `CLAUDE.winter.md` and survives.
+- **`SKILL.md` → anything in the source extension:** always use `<extension>:/...` notation (e.g. `winter-workflow:/context/harness-score/process.md`). `SKILL.md` is symlinked into the consuming workspace, so relative paths from it resolve against the symlink target and break. The extension-prefix path resolves through `AGENTS.winter.md` and survives.
 - **Within `context/<name>/`:** the procedure doc and its shared assets (`rubric.md`, `template.html`, etc.) live together and are not symlinked. Relative links (`./rubric.md`) are fine here.
 - **`context/<name>/process.md` → `SKILL.md`:** don't. The procedure stands alone; callers reference it, not the other way around.
 - **Cross-extension references** follow [`./references.md`](./references.md) regardless of file shape.

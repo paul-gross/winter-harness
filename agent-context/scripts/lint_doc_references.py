@@ -8,8 +8,8 @@ degrade that:
 1. **Broken links.** A relative markdown link whose target no longer exists is
    a dead end — `fail`.
 2. **Orphans.** A `context/**/*.md` file that exists but is unreachable from any
-   routing table or skill (no index/README/CLAUDE.md or SKILL.md link chain
-   leads to it) is content an agent will never be routed to — `warn` (raise or
+   routing table or skill (no AGENTS.md/AGENTS.winter.md/CLAUDE.md/index.md/README.md
+   or SKILL.md link chain leads to it) is content an agent will never be routed to — `warn` (raise or
    silence per consumer).
 
 Reachability and orphan detection are whole-repo properties, so this lint always
@@ -42,7 +42,7 @@ import _doclint as dl  # noqa: E402
 CHECK = "doc-references"
 
 # Files that anchor the routing graph — reachability BFS starts from these.
-SEED_NAMES = frozenset({"index.md", "CLAUDE.md", "CLAUDE.winter.md", "README.md"})
+SEED_NAMES = frozenset({"index.md", "AGENTS.md", "AGENTS.winter.md", "CLAUDE.md", "README.md"})
 
 # Skills are a second class of reachability entrypoint: the BFS also seeds from
 # any SKILL.md found in the repo and follows their outbound links transitively.
@@ -53,7 +53,7 @@ SKILL_NAME = "SKILL.md"
 # agent mid-disclosure. Links in body docs (skills, agents) often use a
 # workspace-root-relative convention this single-repo lint can't model, so they
 # are out of scope here.
-LINK_CHECK_NAMES = frozenset({"index.md", "CLAUDE.md", "CLAUDE.winter.md"})
+LINK_CHECK_NAMES = frozenset({"index.md", "AGENTS.md", "AGENTS.winter.md", "CLAUDE.md"})
 
 # Captures the path portion of a path-notation ref like `workspace:/context/foo.md`
 # or `winter-harness:/architecture/index.md` — everything after `<scheme>:/`.
@@ -242,8 +242,8 @@ class DocReferenceLint:
                     status=self._orphan_severity,
                     message=f"orphaned doc — `{repo_rel}` exists but no routing table or skill links to it",
                     file=rel,
-                    remediation="Link it from an index/routing table (`index.md`, `README.md`, or "
-                    "`CLAUDE.md`) or from a `SKILL.md`, or allow-list it with `--allow` if it is intentionally unrouted.",
+                    remediation="Link it from an index/routing table (`index.md`, `README.md`, `AGENTS.md`, "
+                    "`AGENTS.winter.md`, or `CLAUDE.md`) or from a `SKILL.md`, or allow-list it with `--allow` if it is intentionally unrouted.",
                 )
             )
         return findings
