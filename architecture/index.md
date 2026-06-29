@@ -1,4 +1,6 @@
-# Architecture
+# Architecture — winter
+
+Winter's **architecture guidance** — the structural invariants, design decisions, and constraints a change must honor. Conforms to the Canon concept at [`../canon/architecture-guidance.md`](../canon/architecture-guidance.md).
 
 Plan/build-time conventions for the winter ecosystem — how to structure and design Python code, how the generic rules are realized in concrete winter applications. Consulted when writing new code or designing a feature; the companion `standards/` domain is consulted at review time.
 
