@@ -10,10 +10,21 @@ lint = [
     "agent-context/scripts/lint_link_anchors.py",
 ]
 
-# winter-harness is the governance layer: it documents conventions for the
-# modules it governs, so its docs reference them directly. Those references are
-# dead pointers unless the governed module is installed alongside, so each is a
-# real dependency. Nothing requires winter-harness back, so this list can grow
-# without forming a cycle. Declare a module here only once a doc actually
-# references it (winter-product is governed but not yet referenced).
-requires = ["winter-github", "winter-service-tmux", "winter-workflow"]
+# winter-harness is the governance layer beneath every other module: it documents
+# conventions for all of them, so its docs may reference any module directly, and
+# those references are dead pointers unless the module is installed alongside. We
+# therefore require *every* module in the workspace (all but winter-harness itself).
+# Nothing requires winter-harness back — declaring the full set keeps it strictly
+# below everything, so any reference *to* winter-harness would form a detectable cycle.
+requires = [
+    "winter",
+    "winter-docs",
+    "winter-github",
+    "winter-nvim",
+    "winter-plugin-api",
+    "winter-product",
+    "winter-service-docker",
+    "winter-service-tmux",
+    "winter-test-service",
+    "winter-workflow",
+]
