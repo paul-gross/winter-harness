@@ -39,8 +39,10 @@ OpenCode output carries `mode: subagent` by default so every rendered artifact i
 
 ## Model tier → vendor id
 
-The common `model` field is a **tier** (`haiku` / `sonnet` / `opus`), never a raw model id.
-The transform resolves the tier to each harness's model id; a per-harness `model:` override wins over the table.
+The common `model` field is a **tier label** — either a built-in tier (`haiku` / `sonnet` / `opus`) or a custom label defined in `[model_tiers]` — never a raw model id.
+The transform resolves the model for each harness using a three-level precedence: workspace `[agent_model_overrides]` (highest) → per-harness `model:` override block → effective tier table (lowest). See `workspace:/context/winter-cli/configuration/agents.md` for the authoritative precedence definition, merge rules, and validation table.
+
+The built-in tier defaults are:
 
 | Tier | Claude | Codex | OpenCode |
 |------|--------|-------|----------|
@@ -51,6 +53,12 @@ The transform resolves the tier to each harness's model id; a per-harness `model
 **Source of truth:** `winter:/tools/winter-cli/src/winter_cli/modules/workspace/agent_transform/model_tiers.py` (`MODEL_TIER_IDS`).
 The table above mirrors it — a vendor model-id change lands there first, then here.
 Claude accepts the tier alias directly; the Codex and OpenCode ids are pinned against vendor documentation.
+
+### Workspace-overridable tier table
+
+The tier table is workspace-configurable via `[model_tiers]` in `.winter/config.toml` or `config.local.toml` — a workspace entry can override a built-in tier's vendor id across all agents, or define an entirely new tier label that agents and override maps reference by name. For the full configuration reference, merge rules, and the two validation timings (config-load for `[agent_model_overrides]` bare-string values, render-time for agent `model:` frontmatter), see `workspace:/context/winter-cli/configuration/agents.md`.
+
+An unknown or incomplete tier in agent `model:` frontmatter is a render-time signal: `winter ws init` warns and skips that agent while continuing to install the others, and `winter doctor` reports a WARN for any agent whose frontmatter tier cannot be resolved. Neither command hard-aborts for a frontmatter tier error.
 
 ## Lossy projection
 
@@ -70,7 +78,7 @@ A **surviving** tools-drop warning therefore means exactly one thing: this agent
 Declare the native access control in the override block to both restrict access and silence the warning.
 
 `winter lint` does not verify drops.
-It validates override-block well-formedness (block names are one of `claude` / `codex` / `opencode`, each block is a YAML mapping) and that `model` is a recognised tier.
+It validates override-block well-formedness (block names are one of `claude` / `codex` / `opencode`, each block is a YAML mapping); unknown tier labels in `model:` are not caught by lint — see "Workspace-overridable tier table" above for how render time surfaces them instead. Run `winter ws init` after authoring a new custom tier to confirm it resolves correctly for all vendors before committing.
 
 ## Identity across harnesses
 

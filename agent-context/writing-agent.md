@@ -47,16 +47,17 @@ The caller reads this field to decide whether to spawn the agent for a given sub
 Pattern: `"<one-clause what>. Use this agent when <trigger / context>."`.
 The `description` is loaded into every session that can reach the agent — it is a routing key, not documentation. The exclusion rules — including distinguishing confusable reviewers by the *object each acts on* rather than by "Do NOT use" lists — are shared with skills: see [what a description must not contain](./writing-skill.md#what-a-description-must-not-contain).
 
-### `model:` — `haiku`, `sonnet`, or `opus`
+### `model:` — a tier label
 
-Pick the tier appropriate for the role's reasoning load:
+Pick the tier appropriate for the role's reasoning load — a built-in tier, or a custom label a workspace defines in `[model_tiers]`:
 
 - `haiku` — fast, cheap; suitable for classifiers, formatters, structured output
 - `sonnet` — balanced default; suitable for implementation, exploration, most review roles
 - `opus` — heavyweight; reserve for roles that need deep reasoning (architecture, adversarial review)
+- a workspace-defined custom label (e.g. `"big-thinker"`) — see [`./cross-harness-projection.md`](./cross-harness-projection.md#workspace-overridable-tier-table)
 
 Do not use a full model ID string at the top level.
-`winter lint` accepts only the three tier names.
+`winter lint` does not validate the tier label; an unknown one is surfaced at render time — `winter ws init` warns and skips the agent (other agents still install), and `winter doctor` reports a WARN.
 A per-harness override block *may* pin a vendor-specific model id when the tier default is wrong for that harness — see [`./cross-harness-projection.md`](./cross-harness-projection.md).
 
 ### `tools:` — permissive grant for the role
