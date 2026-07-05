@@ -11,7 +11,7 @@ git remote add <upstream-name> <upstream-url>
 git fetch <upstream-name>
 ```
 
-The upstream remote's name is conventionally the upstream project's short name — `winter` for a workspace tracking `pgross/winter`. Don't use the literal string `upstream`.
+The upstream remote's name is conventionally the upstream project's short name — `winter` for a workspace tracking `paul-gross/winter`. Don't use the literal string `upstream`.
 
 ## Dual-remote layout
 

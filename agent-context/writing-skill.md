@@ -1,12 +1,12 @@
 # Skill convention
 
-How to author a skill across the winter ecosystem. Skills come in two shapes; this file documents both and the test for picking between them. Formalized from observed practice — see [Precedent](#precedent) — not invented here.
+How to author a skill across the winter ecosystem. Skills come in two shapes; this file documents both and the test for picking between them. The [Precedent](#precedent) section links the exemplars.
 
 ## The two shapes
 
 **Self-contained.** The entire procedure lives in `SKILL.md`. The body is the procedure. The only way to execute it is to invoke the slash command. Examples: `winter-workflow:/skills/blizzard/SKILL.md`, `winter-workflow:/skills/thaw/SKILL.md`, `winter-workflow:/skills/commit/SKILL.md`.
 
-**Thin SKILL.md backed by an `context/` procedure doc.** `SKILL.md` is a small entry point that names an `context/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `context/<name>/process.md`. Other agents (a `blizzard` snowflake, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/context/harness-score/process.md`.
+**Thin SKILL.md backed by a `context/` procedure doc.** `SKILL.md` is a small entry point that names a `context/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `context/<name>/process.md`. Other agents (a `blizzard` snowflake, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/context/harness-score/process.md`.
 
 ## When to pick the thin shape
 
@@ -29,7 +29,7 @@ Do not declare a `name:` field. The skill's canonical name is the directory name
 
 Do not declare a `model:` field. A skill runs inline in the calling session and inherits its model; pinning a model forces a mid-session switch that invalidates the prompt cache on the way in and out, and on a tiered session (e.g. 1M context) can fail to load the pinned model at all. When a sub-task genuinely needs a different model, spawn a subagent — agent definitions carry their own `model:` — rather than switching the whole session.
 
-The `description` field must cover **what the skill does and when to use it** — the skill picker reads it to decide whether to fire on a given user prompt, so a description that says only "what" loses to one that also says "when". Pattern: "<one-clause what>. Use when <trigger / cadence / context>." See [`winter-workflow:/skills/harness-score/SKILL.md`](https://github.com/paul-gross/winter-workflow/src/branch/master/skills/harness-score/SKILL.md) for an exemplar — it ends `… Use weekly to track progress or divergence.`
+The `description` field must cover **what the skill does and when to use it** — the skill picker reads it to decide whether to fire on a given user prompt, so a description that says only "what" loses to one that also says "when". Pattern: "<one-clause what>. Use when <trigger / cadence / context>." See [`winter-workflow:/skills/harness-score/SKILL.md`](https://github.com/paul-gross/winter-workflow/blob/master/skills/harness-score/SKILL.md) for an exemplar — it ends `… Use weekly to track progress or divergence.`
 
 #### What a description must not contain
 
@@ -128,7 +128,7 @@ Ask the user to confirm the score.                                     ← "the 
 
 ## Precedent
 
-[`pgross/winter-workflow#9`](https://github.com/paul-gross/winter-workflow/pulls/9) split `harness-score` along these lines:
+[`paul-gross/winter-workflow#9`](https://github.com/paul-gross/winter-workflow/pull/9) split `harness-score` along these lines:
 
 - Thin entry point: `winter-workflow:/skills/harness-score/SKILL.md`
 - Procedure: `winter-workflow:/context/harness-score/process.md`

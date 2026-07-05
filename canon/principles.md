@@ -99,8 +99,6 @@ Describe the destination; let the reader follow the link for the contents.
 
 The enumerated list reads as complete, so the next author trusts it instead of the target — and it is wrong the first time the target changes.
 
-**See also.** [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping this principle; its enforcement instance applies, since `context-reviewer` enforces it.
-
 ## Examples are illustrative, not normative
 
 **Rule.** An example shows the smallest surface that makes the canonical rule concrete. It never reproduces a whole schema, template, exhaustive option set, or second specification already owned elsewhere. If an example would have to change every time the canonical contract changes, it is too big: cut it to the part that illustrates the point and link to the owner for the rest.

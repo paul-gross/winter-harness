@@ -48,4 +48,3 @@ Each rule follows a `Rule` / `Why` / `Do` / `Don't` shape.
 
 - [`./principles.md`](./principles.md) §"One canonical owner per fact" — the ownership rule these placement rules decide the *home* for.
 - [`./progressive-disclosure.md`](./progressive-disclosure.md) — once a fact's home is chosen, how that topic is shaped into hubs and spokes for discovery.
-- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping a change to these rules; its enforcement instance applies, since `context-reviewer` enforces them.

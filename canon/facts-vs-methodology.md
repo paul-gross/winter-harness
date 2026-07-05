@@ -45,5 +45,4 @@ The facts now live in two places and drift; the reviewer cannot be reused agains
 
 ## See also
 
-- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — the cold behavioral-expectation eval to run before shipping context an agent must act on; its enforcement instance covers a rule a reviewer enforces, including this one.
 - [`./principles.md`](./principles.md) — cross-cutting authoring principles for the markdown these features are written in.

@@ -2,7 +2,7 @@
 
 Winter's **architecture guidance** — the structural invariants, design decisions, and constraints a change must honor. Conforms to the Canon concept at [`../canon/architecture-guidance.md`](../canon/architecture-guidance.md).
 
-Plan/build-time conventions for the winter ecosystem — how to structure and design Python code, how the generic rules are realized in concrete winter applications. Consulted when writing new code or designing a feature; the companion `standards/` domain is consulted at review time.
+Plan/build-time conventions for the winter ecosystem — how to structure and design Python code, how the generic rules are realized in concrete winter applications. Consulted when writing new code or designing a feature; the companion `standards/` domain carries the concrete code-quality rules (lint, typecheck, tests, logging, protocol sentinels) the finished code is held to.
 
 **Read this index before changing the code of any winter application** — the `winter` CLI, an extension's Python, a service orchestrator. It routes you to the doc for the surface you're touching so you build with the existing structure rather than reverse-engineering it. Follow the one row that matches your change; don't read the whole tree.
 

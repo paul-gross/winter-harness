@@ -42,16 +42,13 @@ OpenCode output carries `mode: subagent` by default so every rendered artifact i
 The common `model` field is a **tier label** — either a built-in tier (`haiku` / `sonnet` / `opus`) or a custom label defined in `[model_tiers]` — never a raw model id.
 The transform resolves the model for each harness using a three-level precedence: workspace `[agent_model_overrides]` (highest) → per-harness `model:` override block → effective tier table (lowest). See `workspace:/context/winter-cli/configuration/agents.md` for the authoritative precedence definition, merge rules, and validation table.
 
-The built-in tier defaults are:
+Each built-in tier (`opus`, `sonnet`, `haiku`) resolves to a per-vendor id — one representative row:
 
 | Tier | Claude | Codex | OpenCode |
 |------|--------|-------|----------|
 | `opus` | `opus` | `gpt-5.4` | `anthropic/claude-opus-4-20250514` |
-| `sonnet` | `sonnet` | `gpt-5.4` | `anthropic/claude-sonnet-4-20250514` |
-| `haiku` | `haiku` | `gpt-5.4-mini` | `anthropic/claude-haiku-4-20250514` |
 
-**Source of truth:** `winter:/tools/winter-cli/src/winter_cli/modules/workspace/agent_transform/model_tiers.py` (`MODEL_TIER_IDS`).
-The table above mirrors it — a vendor model-id change lands there first, then here.
+The full table is defined once in `winter:/tools/winter-cli/src/winter_cli/modules/workspace/agent_transform/model_tiers.py` (`MODEL_TIER_IDS`) — read the id set there rather than mirroring it here.
 Claude accepts the tier alias directly; the Codex and OpenCode ids are pinned against vendor documentation.
 
 ### Workspace-overridable tier table

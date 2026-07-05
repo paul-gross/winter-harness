@@ -13,13 +13,10 @@ Conventions for `README.md` files across the winter ecosystem (the framework, ex
 
 ## Voice — common pitfalls
 
-Habits to resist. Each one is something a careless first draft will produce; the README only earns its keep when it's been trimmed past them.
+READMEs share the winter authoring voice — the general habits to trim past (describe outcomes not contents, one point with no restating second paragraph, don't position relative to siblings, beware colon-then-elaboration) are owned by [`../agent-context/writing-convention.md`](../agent-context/writing-convention.md) §Voice. README-specific:
 
-- **Describe outcomes, not contents.** Feature bullets and section bodies say what the reader gets, not what's inside the directory or file. "An opinionated guide for developing Python applications" is the whole bullet — the list of what the guide covers does not belong here.
-- **One-paragraph lede, no follow-up.** Resist the urge to add a second supporting paragraph that re-states the first. If two paragraphs feel needed, the first is too vague.
+- **One-paragraph lede, no follow-up.** The lede is a single paragraph under the title — what this is and what it does. Resist a second supporting paragraph that re-states it; if two feel needed, the first is too vague.
 - **Installation tells the reader how to install. Period.** Don't list what gets symlinked, what becomes spawnable, or what path notation is unlocked afterward. Effects belong in `index.md` (see `winter-harness:/agent-context/writing-extension-index.md` for what specifically) or in the file itself — not in Installation.
-- **Don't position relative to siblings.** Avoid "X lives in winter-workflow, Y lives in winter-service-tmux." Tell the reader what THIS repo is. Cross-references only earn their place when readers will otherwise actively confuse repos.
-- **Beware colon-then-elaboration.** A bullet of the form `**Name** — summary: detail, detail, detail.` almost always reads better with everything after the colon deleted. If the details matter, they earn their keep as their own bullets or as the linked file's job.
 
 ## Common sections (extensions)
 

@@ -58,7 +58,7 @@ Two checks over the routing files (`AGENTS.md`, `AGENTS.winter.md`, `CLAUDE.md`,
 - **Broken links** (`fail`) — a relative markdown link whose target does not exist strands an agent mid-disclosure.
   Targets with a scheme or path-notation prefix (`https:`, `workspace:/…`) are skipped — a single-repo lint can't resolve a cross-context reference, and extractability already validates those.
   Body docs (skills, agents) are out of scope here: their links often use a workspace-root-relative convention this lint can't model.
-- **Orphans** (`warn`) — an `context/**/*.md` file that exists but is unreachable from any routing table or skill by link or `@import` chain is content no agent will be routed to.
+- **Orphans** (`warn`) — a `context/**/*.md` file that exists but is unreachable from any routing table or skill by link or `@import` chain is content no agent will be routed to.
   Reachability seeds from both routing-table files (`AGENTS.md`, `AGENTS.winter.md`, `CLAUDE.md`, `index.md`, `README.md`) and from every `SKILL.md` found in the repo.
   Path-notation references inside a `SKILL.md` (e.g. `` `workspace:/context/foo.md` ``) are resolved against the repo root so that docs linked only from a skill are not falsely orphaned.
   `warn` by default; `--orphan-severity fail|off` to change it, `--allow '<glob>'` (repeatable, repo-relative) to exempt intentionally-unrouted files.
@@ -89,20 +89,11 @@ The dispatcher runs each over the selected scope with the standard lint env (`WI
 
 All walk every `*.md` under the target, pruning vendor directories and any nested checkout (a subdirectory with its own `.git` is a separate repo, linted on its own).
 
-## Code shape
+## Maintaining the scripts
 
-The four files in [`./scripts/`](./scripts/) follow the service-class tier — plain concrete classes with constructor injection, no `I`-prefix Protocols or DI container:
-
-- **`_doclint.py`** — shared domain object and services: `Finding` (frozen dataclass with `to_json()`), `MarkdownScanner` (file collection, fenced-block-aware line iteration, code-span / link / import / raw-link extraction, relpath), `NdjsonReporter` (emits NDJSON, returns 0), and `LintCli` (parses argv + the injected environment into a repo root, scan scope, and report base).
-- **`lint_path_notation.py`** — `PathNotationLint(scanner, severity)` with a `check(paths, base) -> list[Finding]` method and `classify_span(span) -> str | None` as a method. `main()` constructs `MarkdownScanner`, `PathNotationLint`, and `NdjsonReporter`, then wires them.
-- **`lint_doc_references.py`** — `DocReferenceLint(scanner, orphan_severity, allow)` with a `check(repo_root, base) -> list[Finding]` method; broken-link detection, reachability BFS, and orphan detection are private methods. `main()` constructs the collaborators and wires them.
-- **`lint_link_anchors.py`** — `LinkAnchorLint(scanner, workspace_dir)` with a `check(paths, base) -> list[Finding]` method; resolves link targets and `#fragment` anchors against GitHub-style heading slugs. `file_heading_slugs(file)` computes the slug set (public, for testing). `main()` constructs the collaborators and wires them, pulling `workspace_dir` from `WINTER_WORKSPACE_DIR`.
-
-## Tests
+The scripts in [`./scripts/`](./scripts/) follow the service-class tier — plain concrete classes with constructor injection, no `I`-prefix Protocols or DI container ([`../architecture/service-architecture.md`](../architecture/service-architecture.md)); the code itself is the reference for their shape.
+Their stdlib `unittest` suite, driven by deliberate-violation fixtures under [`./scripts/fixtures/`](./scripts/fixtures/) so the whole `scripts/` directory travels to any consumer intact, runs standalone:
 
 ```bash
 cd agent-context/scripts && python3 -m unittest test_doclint
 ```
-
-Stdlib `unittest` only, driven by deliberate-violation fixtures under [`./scripts/fixtures/`](./scripts/fixtures/) — so the whole `scripts/` directory travels to any consumer intact.
-Tests construct `MarkdownScanner`, `PathNotationLint`, `DocReferenceLint`, and `LinkAnchorLint` directly and drive them via their methods.

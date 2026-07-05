@@ -17,5 +17,4 @@ They compound: an agent that can see the system's state, verify its own changes,
 
 ## See also
 
-- [`./evaluating-harness-changes.md`](./evaluating-harness-changes.md) — testability applied to harness changes: a change isn't done until a cold agent is shown to act on it.
 - [`./facts-vs-methodology.md`](./facts-vs-methodology.md) — pluggability across the harness/workflow seam: the workflow is swappable because the facts it reads live in the harness.

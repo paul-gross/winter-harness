@@ -68,9 +68,9 @@ Setup an agent uses to stand up the scenario a verification needs — not assert
 ## See also
 
 - [`../canon/verifiability-matrix.md`](../canon/verifiability-matrix.md) — the Canon concept this doc conforms to: shape rules, the Do/Don't list, and why the matrix belongs in the harness.
-- [`./testing.md`](./testing.md) — pytest layout, conftest scoping, and fake-vs-mock guidance for unit-test rows.
-- [`./linting.md`](./linting.md) — ruff configuration and `mise run lint` / `mise run format` convention.
-- [`./typechecking.md`](./typechecking.md) — pyright configuration and `mise run typecheck` convention.
+- [`../standards/testing.md`](../standards/testing.md) — pytest layout, conftest scoping, and fake-vs-mock guidance for unit-test rows.
+- [`../standards/linting.md`](../standards/linting.md) — ruff configuration and `mise run lint` / `mise run format` convention.
+- [`../standards/typechecking.md`](../standards/typechecking.md) — pyright configuration and `mise run typecheck` convention.
 - `workspace:/context/winter-cli/root-flags.md` — the `--winter` and `--service-orchestrator` override flags in full.
 - `winter-service-tmux:/context/orchestrator-dev-loop.md` and `winter-service-docker:/context/dev-loop.md` — the direct-entrypoint dev loops for exercising changed orchestrator code.
 - `workspace:/context/winter-cli/usage/provision.md` — the full `winter provision` surface for resource and seed-data setup.
