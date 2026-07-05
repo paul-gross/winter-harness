@@ -27,11 +27,12 @@ This repo's conventions are written in a specific voice — terse, opinionated, 
 
 ## Pre-commit checks
 
-No linters, formatters, or tests are wired in. Before pushing, manually validate:
+Three markdown lints ship in this repo and are registered with `winter lint` via `winter-ext.toml` — path notation, routing-reference integrity, and link anchors. Run them before pushing; `agent-context/linting.md` is the owner for what each flags and how to run them standalone. When touching the scripts themselves, also run their test suite (`cd agent-context/scripts && python3 -m unittest test_doclint`).
 
-- **Internal links** — every `winter-harness:/path/file.md` reference, every relative link inside this repo, resolves to an existing file.
+Two things the lints do not cover — validate these by hand:
+
+- **Backticked file references** — the lints resolve markdown links, not `` `path` `` code spans; a relative path inside backticks must still resolve from the file that states it.
 - **Code references** — any production example cited via path notation (e.g. `winter:/tools/winter-cli/...`) still exists at that path with the claimed shape. Conventions go stale when winter-cli refactors; if you spot drift while reading, fix it.
-- **Cross-repo refs** — `winter-harness:/...`, `winter-workflow:/...` etc. point at real files in those repos.
 
 ## Delivery
 

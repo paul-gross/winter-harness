@@ -63,4 +63,4 @@ In winter-cli, the I-prefix-on-Protocols rule and the no-Protocols-in-`internal/
 - `./dependency-injection.md` — the DI conventions and `Workspace` injection rule.
 - `./repository-pattern.md` — the rule about confining library imports.
 - `../standards/protocol-conformance.md` — pin each Protocol/adapter pair with a typecheck-time sentinel so DI-laundered drift fails the build.
-- `exemplars/python/repo_pattern.py` — full worked example combining all three.
+- `../exemplars/python/repo_pattern.py` — full worked example combining all three.

@@ -112,6 +112,6 @@ Use the real exception class for error-path tests (`OSError`, `git.GitCommandErr
 ## See also
 
 - `./service-architecture.md` — the service-based principle a repository is one shape of: an injected class that owns I/O against one external system.
-- `exemplars/python/repo_pattern.py` — canonical shape for new repository classes.
+- `../exemplars/python/repo_pattern.py` — canonical shape for new repository classes.
 - `./subprocess.md` — the concrete shape for shelling out from inside a repository (`capture_output` / `check=False` / wrap via the injected factory).
 - `../standards/testing.md` — full test strategy; the Adapters bullet in the assertion-patterns section applies here.

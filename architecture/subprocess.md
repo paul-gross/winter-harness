@@ -54,5 +54,5 @@ subprocess.run(["git", "fetch", remote], cwd=cwd)
 - `./error-handling.md` — structured errors via the injected factory; `from_<transport>(exc, message, *, cwd)` canonical shape.
 - `./repository-pattern.md` — why subprocess lives in `internal/`.
 - `../standards/logging.md` — log levels for wrapped subprocess failures.
-- `winter/tools/winter-cli/src/winter_cli/core/internal/local_subprocess_runner.py` — the production `ISubprocessRunner` adapter (`run` + `popen` seams).
-- `winter/tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` — the production wrapping factory. Currently implements `from_git` only; `from_subprocess` is the canonical shape for new adapters.
+- `winter:/tools/winter-cli/src/winter_cli/core/internal/local_subprocess_runner.py` — the production `ISubprocessRunner` adapter (`run` + `popen` seams).
+- `winter:/tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` — the production wrapping factory. Currently implements `from_git` only; `from_subprocess` is the canonical shape for new adapters.

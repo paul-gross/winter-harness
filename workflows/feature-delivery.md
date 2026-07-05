@@ -153,5 +153,5 @@ The sections above are organized by topic; this is the ordered walkthrough that 
 - `../standards/linting.md`, `../standards/typechecking.md` — pre-push tools for Python repos
 - `../documentation/feature-documentation.md` — the "no undocumented feature" invariant the pre-push doc-currency check enforces
 - `../canon/evaluating-harness-changes.md` — pre-push eval for any change that adds context an agent is expected to act on (new skill, agent, rule, feedforward doc, or routing)
-- `./workflows/upstream-tracking.md` — separate flow for workspaces that customize an upstream framework repo
-- `./CONTRIBUTING.md` — the same rules applied to this repo (`winter-harness`) specifically
+- `./upstream-tracking.md` — separate flow for workspaces that customize an upstream framework repo
+- `../CONTRIBUTING.md` — the same rules applied to this repo (`winter-harness`) specifically

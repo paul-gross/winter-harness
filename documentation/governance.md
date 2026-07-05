@@ -14,7 +14,7 @@ It is deliberately narrow, and it does **not** enumerate every place documentati
 
 Two kinds of repository compose into a winter workspace, and the docs must not blur them.
 
-**Consumable extension.** A *generic, opinion-neutral* capability any workspace installs to gain function — service orchestration, issue tooling, a backlog model. The reader wants the function and adopts it without buying into anyone's methodology. Current consumables: `winter-product`, `winter-service-tmux`, `winter-github`.
+**Consumable extension.** A *generic, opinion-neutral* capability any workspace installs to gain function — service orchestration, issue tooling, a backlog model. The reader wants the function and adopts it without buying into anyone's methodology. Current consumables: `winter-product`, `winter-service-tmux`, `winter-service-docker`, `winter-github`.
 
 **Example (reference implementation).** The maintainer's own *opinionated* implementation of a swappable concern — the agentic workflow, the conventions, the workspace itself. It installs and runs like any extension and is fully usable as-is, but it embodies one personal take that winter deliberately keeps interchangeable; the docs offer it as a reference to adopt **or** fork, not as a fixed part of the framework. Current examples:
 

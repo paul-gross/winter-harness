@@ -27,7 +27,6 @@ When an extension installs an agent, skill, or slash command into a workspace, t
 
 | Kind | Canonical name | Common installed/typed name |
 |------|---------------|----------------------|
-| Agent | `agentic-development-manager` | `wf-agentic-development-manager` |
 | Agent | `developer`, `architect`, `code-reviewer`, `harness-reviewer` | `wf-developer`, `wf-architect`, ... |
 | Agent | `product-specialist` | `wp-product-specialist` |
 | Skill / command | `blizzard`, `thaw`, `commit`, `cold-review`, `harness-review` | `/wf-blizzard`, `/wf-thaw`, ... |

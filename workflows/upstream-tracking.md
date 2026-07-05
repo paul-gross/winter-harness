@@ -76,10 +76,10 @@ git push --force-with-lease origin master
 
 The same agent-sign-off rule from [Sync flow](#sync-flow) applies to the amend push.
 
-Project repos are governed separately — see `./workflows/feature-delivery.md`.
+Project repos are governed separately — see `./feature-delivery.md`.
 
 ## See also
 
-- `./workflows/feature-delivery.md` — the flow for landing changes in project repos (linear history via rebase, push direct to `origin/master`, pre-push checks)
+- `./feature-delivery.md` — the flow for landing changes in project repos (linear history via rebase, push direct to `origin/master`, pre-push checks)
 - `workspace:/context/project/contributing.md` — commit format and `Closes #N` footer rules
 - `workspace:/context/worktree-ops.md` — `winter ws fetch` / `pull` / `push` reference (these operate on **project repos** inside the workspace, not on the workspace repo itself)
