@@ -17,7 +17,7 @@ A block's keys are passed through as native frontmatter for that harness; a bloc
 
 ```yaml
 ---
-name: code-reviewer
+name: cold-reviewer
 description: |
   Reviews a change-set for correctness and design.
   Use this agent when you want a cold read on code quality.
@@ -79,12 +79,12 @@ It validates override-block well-formedness (block names are one of `claude` / `
 
 ## Identity across harnesses
 
-The canonical `name` is the output filename stem for every harness, carrying the workspace-configurable install prefix (e.g. `<prefix>-developer.md`).
+The canonical `name` is the output filename stem for every harness, carrying the workspace-configurable install prefix (e.g. `<prefix>-ice-carver.md`).
 Each harness resolves agent identity differently:
 
-- **Claude Code** resolves by the frontmatter `name` — `subagent_type: developer` finds the agent regardless of the prefixed filename.
+- **Claude Code** resolves by the frontmatter `name` — `subagent_type: ice-carver` finds the agent regardless of the prefixed filename.
 - **Codex** carries the unprefixed canonical `name` in its TOML `name` field, same as Claude; the prefix lives only in the filename.
-- **OpenCode** resolves by **filename**, so its invocation name includes the prefix (`<prefix>-developer`).
+- **OpenCode** resolves by **filename**, so its invocation name includes the prefix (`<prefix>-ice-carver`).
 
 Claude and Codex invoke by the unprefixed canonical name; OpenCode invokes by the prefixed filename.
 This divergence is accepted for the current iteration — a caller naming an OpenCode agent must include the workspace prefix.

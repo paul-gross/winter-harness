@@ -18,7 +18,7 @@ Two kinds of repository compose into a winter workspace, and the docs must not b
 
 **Example (reference implementation).** The maintainer's own *opinionated* implementation of a swappable concern — the agentic workflow, the conventions, the workspace itself. It installs and runs like any extension and is fully usable as-is, but it embodies one personal take that winter deliberately keeps interchangeable; the docs offer it as a reference to adopt **or** fork, not as a fixed part of the framework. Current examples:
 
-- `winter-workflow` — the maintainer's personal agentic workflow (the blizzard team, the review loops). Turnkey — install it and the `/wf-*` skills and `wf-*` agents work — but interchangeable by design: adopt it as-is or fork your own.
+- `winter-workflow` — the maintainer's personal agentic workflow (the build skills, the review loops). Turnkey — install it and the `/wf-*` skills and `wf-*` agents work — but interchangeable by design: adopt it as-is or fork your own.
 - `winter-harness` — the maintainer's own conventions library. Usable directly (reference its files by path notation), but a personal, opinionated set — adopt it or fork the shape and supply your own facts.
 - `winter-workspace` — the meta-workspace winter itself is built in, pre-wired to the maintainer's repos. A worked example of an assembled workspace, not a template to clone.
 

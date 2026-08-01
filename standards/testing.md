@@ -122,7 +122,7 @@ The fake satisfies the Protocol structurally — pyright/mypy will reject a dive
 
 ## Convention tests
 
-Some Python conventions describe AST-level patterns that `ruff`, `pyright`, and `import-linter` can't reach — Protocol naming (`I`-prefix), the no-whole-Config-injection rule, the no-catch-log-rethrow pattern, the service-based-behavior rule. Code review and the `code-reviewer` agent catch them probabilistically; promoting each rule to a small pytest file under `tests/conventions/` makes the check deterministic and runs it alongside the rest of `mise run test`.
+Some Python conventions describe AST-level patterns that `ruff`, `pyright`, and `import-linter` can't reach — Protocol naming (`I`-prefix), the no-whole-Config-injection rule, the no-catch-log-rethrow pattern, the service-based-behavior rule. Code review and the `cold-reviewer` agent catch them probabilistically; promoting each rule to a small pytest file under `tests/conventions/` makes the check deterministic and runs it alongside the rest of `mise run test`.
 
 ### Layout
 

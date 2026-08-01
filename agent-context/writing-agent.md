@@ -27,7 +27,7 @@ An agent missing any of these, or one that declares `allowed-tools` instead of `
 ### `name:` — required for agents
 
 Declare `name:` in every agent frontmatter.
-The `name:` value is the functional identifier the Agent tool uses to resolve `subagent_type` — it is the mechanism by which a caller's `subagent_type: developer` finds `developer.md`.
+The `name:` value is the functional identifier the Agent tool uses to resolve `subagent_type` — it is the mechanism by which a caller's `subagent_type: ice-carver` finds `developer.md`.
 Without it, resolution fails silently and the agent is unreachable.
 
 This is the opposite rule from skills.
@@ -35,7 +35,7 @@ Skills forbid `name:` because a skill's canonical identifier is its directory na
 For agents there is no directory-name convention: the file is a flat `<name>.md`, and the Agent tool reads `name` from frontmatter directly.
 The field is not redundant — it is the resolution key.
 
-Keep the `name:` value identical to the filename stem (`developer.md` → `name: developer`).
+Keep the `name:` value identical to the filename stem (`ice-carver.md` → `name: ice-carver`).
 When they diverge the filename is silently bypassed and the canonical value is whatever the frontmatter says; the filename becomes a misleading label.
 
 `name` is technically optional: an agent that omits it falls back to the filename stem. Authored agents declare it explicitly. For the transform mechanism and why the fallback exists, see [`./cross-harness-projection.md`](./cross-harness-projection.md) §"Omitted names".

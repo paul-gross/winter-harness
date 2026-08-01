@@ -27,9 +27,9 @@ When an extension installs an agent, skill, or slash command into a workspace, t
 
 | Kind | Canonical name | Common installed/typed name |
 |------|---------------|----------------------|
-| Agent | `developer`, `architect`, `code-reviewer`, `harness-reviewer` | `wf-developer`, `wf-architect`, ... |
+| Agent | `ice-carver`, `winter-architect`, `cold-reviewer`, `harness-reviewer` | `wf-ice-carver`, `wf-winter-architect`, ... |
 | Agent | `product-specialist` | `wp-product-specialist` |
-| Skill / command | `blizzard`, `thaw`, `commit`, `cold-review`, `harness-review` | `/wf-blizzard`, `/wf-thaw`, ... |
+| Skill / command | `glacier`, `snowball`, `commit`, `cold-review`, `harness-review` | `/wf-glacier`, `/wf-snowball`, ... |
 | Skill / command | `refine`, `todo` | `/wp-refine`, `/wp-todo` |
 | Skill / command | `issue` | `/wg-issue` |
 

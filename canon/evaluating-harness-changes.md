@@ -88,19 +88,19 @@ Each flavor below is one instance of the same scenario shape.
 - **control** — without the cross-link, the agent reaches for `rm -rf gamma/` and orphans extension state.
 - **anti** — "create a new environment": the agent lands on the init flow, not the destroy flow.
 
-**Routing** — a change documents that small localized fixes go to `/wf-thaw`, not `/wf-blizzard`.
+**Routing** — a change documents that small localized fixes go to `/wf-snowball`, not `/wf-glacier`.
 
 - **cue** — "Fix this off-by-one in the port-index calculation."
-- **via** — the skill descriptions / routing doc → `/wf-thaw`.
-- **reached** — the agent weighs the thaw-vs-blizzard distinction.
-- **behaved** — it picks `/wf-thaw` for the narrow change.
-- **control** — without the routing cue, the agent over-escalates a one-line fix to a full blizzard.
-- **anti** — "design and build a new multi-repo sync subsystem": the agent picks blizzard, not thaw.
+- **via** — the skill descriptions / routing doc → `/wf-snowball`.
+- **reached** — the agent weighs the snowball-vs-glacier distinction.
+- **behaved** — it picks `/wf-snowball` for the narrow change.
+- **control** — without the routing cue, the agent over-escalates a one-line fix to a full glacier.
+- **anti** — "design and build a new multi-repo sync subsystem": the agent picks glacier, not snowball.
 
 ## Who runs it
 
 The eval runs from a session that can open a fresh subagent — the orchestrating top-level session, or a skill that spawns one.
-A non-spawning agent — a `developer` or reviewer one-shot delivering the change — cannot open the cold subagent the eval needs and cannot stand in for it warm.
+A non-spawning agent — an `ice-carver` or reviewer one-shot delivering the change — cannot open the cold subagent the eval needs and cannot stand in for it warm.
 When the agent that authored the change can't spawn, it hands the eval up to the session that can; it does not skip it or run it warm.
 The cold spawn is the eval — an agent that can't make it can't run it.
 
@@ -140,7 +140,7 @@ Note the run count and the tally alongside the change so the next author knows t
 
 - **Skip the eval on a change that's owed one.** Context no cold agent is shown to reach and act on is aspiration, not harness.
 - **Spawn warm.** The reviewer or agent running inside the authoring session has the change in context; the one in production has only what the discovery chain delivers.
-- **Delegate the eval to a non-spawning agent.** A `developer` or reviewer one-shot can't open the cold subagent; it hands the eval up to a session that can, rather than skipping it or running warm.
+- **Delegate the eval to a non-spawning agent.** An `ice-carver` or reviewer one-shot can't open the cold subagent; it hands the eval up to a session that can, rather than skipping it or running warm.
 - **Collapse reached and behaved into one verdict.** The pass/fail hides which of the two opposite fixes the failure needs.
 - **Accept a behaved-without-reached as a pass.** Run the `control` arm — if the agent behaves correctly without the change, the context is dead weight.
 - **Reuse the convention's own examples as the fixture or cue.** Showing the agent the canonical example proves nothing about generalization.

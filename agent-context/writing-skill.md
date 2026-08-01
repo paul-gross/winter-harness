@@ -4,15 +4,15 @@ How to author a skill across the winter ecosystem. Skills come in two shapes; th
 
 ## The two shapes
 
-**Self-contained.** The entire procedure lives in `SKILL.md`. The body is the procedure. The only way to execute it is to invoke the slash command. Examples: `winter-workflow:/skills/blizzard/SKILL.md`, `winter-workflow:/skills/thaw/SKILL.md`, `winter-workflow:/skills/commit/SKILL.md`.
+**Self-contained.** The entire procedure lives in `SKILL.md`. The body is the procedure. The only way to execute it is to invoke the slash command. Examples: `winter-workflow:/skills/snowball/SKILL.md`, `winter-workflow:/skills/commit/SKILL.md`.
 
-**Thin SKILL.md backed by a `context/` procedure doc.** `SKILL.md` is a small entry point that names a `context/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `context/<name>/process.md`. Other agents (a `blizzard` snowflake, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/context/harness-score/process.md`.
+**Thin SKILL.md backed by a `context/` procedure doc.** `SKILL.md` is a small entry point that names a `context/<name>/process.md` and tells the executor to run every step. The procedure itself lives in `context/<name>/process.md`. Other agents (an `iceberg` foreman, another skill, an ad-hoc subagent) can `Read` the procedure and execute it as a substep without firing the slash command. Example: `winter-workflow:/skills/harness-score/SKILL.md` → `winter-workflow:/context/harness-score/process.md`.
 
 ## When to pick the thin shape
 
 The test:
 
-> If you can imagine a non-slash-command caller (a snowflake, another skill, an ad-hoc agent) wanting to execute this procedure as a substep, choose the thin shape. If the procedure is the slash command's entire identity — nothing else will ever want to run it — the self-contained shape is fine.
+> If you can imagine a non-slash-command caller (an iceberg foreman, another skill, an ad-hoc agent) wanting to execute this procedure as a substep, choose the thin shape. If the procedure is the slash command's entire identity — nothing else will ever want to run it — the self-contained shape is fine.
 
 Two corollaries:
 
@@ -67,14 +67,14 @@ Rubrics, templates, sample artifacts, and other supporting files live in `contex
 
 The procedure doc is read by whoever is executing the procedure — sometimes that is a slash-command invocation, sometimes another agent that found the doc via `Read`. The voice must read correctly in both cases.
 
-- **Imperative second-person.** "Read the rubric." "Spawn an `explorer`." "Write the report."
+- **Imperative second-person.** "Read the rubric." "Spawn an `arctic-explorer`." "Write the report."
 - **Address "the executing agent", not "the user".** A non-slash-command caller has no user. If a step genuinely needs user interaction, say "if a human caller is present, ask via `AskUserQuestion`; otherwise take the input from the caller's invocation".
 - **Do not assume slash-command framing.** No "when the user types `/foo bar`", no "`$ARGUMENTS` contains …" at the top. Inputs come from "the caller" — the slash command and the agent caller both qualify.
 - **Report the result to "the caller", not "the user".** The slash command's user is one kind of caller; another agent is another.
 
 ## Cross-reference shape
 
-References point **downward only** — from the caller to the procedure, never back. `SKILL.md` depends on `context/<name>/process.md`; the procedure does not depend on any of its callers. This is dependency inversion: the procedure is the reusable abstraction, every caller (the slash command, a snowflake, another skill) is one consumer among many. A back-reference inverts the direction and pins the procedure to one specific caller — see the anti-pattern in [Anti-patterns](#anti-patterns).
+References point **downward only** — from the caller to the procedure, never back. `SKILL.md` depends on `context/<name>/process.md`; the procedure does not depend on any of its callers. This is dependency inversion: the procedure is the reusable abstraction, every caller (the slash command, a foreman, another skill) is one consumer among many. A back-reference inverts the direction and pins the procedure to one specific caller — see the anti-pattern in [Anti-patterns](#anti-patterns).
 
 - **`SKILL.md` → anything in the source extension:** always use `<extension>:/...` notation (e.g. `winter-workflow:/context/harness-score/process.md`). `SKILL.md` is symlinked into the consuming workspace, so relative paths from it resolve against the symlink target and break. The extension-prefix path resolves through `AGENTS.winter.md` and survives.
 - **Within `context/<name>/`:** the procedure doc and its shared assets (`rubric.md`, `template.html`, etc.) live together and are not symlinked. Relative links (`./rubric.md`) are fine here.
@@ -111,14 +111,14 @@ When the user runs `/foo bar`, $ARGUMENTS contains the project name.   ← assum
 [full rubric pasted here]                                              ← duplicates content that belongs in context/<name>/
 
 ## Step 2: Score
-Ask the user to confirm the score.                                     ← "the user" — a snowflake caller has none
+Ask the user to confirm the score.                                     ← "the user" — a foreman caller has none
 ```
 
 ## Anti-patterns
 
 - **Paraphrasing the procedure inside `SKILL.md`.** If `SKILL.md` lists steps, scoring rules, or output schemas, the procedure has two homes that will drift. `SKILL.md` is a pointer; the doc is the procedure.
 - **Duplicating rubric / template / schema content** into both `SKILL.md` and `context/<name>/`. Pick one home (`context/<name>/`) and link from the other.
-- **Procedure-doc voice that assumes slash-command framing.** "When the user runs `/foo`", "`$ARGUMENTS` is …", "ask the user" at the top of a step. A snowflake reading the doc has no `$ARGUMENTS` and no user.
+- **Procedure-doc voice that assumes slash-command framing.** "When the user runs `/foo`", "`$ARGUMENTS` is …", "ask the user" at the top of a step. A foreman reading the doc has no `$ARGUMENTS` and no user.
 - **Procedure doc that links back to its `SKILL.md`.** Dependency inversion: the procedure is the reusable abstraction; callers depend on it, not vice versa. A back-reference pins the procedure to one caller (the slash command) and silently lies to every other caller that reads it. The procedure must stand alone — anything it needs (frontmatter, argument hints, "who calls this") goes in its own header, not in a pointer back to one specific consumer.
 - **Relative paths out of `SKILL.md`.** `../../context/<name>/process.md` looks fine until `SKILL.md` is symlinked into the consuming workspace, then resolves against the wrong directory. Use `<extension>:/context/<name>/process.md`.
 - **`name:` in frontmatter.** The directory name is the canonical identifier; a `name:` field restates it (drift risk) or contradicts it (loader confusion). Omit it.

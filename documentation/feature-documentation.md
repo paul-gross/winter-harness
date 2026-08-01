@@ -7,7 +7,7 @@ The "no undocumented feature" invariant for the winter ecosystem. A change that 
 When a change touches **user-facing surface**, the documentation that describes that surface is updated in the same commit. User-facing surface is anything an adopter learns winter from:
 
 - a `winter` subcommand, flag, or `config.toml` key;
-- an extension capability — a hook, a service, a dashboard plugin, an env-root file (`up` / `down` / `status`, `.winter.env`);
+- an extension capability — a hook, a service, a dashboard plugin, an env-root file (`up` / `down` / `status`);
 - a skill or agent the workspace installs;
 - a convention an agent is expected to follow.
 
