@@ -4,7 +4,7 @@ Conventions for the top-level `index.md` of a winter extension (the file resolve
 
 ## Why this matters
 
-A workspace's `AGENTS.md` `@`-includes each installed extension's `index.md` via `AGENTS.winter.md` (and `CLAUDE.md` is the committed shim that reaches it), so the file is loaded into **every agent context** opened against the workspace. That makes it an auto-loaded entry point, and the canon's [`../canon/organization.md`](../canon/organization.md) §"Charge auto-loaded entry points a higher context cost" sets what such a file may hold: only universally-required operational rules and navigation, everything else behind links. The rule below is that principle applied to an extension `index.md` — the "universally required" surface here is what the user needs to *run* the workspace.
+A workspace's `AGENTS.md` `@`-includes each installed extension's `index.md` via `AGENTS.winter.md` (and `CLAUDE.md` is the committed shim that reaches it), so the file is loaded into **every agent context** opened against the workspace. That makes it an auto-loaded entry point: it may hold only universally-required operational rules and navigation, with everything else behind links. The "universally required" surface here is what the user needs to *run* the workspace.
 
 ## Rule
 
@@ -25,7 +25,7 @@ Out of scope — these belong elsewhere:
 
 ## Structure
 
-How an `index.md` is shaped for discovery — when to split it into a hub plus per-topic files, and how to write its routing rows as read-triggers rather than contents summaries — is the canon's [`../canon/progressive-disclosure.md`](../canon/progressive-disclosure.md). This file does not restate it. The extension-specific overlay is scope: an extension `index.md` is the hub for the extension's *workspace-runtime* surface only (the Rule above), so its routing rows point at the deeper `context/<topic>.md` walkthroughs and project-config files an operator descends to, not at the behind-the-scenes detail.
+Shape an `index.md` for discovery: split distinct topics behind routed files, and write each routing row as a read-trigger rather than a contents summary. An extension `index.md` is the hub for the extension's *workspace-runtime* surface only (the Rule above), so its routing rows point at the deeper `context/<topic>.md` walkthroughs and project-config files an operator descends to, not at the behind-the-scenes detail.
 
 ## Where the rejected content goes
 

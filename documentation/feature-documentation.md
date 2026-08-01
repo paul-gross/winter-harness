@@ -52,8 +52,5 @@ A doc that lags its feature is worse than no doc — it tells an adopter somethi
 ## See also
 
 - [`../workflows/feature-delivery.md`](../workflows/feature-delivery.md) §Pre-push checks — where the invariant rides the existing pre-push gate.
-- [`../canon/principles.md`](../canon/principles.md) §"No retrospective framing" — the canonical-source-is-current-state rule a docs page must also obey.
-- [`../canon/progressive-disclosure.md`](../canon/progressive-disclosure.md) — how to structure the canonical source itself for discovery: when to split a doc into a hub `index.md` plus per-sub-topic files, and how to write the routing rows.
 - [`../agent-context/writing-extension-index.md`](../agent-context/writing-extension-index.md) — what belongs in an extension `index.md`, the most common canonical source a feature touches.
 - [`./governance.md`](./governance.md) — the companion contract: which content belongs on which documentation surface, and the consumable-extension vs. example distinction. This file keeps docs current; that one places them.
-- [`../canon/evaluating-harness-changes.md`](../canon/evaluating-harness-changes.md) — the cold behavioral-expectation eval that extends this invariant from currency to efficacy: currency keeps the doc true, that eval proves a cold agent reaches and acts on it.

@@ -4,7 +4,7 @@ Conventions for **public / adopter-facing documentation** — the published docs
 
 This domain owns public / adopter-facing documentation policy. It does **not** own agent / skill prompt structure or Markdown path-notation mechanics — those are agent context ([`../agent-context/index.md`](../agent-context/index.md)).
 
-Paired reviewer: `documentation-reviewer` enforces these conventions when reviewing human-facing public documentation, discovering them by walking the workspace's discovery chain rather than from a hard-coded path. The cold behavioral-expectation eval in [`../canon/evaluating-harness-changes.md`](../canon/evaluating-harness-changes.md) applies, since a reviewer enforces it.
+Paired reviewer: `documentation-reviewer` enforces these conventions when reviewing human-facing public documentation, discovering them by walking the workspace's discovery chain rather than from a hard-coded path.
 
 Parent: `../index.md` (root topology).
 

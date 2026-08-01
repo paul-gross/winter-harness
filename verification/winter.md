@@ -1,8 +1,8 @@
 # Verifiability matrix — winter
 
-An inventory of the verification methods available for the winter ecosystem. Each entry is one way a skill or agent may assert a winter change is correct. Conforms to the Canon concept at [`../canon/verifiability-matrix.md`](../canon/verifiability-matrix.md).
+An inventory of the verification methods available for the winter ecosystem. Each entry is one way a skill or agent may assert a winter change is correct.
 
-Method ids follow the Canon's [scheme](../canon/verifiability-matrix.md#method-identifiers): commands and manual methods are `<scope>:<method>` (a manual method's method name is `manual`); `cli-probe:*` is a category scope for the workspace-level `winter` CLI probes; tools are unscoped under a flat `tool:`. The `winter:*` Python-QA rows run from `tools/winter-cli/` inside the `winter` repo worktree; each sibling project's rows run from that project's own worktree; `cli-probe:*` run from a configured workspace root. Choosing a scope for a new winter method: Python QA of winter's own source is `winter:*`; a behavioral probe of the installed CLI against a workspace is `cli-probe:*`.
+Method ids use the following scheme: commands and manual methods are `<scope>:<method>` (a manual method's method name is `manual`); `cli-probe:*` is a category scope for the workspace-level `winter` CLI probes; tools are unscoped under a flat `tool:`. The `winter:*` Python-QA rows run from `tools/winter-cli/` inside the `winter` repo worktree; each sibling project's rows run from that project's own worktree; `cli-probe:*` run from a configured workspace root. Choosing a scope for a new winter method: Python QA of winter's own source is `winter:*`; a behavioral probe of the installed CLI against a workspace is `cli-probe:*`.
 
 ## Commands
 
@@ -70,7 +70,6 @@ Setup an agent uses to stand up the scenario a verification needs — not assert
 
 ## See also
 
-- [`../canon/verifiability-matrix.md`](../canon/verifiability-matrix.md) — the Canon concept this doc conforms to: shape rules, the Do/Don't list, and why the matrix belongs in the harness.
 - [`../standards/testing.md`](../standards/testing.md) — pytest layout, conftest scoping, and fake-vs-mock guidance for unit-test rows.
 - [`../standards/linting.md`](../standards/linting.md) — ruff configuration and `mise run lint` / `mise run format` convention.
 - [`../standards/typechecking.md`](../standards/typechecking.md) — pyright configuration and `mise run typecheck` convention.

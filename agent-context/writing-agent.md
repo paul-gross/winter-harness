@@ -27,7 +27,7 @@ An agent missing any of these, or one that declares `allowed-tools` instead of `
 ### `name:` — required for agents
 
 Declare `name:` in every agent frontmatter.
-The `name:` value is the functional identifier the Agent tool uses to resolve `subagent_type` — it is the mechanism by which a caller's `subagent_type: ice-carver` finds `developer.md`.
+The `name:` value is the functional identifier the Agent tool uses to resolve `subagent_type` — it is the mechanism by which a caller's `subagent_type: ice-carver` finds `ice-carver.md`.
 Without it, resolution fails silently and the agent is unreachable.
 
 This is the opposite rule from skills.

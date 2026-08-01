@@ -6,7 +6,6 @@ The repo is organized by **convention domain**: each directory names the subject
 
 | Domain hub | When to read |
 |------------|--------------|
-| [canon/index.md](./canon/index.md) | A universal harness convention true of *every* harness, independent of language, project, or workflow — read when authoring or organizing any agent-facing markdown, or building any agentic feature |
 | [agent-context/index.md](./agent-context/index.md) | Authoring or validating material an agent loads or traverses — read when writing or reviewing an agent, skill, extension `index.md`, routing table, or cross-context path reference |
 | [documentation/index.md](./documentation/index.md) | Public / adopter-facing documentation — read when writing or auditing a README or the docs site, or classifying a repo for the public catalog |
 | [architecture/index.md](./architecture/index.md) | Before writing or designing the code of any winter application — how the code is structured and shaped |

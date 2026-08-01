@@ -1,10 +1,10 @@
 # Agent-context conventions
 
-Conventions for authoring and validating **agent context** — the material an agent loads or traverses to do work: agents, skills, extension `index.md` files, routing tables, cross-context path references, and the lints that mechanically enforce them. Specific to winter; the universal substrate they rest on is the [Canon](../canon/index.md).
+Conventions for authoring and validating **agent context** — the material an agent loads or traverses to do work: agents, skills, extension `index.md` files, routing tables, cross-context path references, and the lints that mechanically enforce them. Specific to winter.
 
 This domain owns the machine-consumed authoring surface. It does **not** own public README / docs-site policy — that is [`../documentation/index.md`](../documentation/index.md); application architecture — [`../architecture/index.md`](../architecture/index.md); or general development tools — [`../tooling/github.md`](../tooling/github.md).
 
-Paired reviewer: `context-reviewer` enforces these conventions and the [Canon](../canon/index.md) when reviewing agent-facing markdown, discovering them by walking the workspace's discovery chain rather than from a hard-coded path. The cold behavioral-expectation eval in [`../canon/evaluating-harness-changes.md`](../canon/evaluating-harness-changes.md) applies whenever a change adds context an agent is expected to act on — review being one instance.
+Paired reviewer: `context-reviewer` enforces these conventions when reviewing agent-facing markdown, discovering them by walking the workspace's discovery chain rather than from a hard-coded path.
 
 Parent: `../index.md` (root topology).
 
