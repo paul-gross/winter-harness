@@ -2,7 +2,8 @@
 
 How to author an agent definition across the winter ecosystem.
 An agent is a single **canonical** `.md` file: winter projects it into each harness's native artifact (Claude Code, Codex, OpenCode) at `winter ws init`.
-This file documents the frontmatter contract common to every harness and the canonical-name rule; [`./cross-harness-projection.md`](./cross-harness-projection.md) covers the per-harness override blocks, the model-tier→id table, and lossy projection.
+This file documents the frontmatter contract common to every harness, the canonical-name rule, and the two agent-body shapes; [`./cross-harness-projection.md`](./cross-harness-projection.md) covers the per-harness override blocks, the model-tier→id table, and lossy projection.
+[`./methodology-packaging.md`](./methodology-packaging.md) owns how reusable methodology is separated from runtime adapters.
 
 ## Frontmatter contract
 
@@ -70,12 +71,24 @@ See [`winter-workflow:/agents/README.md#convention-tool-grant-vs-preamble`](wint
 
 ## Agent body
 
-The body describes **what the role does and how it behaves** — the agent's identity, decision rules, escalation paths, and output conventions.
+The body owns the agent's stable role identity and isolated-runtime behavior.
+For a self-contained agent, it also owns the procedure's decision and output rules; for a shared-core agent, those rules live in the shared methodology.
 It does not describe how the role participates in any particular workflow; that is the spawning skill's responsibility to inject via its coordination preamble.
 
 Write the body in second-person imperative voice addressed to the executing agent.
 Reference "your caller" rather than any named coordinator or skill.
 Do not include `TaskList`/`TaskUpdate` instructions — those are injected by skills that need them.
+
+## The two shapes
+
+**Self-contained.** Keep the complete procedure in the agent body when isolated-runtime behavior is part of the procedure's identity and no concrete second executor is plausible.
+The body still uses caller-neutral language; self-contained does not mean coupled to one spawning skill.
+
+**Shared-core.** Keep stable isolated-runtime behavior in the agent definition and point it at the project-declared reusable procedure.
+The shared core owns semantic decisions, escalation rules, and output contracts that apply across executors.
+
+Use [`winter-canon:/facts-vs-methodology.md`](winter-canon:/facts-vs-methodology.md) to choose between these shapes, then [`./methodology-packaging.md`](./methodology-packaging.md) to realize the shared-core roots, adapter boundaries, and runtime ports; do not restate those rules in the agent definition.
+Do not paraphrase the reusable procedure's steps, rules, or output schema in a shared-core body.
 
 ## Do
 
@@ -95,6 +108,19 @@ tools:
 
 `name` matches the filename stem; `description` covers what and when; `model` is a tier name; `tools` is the permissive set.
 
+A shared-core body stays thin:
+
+```markdown
+The procedure for this agent is at `<extension>:/<reusable-owner>/process.md`.
+
+## Execute
+
+Read `<extension>:/<reusable-owner>/process.md` and execute every step using the inputs supplied by your caller.
+Return the procedure's declared output to your caller.
+```
+
+Use `<extension>:/...` notation for the reusable owner so the reference survives projection and installation; follow [`./references.md`](./references.md) for cross-context references.
+
 ## Don't
 
 ```yaml
@@ -107,3 +133,5 @@ allowed-tools:
 ```
 
 Missing `name` (resolution fails), vague `description` (no "when to use"), `allowed-tools` instead of `tools` (`winter lint` rejects this pre-push; Claude Code silently ignores it at runtime, leaving the agent with the full grant).
+
+Do not make a shared-core body a second procedure copy or put one spawning skill's coordination preamble in it.

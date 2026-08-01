@@ -15,9 +15,10 @@ Heading slugs follow GitHub's algorithm: lowercase, strip non-word/space/hyphen
 characters (backtick spans are inlined before stripping), spaces to hyphens,
 duplicate headings disambiguated as `slug`, `slug-1`, `slug-2`, …
 
-Cross-repo resolution uses `WINTER_WORKSPACE_DIR` to locate installed
-extensions under `.winter/ext/<name>/`. If the env var is absent the lint
-silently skips cross-context links it cannot resolve.
+Cross-repo resolution prefers selected module roots for their own canonical
+identities, then uses `WINTER_WORKSPACE_DIR` to locate foreign installed
+extensions under `.winter/ext/<name>/`. If neither source can resolve a
+cross-context link, the lint silently skips it.
 
 Honors the `<!-- winter-lint:example -->` line marker and fenced-code-block
 skip (mirroring the other markdown lints in this directory).
@@ -33,6 +34,8 @@ from __future__ import annotations
 import os
 import re
 import sys
+import tomllib
+from collections.abc import Mapping
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -121,14 +124,21 @@ class LinkAnchorLint:
     """Checks markdown files for dangling link anchors and dead file targets.
 
     Constructor injection: `scanner` provides file collection and line parsing;
-    `workspace_dir` is the absolute workspace root used to resolve cross-repo
+    `workspace_dir` is the absolute workspace root used to resolve foreign
     `winter-<name>:/` and `workspace:/` links (may be None when running
-    standalone without `WINTER_WORKSPACE_DIR`).
+    standalone without `WINTER_WORKSPACE_DIR`). `module_roots` maps canonical
+    extension identities in the selected scope to those source worktrees.
     """
 
-    def __init__(self, scanner: dl.MarkdownScanner, workspace_dir: Path | None = None) -> None:
+    def __init__(
+        self,
+        scanner: dl.MarkdownScanner,
+        workspace_dir: Path | None = None,
+        module_roots: Mapping[str, Path] | None = None,
+    ) -> None:
         self._scanner = scanner
         self._workspace_dir = workspace_dir
+        self._module_roots = dict(module_roots or {})
         self._slug_cache: dict[Path, set[str]] = {}
 
     def _get_slugs(self, file: Path) -> set[str]:
@@ -139,17 +149,26 @@ class LinkAnchorLint:
             )
         return self._slug_cache[file]
 
-    def _resolve_context(self, context: str, rest: str) -> Path | None:
+    def _resolve_context(self, context: str, rest: str, from_file: Path) -> Path | None:
         """Resolve a `<context>:/rest` prefix to an absolute path.
 
-        Returns None when the workspace directory is unavailable or the context
-        is not a known resolvable form (`workspace` or `winter-<name>`).
+        Selected module identities resolve to their selected source roots.
+        Other extension identities resolve through the installed workspace copy.
+        Returns None when neither source is available or the context is unknown.
 
-        Note: `winter-<name>:/` links are resolved to `.winter/ext/<name>/`
-        under the workspace root.  This path is a workspace-layout convention,
-        not a configurable value; cross-repo fragment links will false-fail in
-        workspaces that install extensions to a non-standard location.
+        Note: foreign `winter-<name>:/` links are resolved to
+        `.winter/ext/<name>/` under the workspace root. This path is a
+        workspace-layout convention, not a configurable value; foreign fragment
+        links will false-fail in workspaces using a non-standard install location.
         """
+        selected_root = self._module_roots.get(context)
+        if selected_root is not None:
+            try:
+                from_file.resolve().relative_to(selected_root.resolve())
+            except ValueError:
+                pass
+            else:
+                return (selected_root / rest).resolve()
         if self._workspace_dir is None:
             return None
         if context == "workspace":
@@ -195,7 +214,7 @@ class LinkAnchorLint:
             return from_file
         m = _CONTEXT_RE.match(file_part)
         if m:
-            return self._resolve_context(m.group(1), m.group(2))
+            return self._resolve_context(m.group(1), m.group(2), from_file)
         return (from_file.parent / file_part).resolve()
 
     def check(self, paths: list[Path], base: Path) -> list[dl.Finding]:
@@ -272,7 +291,15 @@ def main(argv: list[str]) -> int:
     workspace_dir = Path(workspace_dir_raw) if workspace_dir_raw else None
 
     scanner = dl.MarkdownScanner()
-    lint = LinkAnchorLint(scanner, workspace_dir)
+    module_roots: dict[str, Path] = {}
+    for root in cli.selected_repository_roots(scope):
+        try:
+            name = tomllib.loads((root / "winter-ext.toml").read_text()).get("name")
+        except (OSError, tomllib.TOMLDecodeError):
+            continue
+        if isinstance(name, str) and name:
+            module_roots[name] = root
+    lint = LinkAnchorLint(scanner, workspace_dir, module_roots)
     reporter = dl.NdjsonReporter()
     return reporter.emit(lint.check(scope, cli.base_dir(repo_root)))
 

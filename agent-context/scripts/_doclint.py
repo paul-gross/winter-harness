@@ -249,9 +249,7 @@ class LintCli:
         """
         raw = self._env.get("WINTER_LINT_PATHS")
         if raw is not None:
-            scoped = [Path(line) for line in raw.splitlines() if line.strip()]
-            if scoped:
-                return scoped
+            return [Path(line) for line in raw.splitlines() if line.strip()]
         if argv:
             return [Path(a) for a in argv]
         return [repo_root]
@@ -259,3 +257,24 @@ class LintCli:
     def base_dir(self, repo_root: Path) -> Path:
         """Base for reported paths — WINTER_WORKSPACE_DIR, else the repo root."""
         return Path(self._env.get("WINTER_WORKSPACE_DIR") or repo_root)
+
+    def has_contributed_scope(self) -> bool:
+        """Whether winter supplied an explicit contributed-lint scope."""
+        return "WINTER_LINT_PATHS" in self._env
+
+    def selected_repository_roots(self, paths: list[Path]) -> list[Path]:
+        """Selected directory paths that are repository or worktree roots.
+
+        A file-only scope cannot safely be widened for a whole-repository check,
+        so files are deliberately omitted. The caller may still apply direct
+        file-local checks to them.
+        """
+        roots: list[Path] = []
+        seen: set[Path] = set()
+        for path in paths:
+            resolved = path.resolve()
+            if not resolved.is_dir() or not (resolved / ".git").exists() or resolved in seen:
+                continue
+            seen.add(resolved)
+            roots.append(resolved)
+        return roots

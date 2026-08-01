@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """Reference-integrity lint for agent-facing markdown.
 
-The routing tables in `workspace:/CLAUDE.md` and every `index.md` are how an
+The routing tables in `workspace:/CLAUDE.md` and repository indexes are how an
 agent navigates the docs via progressive disclosure. Two failure modes silently
 degrade that:
 
 1. **Broken links.** A relative markdown link whose target no longer exists is
    a dead end — `fail`.
-2. **Orphans.** A `context/**/*.md` file that exists but is unreachable from any
-   routing table or skill (no AGENTS.md/AGENTS.winter.md/CLAUDE.md/index.md/README.md
-   or SKILL.md link chain leads to it) is content an agent will never be routed to — `warn` (raise or
+2. **Orphans.** A markdown file under a `context/` or `methodology/` root that
+   exists but is unreachable from any routing table or skill (no
+   AGENTS.md/AGENTS.winter.md/CLAUDE.md/index.md/README.md or SKILL.md link chain
+   leads to it) is content an agent will never be routed to — `warn` (raise or
    silence per consumer).
 
-Reachability and orphan detection are whole-repo properties, so this lint always
-operates over the full repo (the `--repo` root), not a changed-file subset.
+Reachability and orphan detection are whole-repo properties. Standalone
+`--repo` scans that root. Under `winter lint`, orphan detection scans each
+selected repository directory root; a changed-file-only scope runs direct
+broken-link checks but skips orphan detection rather than widening scope.
 
 Link targets that carry a scheme or a path-notation prefix (`https:`,
 `mailto:`, `workspace:/…`, `winter-<name>:/…`) are skipped for broken-link
@@ -33,6 +36,7 @@ from __future__ import annotations
 import fnmatch
 import re
 import sys
+import tomllib
 from collections import deque
 from pathlib import Path
 
@@ -41,12 +45,17 @@ import _doclint as dl  # noqa: E402
 
 CHECK = "doc-references"
 
-# Files that anchor the routing graph — reachability BFS starts from these.
+# Root files that anchor the repository routing graph. A nested index or README
+# is reached through that graph; its filename alone does not make it an entrypoint.
 SEED_NAMES = frozenset({"index.md", "AGENTS.md", "AGENTS.winter.md", "CLAUDE.md", "README.md"})
 
 # Skills are a second class of reachability entrypoint: the BFS also seeds from
 # any SKILL.md found in the repo and follows their outbound links transitively.
 SKILL_NAME = "SKILL.md"
+
+# Agent-facing roots whose markdown must be reachable through progressive
+# disclosure. A component may own either root or both.
+ROUTED_DOC_ROOTS = frozenset({"context", "methodology"})
 
 # Routing files whose outbound links are checked for breakage. Scoped to the
 # routing tables (per the issue): a broken link in a navigation table strands an
@@ -55,9 +64,9 @@ SKILL_NAME = "SKILL.md"
 # are out of scope here.
 LINK_CHECK_NAMES = frozenset({"index.md", "AGENTS.md", "AGENTS.winter.md", "CLAUDE.md"})
 
-# Captures the path portion of a path-notation ref like `workspace:/context/foo.md`
-# or `winter-harness:/architecture/index.md` — everything after `<scheme>:/`.
-_PATHNOTATION_RE = re.compile(r"^[a-z][a-z0-9+.-]*:/(.+)$")
+# Captures a path-notation identity and path, such as
+# `winter-harness:/architecture/index.md`.
+_PATHNOTATION_RE = re.compile(r"^([a-z][a-z0-9+.-]*):/(.+)$")
 
 # A target with a scheme or path-notation prefix: `https:`, `mailto:`,
 # `workspace:/…`, `winter-harness:/…`. Not resolvable in a single-repo lint.
@@ -78,15 +87,30 @@ class DocReferenceLint:
         scanner: dl.MarkdownScanner,
         orphan_severity: str,
         allow: list[str],
+        workspace_root: Path | None = None,
     ) -> None:
         self._scanner = scanner
         self._orphan_severity = orphan_severity
         self._allow = allow
+        self._workspace_root = workspace_root
 
     def check(self, repo_root: Path, base: Path) -> list[dl.Finding]:
         files = self._scanner.collect_markdown([repo_root])
         findings = self._broken_link_findings(files, base)
         findings += self._orphan_findings(files, repo_root, base)
+        return findings
+
+    def check_scope(
+        self,
+        paths: list[Path],
+        repository_roots: list[Path],
+        base: Path,
+    ) -> list[dl.Finding]:
+        """Check direct references in scope and reachability for selected repos."""
+        findings = self._broken_link_findings(self._scanner.collect_markdown(paths), base)
+        for repo_root in repository_roots:
+            files = self._scanner.collect_markdown([repo_root])
+            findings += self._orphan_findings(files, repo_root, base)
         return findings
 
     def _is_local_relative(self, target: str) -> bool:
@@ -119,16 +143,16 @@ class DocReferenceLint:
     def _skill_pathnotation_targets(self, file: Path, repo_root: Path) -> list[Path]:
         """Repo-local paths referenced via path-notation in a skill file.
 
-        Extracts targets of the form `<context>:/path` from `file` — both from
-        markdown link targets and from inline code spans (the typical skill
-        authoring style is to write `` `workspace:/context/foo.md` ``).  Strips the
-        context prefix, resolves the remainder against `repo_root`, and returns
-        only paths that actually exist inside the repo.
+        Only identities that can denote this root are followed: its extension
+        name from `winter-ext.toml`, `local`, and `workspace` when this root is
+        itself the workspace (or no external workspace is configured). Arbitrary
+        extension prefixes must not make same-named local files reachable.
         """
         lines = self._scanner.read_lines(file)
         if lines is None:
             return []
         root = repo_root.resolve()
+        local_identities = self._local_pathnotation_identities(root)
         out: list[Path] = []
         seen: set[Path] = set()
         for _, line in self._scanner.iter_content_lines("\n".join(lines)):
@@ -138,10 +162,11 @@ class DocReferenceLint:
                 + self._scanner.code_spans(line)
             )
             for target in candidates:
-                m = _PATHNOTATION_RE.match(target)
-                if not m:
+                file_target = target.split("#", 1)[0]
+                m = _PATHNOTATION_RE.match(file_target)
+                if not m or m.group(1) not in local_identities:
                     continue
-                candidate = (root / m.group(1)).resolve()
+                candidate = (root / m.group(2)).resolve()
                 try:
                     candidate.relative_to(root)
                 except ValueError:
@@ -150,6 +175,19 @@ class DocReferenceLint:
                     seen.add(candidate)
                     out.append(candidate)
         return out
+
+    def _local_pathnotation_identities(self, repo_root: Path) -> set[str]:
+        identities = {"local"}
+        if self._workspace_root is None or repo_root == self._workspace_root.resolve():
+            identities.add("workspace")
+        manifest = repo_root / "winter-ext.toml"
+        try:
+            name = tomllib.loads(manifest.read_text()).get("name")
+        except (OSError, tomllib.TOMLDecodeError):
+            name = None
+        if isinstance(name, str) and name:
+            identities.add(name)
+        return identities
 
     def _broken_link_findings(self, files: list[Path], base: Path) -> list[dl.Finding]:
         findings: list[dl.Finding] = []
@@ -179,7 +217,7 @@ class DocReferenceLint:
                         )
         return findings
 
-    def _reachable_md(self, files: list[Path], repo_root: Path) -> set[Path]:
+    def _reachable_markdown(self, files: list[Path], repo_root: Path) -> set[Path]:
         """Resolved `.md` paths reachable from the routing seeds by link-following.
 
         Seeds from both routing-table files (`SEED_NAMES`) and skill entrypoints
@@ -191,7 +229,8 @@ class DocReferenceLint:
         visited: set[Path] = set()
         queue: deque[Path] = deque()
         for resolved, _ in by_path.items():
-            if resolved.name in SEED_NAMES or resolved.name == SKILL_NAME:
+            is_root_seed = resolved.parent == root and resolved.name in SEED_NAMES
+            if is_root_seed or resolved.name == SKILL_NAME:
                 visited.add(resolved)
                 queue.append(resolved)
         while queue:
@@ -214,20 +253,21 @@ class DocReferenceLint:
                         queue.append(resolved)
         return visited
 
-    def _under_context_dir(self, file: Path, repo_root: Path) -> bool:
+    def _under_routed_doc_root(self, file: Path, repo_root: Path) -> bool:
+        """Whether `file` is beneath a context or methodology root."""
         try:
             rel = file.resolve().relative_to(repo_root.resolve())
         except ValueError:
             return False
-        return "context" in rel.parts[:-1]
+        return bool(ROUTED_DOC_ROOTS.intersection(rel.parts[:-1]))
 
     def _orphan_findings(self, files: list[Path], repo_root: Path, base: Path) -> list[dl.Finding]:
         if self._orphan_severity == "off":
             return []
-        visited = self._reachable_md(files, repo_root)
+        visited = self._reachable_markdown(files, repo_root)
         findings: list[dl.Finding] = []
         for file in files:
-            if not self._under_context_dir(file, repo_root):
+            if not self._under_routed_doc_root(file, repo_root):
                 continue
             resolved = file.resolve()
             if resolved in visited:
@@ -274,12 +314,19 @@ def main(argv: list[str]) -> int:
         i += 1
 
     cli = dl.LintCli()
-    repo_root, _ = cli.parse_repo_arg(rest)
+    repo_root, paths_args = cli.parse_repo_arg(rest)
+    scope = cli.resolve_scope(paths_args, repo_root)
 
     scanner = dl.MarkdownScanner()
-    lint = DocReferenceLint(scanner, orphan_severity, allow)
+    workspace_root = cli.base_dir(repo_root) if cli.has_contributed_scope() else None
+    lint = DocReferenceLint(scanner, orphan_severity, allow, workspace_root)
     reporter = dl.NdjsonReporter()
-    return reporter.emit(lint.check(repo_root, cli.base_dir(repo_root)))
+    if cli.has_contributed_scope():
+        roots = cli.selected_repository_roots(scope)
+        findings = lint.check_scope(scope, roots, cli.base_dir(repo_root))
+    else:
+        findings = lint.check(repo_root, cli.base_dir(repo_root))
+    return reporter.emit(findings)
 
 
 if __name__ == "__main__":

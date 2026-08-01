@@ -18,6 +18,7 @@ lint = [
 # below everything, so any reference *to* winter-harness would form a detectable cycle.
 requires = [
     "winter",
+    "winter-canon",
     "winter-docs",
     "winter-github",
     "winter-nvim",

@@ -34,7 +34,7 @@ Four link forms are handled:
 |------|------------|
 | `#anchor` | same-file headings |
 | `path/to/file.md#anchor` | file relative to the linking document |
-| `winter-foo:/path.md#anchor` | extension file under `$WINTER_WORKSPACE_DIR/.winter/ext/foo/` |
+| `winter-foo:/path.md#anchor` | the selected module root for a `winter-foo` self-reference; otherwise the installed extension under `$WINTER_WORKSPACE_DIR/.winter/ext/foo/` |
 | `workspace:/path.md#anchor` | file under `$WINTER_WORKSPACE_DIR` |
 
 Two kinds of findings:
@@ -44,7 +44,8 @@ Two kinds of findings:
 - **Dead file target** (`fail`) — a link without a fragment whose target does not exist (relative links and cross-repo `<context>:/` links both checked).
   Dead-file detection also fires in `lint_doc_references`; the overlap is deliberate — each check's scope differs and double-reporting ensures coverage under `--changed`.
 
-Cross-repo resolution requires `WINTER_WORKSPACE_DIR` (set by `winter lint`); running standalone without it silently skips cross-context links.
+Canonical self-references from a module selected as a repository/worktree directory resolve against that selected root, including standalone `--repo` runs.
+Foreign extension resolution requires `WINTER_WORKSPACE_DIR` (set by `winter lint`) and uses the installed `.winter/ext/<name>/` copy; running standalone without it silently skips only those unresolved foreign links.
 External URLs (`https://…`) and root-relative paths (`/…`) are never checked.
 
 Under `--changed`, only links outbound from the changed files are validated; a heading renamed in file B will not flag inbound links from unchanged file A.
@@ -58,12 +59,12 @@ Two checks over the routing files (`AGENTS.md`, `AGENTS.winter.md`, `CLAUDE.md`,
 - **Broken links** (`fail`) — a relative markdown link whose target does not exist strands an agent mid-disclosure.
   Targets with a scheme or path-notation prefix (`https:`, `workspace:/…`) are skipped — a single-repo lint can't resolve a cross-context reference, and extractability already validates those.
   Body docs (skills, agents) are out of scope here: their links often use a workspace-root-relative convention this lint can't model.
-- **Orphans** (`warn`) — a `context/**/*.md` file that exists but is unreachable from any routing table or skill by link or `@import` chain is content no agent will be routed to.
-  Reachability seeds from both routing-table files (`AGENTS.md`, `AGENTS.winter.md`, `CLAUDE.md`, `index.md`, `README.md`) and from every `SKILL.md` found in the repo.
-  Path-notation references inside a `SKILL.md` (e.g. `` `workspace:/context/foo.md` ``) are resolved against the repo root so that docs linked only from a skill are not falsely orphaned.
+- **Orphans** (`warn`) — a markdown file under a `context/` or `methodology/` root that exists but is unreachable from any routing table or skill by link or `@import` chain is content no agent will be routed to.
+  Reachability seeds from repository-root entrypoints (`AGENTS.md`, `AGENTS.winter.md`, `CLAUDE.md`, `index.md`, `README.md`) and from every `SKILL.md` found in the repo. A nested `index.md` or `README.md` is not an entrypoint by filename alone; it becomes reachable only through the link chain.
+  Repo-local path-notation references inside a `SKILL.md` are followed for the extension name declared by that repo's `winter-ext.toml` and for the `local:` alias. `workspace:` is local only when the scanned root is the workspace root or the script is running standalone without an external workspace. Other extension identities are not stripped and resolved locally.
   `warn` by default; `--orphan-severity fail|off` to change it, `--allow '<glob>'` (repeatable, repo-relative) to exempt intentionally-unrouted files.
 
-Reachability and orphan detection are whole-repo properties, so this lint always scans the full `--repo` root, not a changed-file subset.
+Reachability and orphan detection are whole-repo properties. Standalone `--repo` scans preserve the full-root behavior. Under `winter lint`, direct broken-link checks honor every file or directory in `WINTER_LINT_PATHS`; orphan detection runs separately against each selected path that is itself a repository/worktree directory root. A changed-file-only scope cannot establish a whole repository without widening contributed-lint scope, so it checks direct routing links and emits no orphan findings. The lint never substitutes or scans an unrelated `WINTER_WORKSPACE_DIR`; that variable is only the reporting and workspace-identity base.
 
 ## Running them
 
@@ -85,9 +86,9 @@ lint = [
 ]
 ```
 
-The dispatcher runs each over the selected scope with the standard lint env (`WINTER_LINT_PATHS`, `WINTER_WORKSPACE_DIR`, cwd at the workspace root) and groups their findings under the `[wh]` source. `lint_path_notation` and `lint_link_anchors` honor `WINTER_LINT_PATHS`; `lint_doc_references` always scans the whole `WINTER_WORKSPACE_DIR` (reachability is a whole-repo property), so under a narrower scope it still reports against the full workspace.
+The dispatcher runs each over the selected scope with the standard lint env (`WINTER_LINT_PATHS`, `WINTER_WORKSPACE_DIR`, cwd at the workspace root) and groups their findings under the `[wh]` source. All three honor `WINTER_LINT_PATHS`. The doc-reference lint performs whole-repo orphan analysis only when a selected path is a repository/worktree root, and remains direct-check-only for selected files.
 
-All walk every `*.md` under the target, pruning vendor directories and any nested checkout (a subdirectory with its own `.git` is a separate repo, linted on its own).
+Directory targets walk every `*.md` beneath that target, pruning vendor directories and any nested checkout (a subdirectory with its own `.git` is a separate repo, linted on its own). File targets check only that file.
 
 ## Maintaining the scripts
 

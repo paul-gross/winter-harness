@@ -8,6 +8,10 @@ directory can be invoked from any consumer checkout intact. Run with:
 
 from __future__ import annotations
 
+import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -18,6 +22,8 @@ import lint_link_anchors as anchors
 import lint_path_notation as paths
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
+DOC_REFERENCE_SCRIPT = Path(__file__).resolve().parent / "lint_doc_references.py"
+LINK_ANCHOR_SCRIPT = Path(__file__).resolve().parent / "lint_link_anchors.py"
 
 
 class PathNotationTest(unittest.TestCase):
@@ -106,9 +112,32 @@ class DocReferencesTest(unittest.TestCase):
         lint = self._make_lint()
         orphans = lint._orphan_findings(self.files, self.root, self.root)
         messages = " ".join(f.message for f in orphans)
-        self.assertIn("orphan.md", messages)
-        self.assertNotIn("linked.md", messages)
+        self.assertIn("context/orphan.md", messages)
+        self.assertNotIn("context/linked.md", messages)
         self.assertTrue(all(f.status == "warn" for f in orphans))
+
+    def test_routed_methodology_not_orphaned(self) -> None:
+        lint = self._make_lint()
+        orphans = lint._orphan_findings(self.files, self.root, self.root)
+        messages = " ".join(f.message for f in orphans)
+        self.assertNotIn("methodology/index.md", messages)
+        self.assertNotIn("methodology/routed.md", messages)
+
+    def test_unrouted_methodology_is_orphaned(self) -> None:
+        lint = self._make_lint()
+        orphans = lint._orphan_findings(self.files, self.root, self.root)
+        self.assertIn("methodology/orphan.md", " ".join(f.message for f in orphans))
+
+    def test_detached_nested_routing_files_do_not_seed_themselves(self) -> None:
+        lint = self._make_lint()
+        orphans = lint._orphan_findings(self.files, self.root, self.root)
+        messages = " ".join(f.message for f in orphans)
+        for path in (
+            "methodology/hidden/index.md",
+            "methodology/hidden/README.md",
+            "methodology/hidden/child.md",
+        ):
+            self.assertIn(path, messages)
 
     def test_reachability_is_multi_hop(self) -> None:
         # deep.md is reached only via linked.md (a non-seed doc), so it must be
@@ -118,7 +147,9 @@ class DocReferencesTest(unittest.TestCase):
         self.assertNotIn("deep.md", " ".join(f.message for f in orphans))
 
     def test_orphan_allow_list_silences(self) -> None:
-        lint = self._make_lint(allow=["context/orphan.md"])
+        lint = self._make_lint(
+            allow=["context/orphan.md", "methodology/orphan.md", "methodology/hidden/*"]
+        )
         orphans = lint._orphan_findings(self.files, self.root, self.root)
         self.assertEqual(orphans, [])
 
@@ -164,6 +195,60 @@ class DocReferencesSkillsTest(unittest.TestCase):
         self.assertIn("skill-orphan.md", messages)
 
 
+class SkillPathNotationIdentityTest(unittest.TestCase):
+    def test_only_local_identities_are_resolved_and_fragments_are_stripped(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "winter-ext.toml").write_text('name = "winter-current"\n')
+            context = root / "context"
+            context.mkdir()
+            for name in ("extension.md", "workspace.md", "local.md", "other-only.md"):
+                (context / name).write_text(f"# {name}\n")
+            skill = root / "SKILL.md"
+            skill.write_text(
+                "`winter-current:/context/extension.md#section`\n"
+                "`workspace:/context/workspace.md#section`\n"
+                "`local:/context/local.md#section`\n"
+                "`winter-other:/context/other-only.md#section`\n"
+            )
+
+            lint = docs.DocReferenceLint(dl.MarkdownScanner(), "warn", [])
+            targets = {
+                path.relative_to(root).as_posix()
+                for path in lint._skill_pathnotation_targets(skill, root)
+            }
+
+            self.assertEqual(
+                targets,
+                {"context/extension.md", "context/workspace.md", "context/local.md"},
+            )
+
+    def test_workspace_identity_is_not_local_inside_a_selected_repo(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp)
+            root = workspace / "alpha" / "winter-current"
+            context = root / "context"
+            context.mkdir(parents=True)
+            (root / "winter-ext.toml").write_text('name = "winter-current"\n')
+            (context / "extension.md").write_text("# Extension\n")
+            (context / "workspace-only.md").write_text("# Workspace\n")
+            skill = root / "SKILL.md"
+            skill.write_text(
+                "`winter-current:/context/extension.md`\n"
+                "`workspace:/context/workspace-only.md`\n"
+            )
+
+            lint = docs.DocReferenceLint(
+                dl.MarkdownScanner(), "warn", [], workspace_root=workspace
+            )
+            targets = {
+                path.relative_to(root).as_posix()
+                for path in lint._skill_pathnotation_targets(skill, root)
+            }
+
+            self.assertEqual(targets, {"context/extension.md"})
+
+
 class CollectMarkdownTest(unittest.TestCase):
     def test_prunes_nested_checkouts(self) -> None:
         # A subdirectory carrying its own `.git` (clone dir or worktree file) is
@@ -202,6 +287,10 @@ class LintCliTest(unittest.TestCase):
         cli = dl.LintCli(env={"WINTER_LINT_PATHS": "/a\n/b\n"})
         self.assertEqual(cli.resolve_scope([], Path("/ws")), [Path("/a"), Path("/b")])
 
+    def test_empty_winter_lint_paths_does_not_fall_back_to_workspace(self) -> None:
+        cli = dl.LintCli(env={"WINTER_LINT_PATHS": ""})
+        self.assertEqual(cli.resolve_scope([], Path("/ws")), [])
+
     def test_scope_falls_back_to_argv_then_repo_root(self) -> None:
         cli = dl.LintCli(env={})
         self.assertEqual(cli.resolve_scope(["x.md"], Path("/ws")), [Path("x.md")])
@@ -210,6 +299,84 @@ class LintCliTest(unittest.TestCase):
     def test_base_dir_prefers_workspace_dir(self) -> None:
         self.assertEqual(dl.LintCli(env={"WINTER_WORKSPACE_DIR": "/ws"}).base_dir(Path("/repo")), Path("/ws"))
         self.assertEqual(dl.LintCli(env={}).base_dir(Path("/repo")), Path("/repo"))
+
+    def test_selected_repository_roots_omit_files_and_non_repositories(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            repo = root / "repo"
+            (repo / ".git").mkdir(parents=True)
+            file = repo / "changed.md"
+            file.write_text("# Changed\n")
+            plain = root / "plain"
+            plain.mkdir()
+
+            roots = dl.LintCli(env={}).selected_repository_roots([file, plain, repo])
+
+            self.assertEqual(roots, [repo.resolve()])
+
+
+class DocReferenceSubprocessScopeTest(unittest.TestCase):
+    def _run(self, workspace: Path, lint_paths: list[Path]) -> list[dict[str, object]]:
+        env = os.environ.copy()
+        env.update(
+            {
+                "WINTER_WORKSPACE_DIR": str(workspace),
+                "WINTER_LINT_SCOPE": "changed" if all(p.is_file() for p in lint_paths) else "env",
+                "WINTER_LINT_PATHS": "\n".join(str(path) for path in lint_paths),
+            }
+        )
+        result = subprocess.run(
+            [sys.executable, str(DOC_REFERENCE_SCRIPT)],
+            cwd=workspace,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return [json.loads(line) for line in result.stdout.splitlines() if line]
+
+    def test_each_selected_repo_root_is_checked_without_scanning_unrelated_repos(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp)
+            selected = workspace / "alpha" / "selected"
+            also_selected = workspace / "alpha" / "also-selected"
+            unrelated = workspace / "alpha" / "unrelated"
+            for repo in (selected, also_selected, unrelated):
+                (repo / ".git").mkdir(parents=True)
+                (repo / "context").mkdir()
+                (repo / "context" / "orphan.md").write_text("# Orphan\n")
+            (selected / "index.md").write_text("# Selected\n")
+            (also_selected / "index.md").write_text("# Also selected\n")
+            (unrelated / "index.md").write_text("[broken](./missing.md)\n")
+
+            findings = self._run(workspace, [selected, also_selected])
+            files = {str(finding.get("file")) for finding in findings}
+
+            self.assertEqual(
+                files,
+                {
+                    "alpha/selected/context/orphan.md",
+                    "alpha/also-selected/context/orphan.md",
+                },
+            )
+            self.assertTrue(all("unrelated" not in str(finding) for finding in findings))
+
+    def test_changed_file_scope_checks_direct_links_but_skips_whole_repo_orphans(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp)
+            repo = workspace / "alpha" / "selected"
+            (repo / ".git").mkdir(parents=True)
+            (repo / "context").mkdir()
+            (repo / "context" / "orphan.md").write_text("# Orphan\n")
+            changed = repo / "index.md"
+            changed.write_text("[broken](./missing.md)\n")
+
+            findings = self._run(workspace, [changed])
+
+            self.assertEqual(len(findings), 1)
+            self.assertIn("broken link", str(findings[0]["message"]))
+            self.assertNotIn("orphaned doc", str(findings))
 
 
 class LinkAnchorSlugTest(unittest.TestCase):
@@ -365,6 +532,81 @@ class LinkAnchorCrossRepoTest(unittest.TestCase):
             lint = anchors.LinkAnchorLint(dl.MarkdownScanner(), workspace_dir=None)
             findings = lint.check([doc], Path(tmp))
             self.assertEqual(findings, [])
+
+
+class LinkAnchorSubprocessScopeTest(unittest.TestCase):
+    def _run(
+        self,
+        repo: Path,
+        workspace: Path | None = None,
+    ) -> list[dict[str, object]]:
+        env = os.environ.copy()
+        for key in ("WINTER_WORKSPACE_DIR", "WINTER_LINT_PATHS", "WINTER_LINT_SCOPE"):
+            env.pop(key, None)
+        if workspace is not None:
+            env.update(
+                {
+                    "WINTER_WORKSPACE_DIR": str(workspace),
+                    "WINTER_LINT_PATHS": str(repo),
+                    "WINTER_LINT_SCOPE": "env",
+                }
+            )
+            command = [sys.executable, str(LINK_ANCHOR_SCRIPT)]
+            cwd = workspace
+        else:
+            command = [sys.executable, str(LINK_ANCHOR_SCRIPT), "--repo", str(repo)]
+            cwd = repo
+        result = subprocess.run(
+            command,
+            cwd=cwd,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return [json.loads(line) for line in result.stdout.splitlines() if line]
+
+    def test_selected_module_wins_dual_install_and_foreign_extension_stays_installed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp)
+            installed_workflow = workspace / ".winter" / "ext" / "workflow"
+            installed_workflow.mkdir(parents=True)
+            (installed_workflow / "topic.md").write_text("# Installed Heading\n")
+            installed_canon = workspace / ".winter" / "ext" / "canon"
+            installed_canon.mkdir(parents=True)
+            (installed_canon / "rule.md").write_text("# Canon Heading\n")
+
+            selected = workspace / "alpha" / "winter-workflow"
+            (selected / ".git").mkdir(parents=True)
+            (selected / "winter-ext.toml").write_text('name = "winter-workflow"\n')
+            (selected / "topic.md").write_text("# Selected Heading\n")
+            (selected / "index.md").write_text(
+                "[selected](winter-workflow:/topic.md#selected-heading)\n"
+                "[stale-only](winter-workflow:/topic.md#installed-heading)\n"
+                "[foreign](winter-canon:/rule.md#canon-heading)\n"
+            )
+
+            findings = self._run(selected, workspace)
+
+            self.assertEqual(len(findings), 1)
+            self.assertIn("installed-heading", str(findings[0]["message"]))
+
+    def test_standalone_repo_resolves_its_own_canonical_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "winter-workflow"
+            (repo / ".git").mkdir(parents=True)
+            (repo / "winter-ext.toml").write_text('name = "winter-workflow"\n')
+            (repo / "topic.md").write_text("# Selected Heading\n")
+            (repo / "index.md").write_text(
+                "[valid](winter-workflow:/topic.md#selected-heading)\n"
+                "[invalid](winter-workflow:/topic.md#missing-heading)\n"
+            )
+
+            findings = self._run(repo)
+
+            self.assertEqual(len(findings), 1)
+            self.assertIn("missing-heading", str(findings[0]["message"]))
 
 
 class RawLinkTargetsTest(unittest.TestCase):
