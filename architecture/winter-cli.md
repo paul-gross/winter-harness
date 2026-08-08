@@ -25,9 +25,13 @@ tools/winter-cli/src/winter_cli/
 │   │   ├── handlers/              # CLI-shaped output formatting + arg parsing
 │   │   │   ├── init_handler.py        # `winter ws init`
 │   │   │   ├── destroy_handler.py     # `winter ws destroy`
-│   │   │   ├── workspace_handler.py   # `winter ws {list,status,connect,disconnect,checkout,fetch,pull,push,prune,index,diff}`
+│   │   │   ├── workspace_handler.py   # every other `winter ws *` surface (list, status, connect,
+│   │   │   │                          #   disconnect, checkout, reset, clean, fetch, pull, push,
+│   │   │   │                          #   merge, update, prune, index, diff, worktrees) — an open
+│   │   │   │                          #   list; a new `ws` verb lands here unless it earns its own file
 │   │   │   └── repo_handler.py        # `winter repo {list,add,remove}`
-│   │   ├── *_service.py           # domain orchestration (init / destroy / workspace (omnibus) / prune)
+│   │   ├── *_service.py           # domain orchestration (init / destroy / workspace (omnibus) /
+│   │   │                          #   prune / env checkout / env reset / env clean / sync / push / merge)
 │   │   ├── *_reporter.py          # stream / json reporters for lifecycle events
 │   │   ├── reporter_factory.py    # picks stream-vs-json reporter from --json flag
 │   │   ├── repository_factory.py  # builds per-repo IWriteRepoRepository instances
