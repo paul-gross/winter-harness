@@ -20,10 +20,15 @@ lint = [
 # therefore require *every* module in the workspace (all but winter-context itself).
 # Nothing requires winter-context back — declaring the full set keeps it strictly
 # below everything, so any reference *to* winter-context would form a detectable cycle.
+#
+# winter-docs is the one carve-out: it consumes this repo, citing `winter-context:`
+# paths for the conventions it narrates, so requiring it back would close a cycle.
+# Nothing here cites a `winter-docs:` path — the lone `winter-docs:build` in
+# verification/winter.md is a verifiability-matrix method id, not a path reference —
+# so there is no dead pointer to guard against.
 requires = [
     "winter",
     "winter-canon",
-    "winter-docs",
     "winter-github",
     "winter-nvim",
     "winter-plugin-api",
