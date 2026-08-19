@@ -12,7 +12,7 @@ resolves on disk.
 | -------------------- | ------------------------------------------------------------------------ | ------------------------------------------------ |
 | `workspace:`         | The current workspace root                                               | `workspace:/CLAUDE.md`                           |
 | `<env>:`             | A feature environment under the workspace (Greek-letter or feature name) | `alpha:/winter/tools/winter-cli/`                |
-| `<extension-name>:`  | An installed winter extension                                            | `winter-harness:/architecture/error-handling.md` |
+| `<extension-name>:`  | An installed winter extension                                            | `winter-context:/architecture/error-handling.md` |
 | `<standalone-name>:` | A standalone repository cloned in the workspace                          | `my-app:/context/architecture.md`                |
 
 Notes:
@@ -23,7 +23,7 @@ Notes:
 - Do not write absolute paths or sibling-relative paths (`../winter-product/...`) when crossing a repo or context
   boundary. Always use a prefix so the reference survives directory and adoption changes. <!-- winter-lint:example -->
 - A repo's own files may be referred to with bare relative paths (`./architecture/error-handling.md` from inside
-  `winter-harness/index.md`). The prefix is only required when *crossing* a context. <!-- winter-lint:example -->
+  `winter-context/index.md`). The prefix is only required when *crossing* a context. <!-- winter-lint:example -->
 
 ## Names for agents, skills, and slash commands
 

@@ -145,7 +145,7 @@ off the exception itself; callers pass only the high-level `message`. Production
 `from_git`.
 
 `RepoError` itself becomes a dataclass-shaped exception carrying those fields, not just a message string. See
-`winter-harness:/exemplars/python/repo_pattern.py` for the full example, and
+`winter-context:/exemplars/python/repo_pattern.py` for the full example, and
 `winter:/tools/winter-cli/src/winter_cli/modules/workspace/internal/repo_error_factory.py` for the production factory in
 winter-cli (which wraps `git.GitCommandError`, `subprocess.CalledProcessError`, and other transport-level exceptions).
 

@@ -1,5 +1,5 @@
-name = "winter-harness"
-prefix = "wh"
+name = "winter-context"
+prefix = "wx"
 
 # Markdown-convention lint checks contributed to `winter lint` (see
 # agent-context/linting.md). The field takes a list, so each check ships as its
@@ -14,12 +14,12 @@ lint = [
     "agent-context/scripts/lint_markdown_style.py",
 ]
 
-# winter-harness is the governance layer beneath every other module: it documents
+# winter-context is the governance layer beneath every other module: it documents
 # conventions for all of them, so its docs may reference any module directly, and
 # those references are dead pointers unless the module is installed alongside. We
-# therefore require *every* module in the workspace (all but winter-harness itself).
-# Nothing requires winter-harness back — declaring the full set keeps it strictly
-# below everything, so any reference *to* winter-harness would form a detectable cycle.
+# therefore require *every* module in the workspace (all but winter-context itself).
+# Nothing requires winter-context back — declaring the full set keeps it strictly
+# below everything, so any reference *to* winter-context would form a detectable cycle.
 requires = [
     "winter",
     "winter-canon",

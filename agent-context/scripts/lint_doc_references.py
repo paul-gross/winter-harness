@@ -65,11 +65,11 @@ ROUTED_DOC_ROOTS = frozenset({"context", "methodology"})
 LINK_CHECK_NAMES = frozenset({"index.md", "AGENTS.md", "AGENTS.winter.md", "CLAUDE.md"})
 
 # Captures a path-notation identity and path, such as
-# `winter-harness:/architecture/index.md`.
+# `winter-context:/architecture/index.md`.
 _PATHNOTATION_RE = re.compile(r"^([a-z][a-z0-9+.-]*):/(.+)$")
 
 # A target with a scheme or path-notation prefix: `https:`, `mailto:`,
-# `workspace:/…`, `winter-harness:/…`. Not resolvable in a single-repo lint.
+# `workspace:/…`, `winter-context:/…`. Not resolvable in a single-repo lint.
 _PREFIXED_RE = re.compile(r"^[a-z][a-z0-9+.-]*:")
 
 

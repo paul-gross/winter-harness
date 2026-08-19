@@ -188,7 +188,7 @@ uses it twice:
 2. A regression test that parses the matching `fixtures/violating_<rule>.py` and asserts the function returns at least
    one violation. This keeps the lint honest — if a refactor silently disables detection, the fixture test fails.
 
-Failure messages follow the pattern `f"{file}:{line}: <rule restatement> ({winter-harness:/architecture/<conv>.md})"` so
+Failure messages follow the pattern `f"{file}:{line}: <rule restatement> ({winter-context:/architecture/<conv>.md})"` so
 the offending line and the convention citation are both inline.
 
 ### Carve-outs

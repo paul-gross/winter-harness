@@ -55,7 +55,7 @@ class PathNotationTest(unittest.TestCase):
             "architecture/error-handling.md",
             "pyproject.toml",
             "workspace:/CLAUDE.md",
-            "winter-harness:/agent-context/index.md",
+            "winter-context:/agent-context/index.md",
             "foo/bar.md",  # the example-marked line
         ):
             self.assertNotIn(ok, joined)
@@ -78,7 +78,7 @@ class ClassifySpanTest(unittest.TestCase):
     def test_canonical_prefix_exempts_nested_segments(self) -> None:
         # A canonical reference that happens to contain `.winter/ext/…` deeper in
         # the path is already addressed and must not be flagged.
-        self.assertIsNone(self.lint.classify_span("workspace:/.winter/ext/harness/index.md"))
+        self.assertIsNone(self.lint.classify_span("workspace:/.winter/ext/context/index.md"))
 
     def test_winter_ext_filename_is_not_a_repo_path(self) -> None:
         self.assertIsNone(self.lint.classify_span("winter-ext.toml"))

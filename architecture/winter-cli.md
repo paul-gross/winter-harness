@@ -5,7 +5,7 @@ realized here, plus the CLI's own argument conventions. Read this before adding 
 you build with the existing structure instead of reverse-engineering it.
 
 This is a **reference**, not a CLAUDE.md — it is not auto-loaded. Open it on demand from
-`winter-harness:/architecture/winter-cli.md` (reached via `architecture/index.md`).
+`winter-context:/architecture/winter-cli.md` (reached via `architecture/index.md`).
 
 ## Layout
 
@@ -48,7 +48,7 @@ tools/winter-cli/src/winter_cli/
 tools/winter-cli/tests/    # pytest; DI-friendly via injected fixtures (see tests/conftest.py)
 ```
 
-The layout instantiates the `winter-harness:/architecture/*.md` rules at once:
+The layout instantiates the `winter-context:/architecture/*.md` rules at once:
 
 - **`./service-architecture.md`** — behavior lives in injected service classes (`*_service.py`), not module-level free
   functions; the other three rules below are facets of this one.

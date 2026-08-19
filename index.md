@@ -1,11 +1,11 @@
 # Topology
 
-Convention files live at the **top of the repo**, not under `context/`. `winter-harness` *is* the conventions repo; its
-content is its public surface, addressed via the `winter-harness:` path notation (e.g.
-`winter-harness:/architecture/error-handling.md`).
+Convention files live at the **top of the repo**, not under `context/`. `winter-context` *is* the conventions repo; its
+content is its public surface, addressed via the `winter-context:` path notation (e.g.
+`winter-context:/architecture/error-handling.md`).
 
 The repo is organized by **convention domain**: each directory names the subject it governs, not the repository.
-`harness` names this complete conventions system; the domains below partition it. Every convention belongs to the domain
+`context` names this complete conventions system; the domains below partition it. Every convention belongs to the domain
 whose subject it governs — start at the domain hub for the topic you need and follow the one row that matches, rather
 than reading the whole tree.
 

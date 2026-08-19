@@ -7,7 +7,7 @@ them check what a reference *means*: the canonical path notation in [`./referenc
 integrity of the routing tables an agent navigates by, and the anchor validity of every `#fragment` link. The fourth
 checks *shape* — line width, list markers, emphasis style, fence languages — by running two external tools, and is
 described under [Mechanical style](#lint_markdown_stylepy--mechanical-format-and-structure) below. They ship in the
-winter-harness agent-context domain because they enforce *its* conventions, so any ecosystem repo can run them against
+winter-context agent-context domain because they enforce *its* conventions, so any ecosystem repo can run them against
 its own docs. The three semantic checks are graph-free, which is what distinguishes them from the extractability lint at
 `winter:/tools/winter-lint/extractability.py`: extractability asks whether a reference *already in* `<context>:/`
 notation points at a declared dependency, while these ask whether a raw path *should be* in notation, whether a routing
@@ -113,7 +113,7 @@ semantic lints deliberately ignore is gated too:
 **The two config files are the opt-in.** A repo joins the gate by committing them; a repo carrying neither is silently
 out of scope, and a repo may adopt one tool without the other. That is what lets the check ship from here and still
 travel to a consumer that has not adopted the style. The ecosystem repos carrying both today: `winter`, `winter-canon`,
-`winter-docs`, `winter-harness`, `winter-service-docker`, `winter-service-tmux`, `winter-workflow`.
+`winter-docs`, `winter-context`, `winter-service-docker`, `winter-service-tmux`, `winter-workflow`.
 
 Both tools honor `.gitignore`, so vendored trees (`node_modules/`, `.venv/`, `dist/`) need no exclusion. What *does*
 need excluding is a deliberate-violation fixture directory — reflowing one rewrites the shapes its assertions pin — so

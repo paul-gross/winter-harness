@@ -1,4 +1,4 @@
-# ❄️ winter-harness
+# ❄️ winter-context
 
 A [winter](https://github.com/paul-gross/winter) extension curated for the meta
 [winter-workspace](https://github.com/paul-gross/winter-workspace) itself.
@@ -7,7 +7,7 @@ A [winter](https://github.com/paul-gross/winter) extension curated for the meta
 
 ## ✨ Features
 
-- **Exemplar for others** — serves as an example harness project, a reference others can pull ideas from when assembling
+- **Exemplar for others** — serves as an example context repo, a reference others can pull ideas from when assembling
   their own harness.
 - **Architecture conventions** (`architecture/`) — an opinionated guide for structuring Python applications, read at
   plan/build time: the generic design and structure rules plus application-specific architecture docs (e.g.
@@ -32,8 +32,8 @@ Add to the workspace's `.winter/config.toml`:
 
 ```toml
 [[standalone_repository]]
-name = "winter-harness"
-url = "git@github.com:paul-gross/winter-harness.git"
+name = "winter-context"
+url = "git@github.com:paul-gross/winter-context.git"
 ```
 
 Then run `winter ws init`.

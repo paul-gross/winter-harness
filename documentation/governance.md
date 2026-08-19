@@ -45,7 +45,7 @@ reference to adopt **or** fork, not as a fixed part of the framework. Current ex
 
 - `winter-workflow` — the maintainer's personal agentic workflow (the build skills, the review loops). Turnkey — install
   it and the `/wf-*` skills and `wf-*` agents work — but interchangeable by design: adopt it as-is or fork your own.
-- `winter-harness` — the maintainer's own conventions library. Usable directly (reference its files by path notation),
+- `winter-context` — the maintainer's own conventions library. Usable directly (reference its files by path notation),
   but a personal, opinionated set — adopt it or fork the shape and supply your own facts.
 - `winter-workspace` — the meta-workspace winter itself is built in, pre-wired to the maintainer's repos. A worked
   example of an assembled workspace, not a template to clone.
@@ -88,7 +88,7 @@ The maintainer's own opinionated, swappable implementations — use them as-is o
 
 - **winter-workflow** — the maintainer's agentic workflow. Turnkey, but interchangeable: adopt its agent roles and
   review loops, or fork them for your own.
-- **winter-harness** — the maintainer's conventions library. Usable as-is, or a worked example of encoding conventions
+- **winter-context** — the maintainer's conventions library. Usable as-is, or a worked example of encoding conventions
   to fork and adapt.
 - **winter-workspace** — the meta-workspace winter is built in. A worked example of an assembled workspace, not a
   template to clone.
@@ -101,12 +101,12 @@ The maintainer's own opinionated, swappable implementations — use them as-is o
 
 | Extension           | Adds                     |
 | ------------------- | ------------------------ |
-| **winter-harness**  | The conventions layer.   |
+| **winter-context**  | The conventions layer.   |
 | **winter-workflow** | The agentic workflow.    |
 | **winter-product**  | A product backlog model. |
 ```
 
-Listing `winter-harness` and `winter-workflow` in the consumable catalog presents the maintainer's personal conventions
+Listing `winter-context` and `winter-workflow` in the consumable catalog presents the maintainer's personal conventions
 and workflow as neutral framework capabilities. They are opinionated, swappable instances — they belong in an Examples
 list that says so.
 

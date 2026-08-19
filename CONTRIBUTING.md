@@ -1,6 +1,6 @@
 # Contributing
 
-`winter-harness` is a docs repo — it contains conventions, exemplars, and the README guide that the rest of the winter
+`winter-context` is a docs repo — it contains conventions, exemplars, and the README guide that the rest of the winter
 ecosystem reads. Changes target a convention file directly.
 
 ## Commit messages
@@ -14,7 +14,7 @@ Conventional Commits with a scope:
 ```
 
 - Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`, `style`, `ai`. `docs` is the common case here.
-- Scope: `harness` (or a subsystem like `python`, `exemplars`).
+- Scope: `context` (or a subsystem like `python`, `exemplars`).
 - Use `Closes #N` to link a GitHub issue this commit finishes (workspace-level rules at
   `workspace:/context/project/contributing.md`).
 - The `/wf-commit` skill from [winter-workflow](https://github.com/paul-gross/winter-workflow) generates commits in this
@@ -23,7 +23,7 @@ Conventional Commits with a scope:
 Example:
 
 ```text
-docs(harness): tighten error-handling do/don't pairing
+docs(context): tighten error-handling do/don't pairing
 
 Closes #12
 ```

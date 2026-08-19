@@ -20,7 +20,7 @@ commit with no test is. Documented state then only holds or improves as features
 ## One source per fact
 
 Every concept has exactly one canonical home: the agent-facing markdown already in the ecosystem — `context/`
-directories, extension `index.md` files, and the `winter-harness` convention files. That is what an authoring change
+directories, extension `index.md` files, and the `winter-context` convention files. That is what an authoring change
 edits.
 
 If the ecosystem publishes a rendered documentation site, its pages are a **human-facing view over** those canonical

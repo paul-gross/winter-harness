@@ -1,7 +1,7 @@
 # Extension `index.md` convention
 
 Conventions for the top-level `index.md` of a winter extension (the file resolved by the extension's path-notation
-prefix — e.g. `winter-harness:/index.md`).
+prefix — e.g. `winter-context:/index.md`).
 
 ## Rule
 
@@ -29,7 +29,7 @@ Out of scope — these belong elsewhere:
   `winter doctor`'s rendered output, not the probe internals. The contract lives in
   `workspace:/context/winter-cli/configuration/doctor.md#probe-output-contract`.
 - **Manifest schema, plugin internals, hook-script implementation details.** All behind-the-scenes.
-- **Installation steps.** Those belong in `README.md` (see `winter-harness:/documentation/writing-readme.md`).
+- **Installation steps.** Those belong in `README.md` (see `winter-context:/documentation/writing-readme.md`).
 - **Setup walkthroughs.** Those belong in `context/` (e.g. `context/workflow-setup.md`) and are referenced *from*
   `index.md` with a one-line pointer.
 
@@ -57,8 +57,8 @@ If you're tempted to add a section that's out-of-scope per the rule above:
 | Hook tables, probe internals, manifest details        | The extension's source — `winter-ext.toml`, the hook script's header comment, the probe script's header comment. Self-documenting code beats redundant markdown.                   |
 | Setup walkthroughs and interactive guides             | `context/<topic>.md` inside the extension. Reference from `index.md` with one line.                                                                                                |
 | Reusable operational methodology shipped as a product | `methodology/<operation>/` when that root truthfully describes the product. Route its entry point from `index.md`; see [`./methodology-packaging.md`](./methodology-packaging.md). |
-| User-facing feature pitch, installation, scope        | `README.md`. See `winter-harness:/documentation/writing-readme.md`.                                                                                                                |
-| Cross-cutting engineering conventions                 | `winter-harness:/`.                                                                                                                                                                |
+| User-facing feature pitch, installation, scope        | `README.md`. See `winter-context:/documentation/writing-readme.md`.                                                                                                                |
+| Cross-cutting engineering conventions                 | `winter-context:/`.                                                                                                                                                                |
 
 ## Do
 

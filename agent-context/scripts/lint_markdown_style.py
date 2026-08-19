@@ -14,7 +14,7 @@ Two external tools own that layer, and this check runs them:
 
 **The config files are the opt-in.** A repo joins the gate by committing
 `dprint.json` and `.rumdl.toml`; a repo carrying neither is silently out of
-scope, so this check ships from winter-harness and travels to any consumer
+scope, so this check ships from winter-context and travels to any consumer
 without forcing the style on repos that have not adopted it. Each tool runs
 only where its own config is present — a repo may adopt one without the other.
 

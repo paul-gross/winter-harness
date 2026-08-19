@@ -38,7 +38,7 @@ The surfaces:
 - **Tests** — coverage for the new or changed behaviour, in the same unit of work. A feature commit with no test is the
   anti-pattern.
 - **Canonical `context/` docs** — the agent-facing source of truth for the surface: the owning repo's `context/`
-  reference, an extension `index.md`, or a `winter-harness` convention file. This is the *currency* half of the
+  reference, an extension `index.md`, or a `winter-context` convention file. This is the *currency* half of the
   no-undocumented-feature invariant.
 - **Public docs site** — the human-facing documentation site, which for this ecosystem is its **own repo,
   `winter-docs`** (a separate repo, *not* an in-repo `docs/` tree — see `../documentation/governance.md` for what it
@@ -110,7 +110,7 @@ resolution.
 Use Conventional Commits with a scope, and include a `Closes #N` footer for any GitHub issue this commit finishes:
 
 ```text
-docs(winter-harness): tighten error-handling do/don't pairing
+docs(winter-context): tighten error-handling do/don't pairing
 
 Closes #12
 ```
@@ -237,4 +237,4 @@ link for the commands and rules.
 - `../documentation/feature-documentation.md` — the "no undocumented feature" invariant the pre-push doc-currency check
   enforces
 - `./upstream-tracking.md` — separate flow for workspaces that customize an upstream framework repo
-- `../CONTRIBUTING.md` — the same rules applied to this repo (`winter-harness`) specifically
+- `../CONTRIBUTING.md` — the same rules applied to this repo (`winter-context`) specifically

@@ -26,7 +26,7 @@ with no restating second paragraph, don't position relative to siblings, beware 
   Resist a second supporting paragraph that re-states it; if two feel needed, the first is too vague.
 - **Installation tells the reader how to install. Period.** Don't list what gets symlinked, what becomes spawnable, or
   what path notation is unlocked afterward. Effects belong in `index.md` (see
-  `winter-harness:/agent-context/writing-extension-index.md` for what specifically) or in the file itself — not in
+  `winter-context:/agent-context/writing-extension-index.md` for what specifically) or in the file itself — not in
   Installation.
 
 ## Common sections (extensions)
@@ -83,7 +83,7 @@ Then run `winter ws init`.
 ## 🎯 Scope
 
 Planning and task tracking only. Code conventions live in
-[winter-harness](https://github.com/paul-gross/winter-harness).
+[winter-context](https://github.com/paul-gross/winter-context).
 
 ## License
 
