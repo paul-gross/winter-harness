@@ -26,7 +26,7 @@ nothing.
 Flags a path written without a `<context>:/` prefix when it unambiguously crosses a repo or context boundary — the kind
 of reference that dies the moment an extension is renamed or its install path changes. It scans inline code spans (where
 file references live in these docs), skips fenced code blocks (sample commands, where a raw relative path is correct),
-and skips any line carrying the example marker. Findings are `warn` by default because path notation has fuzzy edges;
+and skips any block carrying the example marker. Findings are `warn` by default because path notation has fuzzy edges;
 raise to `fail` per consumer with `--severity fail`.
 
 It fires on five unambiguous shapes and leaves everything else alone:
