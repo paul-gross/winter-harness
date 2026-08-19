@@ -4,22 +4,31 @@
 
 - One logger per module: `logger = logging.getLogger(__name__)` at module top, immediately under imports.
 - Levels:
-  - **ERROR** — wrapped exceptions at the boundary that transforms them. Logged once by the `RepoErrorFactory` (or equivalent), never again by callers (see `../architecture/error-handling.md`).
+  - **ERROR** — wrapped exceptions at the boundary that transforms them. Logged once by the `RepoErrorFactory` (or
+    equivalent), never again by callers (see `../architecture/error-handling.md`).
   - **WARNING** — recoverable conditions the caller continued past (skipped repo, missing optional config).
   - **INFO** — major lifecycle events (`init started`, `reconcile complete`). One line per event, not per item.
   - **DEBUG** — per-item traces (per-repo step, per-file action). Opt-in via `LOG_LEVEL=DEBUG`.
-- Structured fields go on the exception object (`RepoError(subcommand=..., exit_code=...)`), not interpolated into the log message. The wrap site reads them off the exception and emits one record.
-- No `print()` in service code. Use the injected reporter for user-facing output (see `../architecture/dependency-injection.md`) or the logger for diagnostics. `print()` belongs in `__main__` or top-level CLI glue only.
+- Structured fields go on the exception object (`RepoError(subcommand=..., exit_code=...)`), not interpolated into the
+  log message. The wrap site reads them off the exception and emits one record.
+- No `print()` in service code. Use the injected reporter for user-facing output (see
+  `../architecture/dependency-injection.md`) or the logger for diagnostics. `print()` belongs in `__main__` or top-level
+  CLI glue only.
 
 ## Why
 
-`getLogger(__name__)` gives every record a dotted path the user can filter on (`winter_cli.modules.workspace.init_service`). A single shared root logger loses that.
+`getLogger(__name__)` gives every record a dotted path the user can filter on
+(`winter_cli.modules.workspace.init_service`). A single shared root logger loses that.
 
-The wrap-once-at-the-boundary rule keeps stack traces clean — catch-log-rethrow produces N duplicate records for the same failure, one per layer the exception passed through. Concentrating the log call inside the factory means the trace is recorded exactly where the exception is transformed, with full structured context.
+The wrap-once-at-the-boundary rule keeps stack traces clean — catch-log-rethrow produces N duplicate records for the
+same failure, one per layer the exception passed through. Concentrating the log call inside the factory means the trace
+is recorded exactly where the exception is transformed, with full structured context.
 
-Structured fields on the exception let the reporter, dashboard, and JSON output all render the same failure consistently without parsing message strings.
+Structured fields on the exception let the reporter, dashboard, and JSON output all render the same failure consistently
+without parsing message strings.
 
-`print()` writes to stdout regardless of verbosity flags, breaks `--quiet`, and pollutes machine-readable output. The reporter exists so handlers can pick the right surface (TTY, JSON, log file) per invocation.
+`print()` writes to stdout regardless of verbosity flags, breaks `--quiet`, and pollutes machine-readable output. The
+reporter exists so handlers can pick the right surface (TTY, JSON, log file) per invocation.
 
 ## Do
 

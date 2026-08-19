@@ -48,8 +48,9 @@ _LINK_RE = re.compile(r"\[(?:[^\]]*)\]\(([^)]+)\)")
 # mechanism alongside markdown links, so reachability must follow it.
 _IMPORT_RE = re.compile(r"^\s*@(\S+)")
 
-# Same-line illustrative-example exemption — identical marker to the
-# extractability lint, so authors learn one escape hatch for both.
+# Illustrative-example exemption — identical marker to the extractability lint,
+# so authors learn one escape hatch for both. Block-scoped, not line-scoped: see
+# `MarkdownScanner.exempt_lines`.
 _MARKER_RE = re.compile(r"<!--\s*winter-lint:\s*example\s*-->", re.IGNORECASE)
 
 
@@ -181,8 +182,35 @@ class MarkdownScanner:
             return []
         return [raw]
 
-    def has_example_marker(self, line: str) -> bool:
-        return bool(_MARKER_RE.search(line))
+    def exempt_lines(self, text: str) -> set[int]:
+        """Line numbers covered by an `<!-- winter-lint:example -->` marker.
+
+        The marker exempts the whole **block** it sits in, not just its own
+        physical line. A markdown formatter owns where lines break, so a marker
+        at the end of a wrapped paragraph must still cover the reference that
+        reflow pushed three lines up; a line is not a stable unit of meaning once
+        `dprint fmt` runs. A block is a run of non-blank lines.
+
+        The consequence for tables: a formatter puts a blank line between a table
+        and a comment above or below it, which makes the comment its own block and
+        exempts nothing. Put a table's marker *inside a cell* — cell content
+        survives reformatting, and the row is its own line.
+        """
+        exempt: set[int] = set()
+        lines = text.splitlines()
+        start = 0
+        marked = False
+        for index, line in enumerate(lines):
+            if line.strip():
+                marked = marked or bool(_MARKER_RE.search(line))
+                continue
+            if marked:
+                exempt.update(range(start + 1, index + 1))
+            start = index + 1
+            marked = False
+        if marked:
+            exempt.update(range(start + 1, len(lines) + 1))
+        return exempt
 
     def relpath(self, file: Path, base: Path) -> str:
         try:

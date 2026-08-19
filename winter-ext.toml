@@ -3,11 +3,15 @@ prefix = "wh"
 
 # Markdown-convention lint checks contributed to `winter lint` (see
 # agent-context/linting.md). The field takes a list, so each check ships as its
-# own script and runs over the selected scope, emitting NDJSON findings.
+# own script and runs over the selected scope, emitting NDJSON findings. The
+# first three check what a reference means; the fourth runs the mechanical
+# dprint/rumdl style gates over every scoped repo that has opted in by
+# committing their configs.
 lint = [
     "agent-context/scripts/lint_path_notation.py",
     "agent-context/scripts/lint_doc_references.py",
     "agent-context/scripts/lint_link_anchors.py",
+    "agent-context/scripts/lint_markdown_style.py",
 ]
 
 # winter-harness is the governance layer beneath every other module: it documents

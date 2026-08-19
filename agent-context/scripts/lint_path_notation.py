@@ -17,7 +17,7 @@ referred to with bare relative paths (`./architecture/error-handling.md`,
 are `warn` by default — raise to `fail` per consumer with `--severity fail`.
 
 Scope: inline code spans in every in-scope `*.md`, skipping fenced code blocks
-(sample commands, where a raw path is correct) and any line carrying the
+(sample commands, where a raw path is correct) and any block carrying the
 `<!-- winter-lint:example -->` marker (a reference that only illustrates a path,
 not one that must resolve).
 
@@ -95,8 +95,10 @@ class PathNotationLint:
             lines = self._scanner.read_lines(file)
             if lines is None:
                 continue
-            for lineno, line in self._scanner.iter_content_lines("\n".join(lines)):
-                if self._scanner.has_example_marker(line):
+            text = "\n".join(lines)
+            exempt = self._scanner.exempt_lines(text)
+            for lineno, line in self._scanner.iter_content_lines(text):
+                if lineno in exempt:
                     continue
                 for span in self._scanner.code_spans(line):
                     reason = self.classify_span(span)
@@ -109,7 +111,7 @@ class PathNotationLint:
                                 file=self._scanner.relpath(file, base),
                                 line=lineno,
                                 remediation="Use canonical path notation: `workspace:/…`, `winter-<name>:/…`, "
-                                "or a `<env>:/…` prefix. If the path only illustrates notation, mark the line "
+                                "or a `<env>:/…` prefix. If the path only illustrates notation, mark the block "
                                 "`<!-- winter-lint:example -->`.",
                             )
                         )

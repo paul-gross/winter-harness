@@ -20,7 +20,7 @@ identities, then uses `WINTER_WORKSPACE_DIR` to locate foreign installed
 extensions under `.winter/ext/<name>/`. If neither source can resolve a
 cross-context link, the lint silently skips it.
 
-Honors the `<!-- winter-lint:example -->` line marker and fenced-code-block
+Honors the `<!-- winter-lint:example -->` block marker and fenced-code-block
 skip (mirroring the other markdown lints in this directory).
 
 This is a `winter lint` check: NDJSON findings on stdout, exit 0.
@@ -223,8 +223,10 @@ class LinkAnchorLint:
             lines = self._scanner.read_lines(file)
             if lines is None:
                 continue
-            for lineno, line in self._scanner.iter_content_lines("\n".join(lines)):
-                if self._scanner.has_example_marker(line):
+            text = "\n".join(lines)
+            exempt = self._scanner.exempt_lines(text)
+            for lineno, line in self._scanner.iter_content_lines(text):
+                if lineno in exempt:
                     continue
                 for raw in self._scanner.raw_link_targets(line):
                     file_part, fragment = self._parse_raw_target(raw)

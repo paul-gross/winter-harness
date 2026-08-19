@@ -1,28 +1,51 @@
 # Service-based architecture
 
-Winter code is **service-based**: behavior lives in service classes whose collaborators are injected at construction, reached through Protocol seams. Module-level free functions are reserved for pure, dependency-free helpers — they are the exception, not the default.
+Winter code is **service-based**: behavior lives in service classes whose collaborators are injected at construction,
+reached through Protocol seams. Module-level free functions are reserved for pure, dependency-free helpers — they are
+the exception, not the default.
 
-This is the principle the other Python conventions are facets of. Dependency injection (`./dependency-injection.md`) is *how* a service receives its collaborators; module layout (`./module-layout.md`) is *where* the service and its Protocol seam live; the repository pattern (`./repository-pattern.md`) is the I/O-owning service shape. Read this first — it names the shape those three assume. The system-level counterpart — how winter's command surface relates to a swappable backend behind the seam — is `./system-architecture.md`.
+This is the principle the other Python conventions are facets of. Dependency injection (`./dependency-injection.md`) is
+*how* a service receives its collaborators; module layout (`./module-layout.md`) is *where* the service and its Protocol
+seam live; the repository pattern (`./repository-pattern.md`) is the I/O-owning service shape. Read this first — it
+names the shape those three assume. The system-level counterpart — how winter's command surface relates to a swappable
+backend behind the seam — is `./system-architecture.md`.
 
 ## Rule
 
-- **Behavior belongs in a class.** Anything that orchestrates collaborators — calls a repository, drives another service, picks an adapter, emits to a reporter — is a method on a service class. The class declares its collaborators in `__init__` and receives them via the container.
-- **Collaborators are injected, never reached for.** A service depends on a Protocol (`IReadFooRepository`, `ICliOutputService`), not a concrete class and not a module-level singleton. It never constructs its own collaborators or imports them at module scope to call them directly.
-- **Free functions are pure helpers only, and a last resort.** A module-level function is legitimate when it takes plain values (stdlib types, domain dataclasses) and returns a value with no injected collaborator and no I/O — `is_transient_git_error(stderr: str) -> bool`, a parsing or formatting helper, a small predicate. The moment a function needs a collaborator, it is behavior, and behavior is a service method. Reach for a free function only after the two better homes don't fit: if the logic is intrinsic to a domain type, it belongs on that type as a property or method; if it's a step in a service's work, it belongs in a private method on the service. A free function is what's left when the logic fits neither — a genuinely standalone pure transform.
+- **Behavior belongs in a class.** Anything that orchestrates collaborators — calls a repository, drives another
+  service, picks an adapter, emits to a reporter — is a method on a service class. The class declares its collaborators
+  in `__init__` and receives them via the container.
+- **Collaborators are injected, never reached for.** A service depends on a Protocol (`IReadFooRepository`,
+  `ICliOutputService`), not a concrete class and not a module-level singleton. It never constructs its own collaborators
+  or imports them at module scope to call them directly.
+- **Free functions are pure helpers only, and a last resort.** A module-level function is legitimate when it takes plain
+  values (stdlib types, domain dataclasses) and returns a value with no injected collaborator and no I/O —
+  `is_transient_git_error(stderr: str) -> bool`, a parsing or formatting helper, a small predicate. The moment a
+  function needs a collaborator, it is behavior, and behavior is a service method. Reach for a free function only after
+  the two better homes don't fit: if the logic is intrinsic to a domain type, it belongs on that type as a property or
+  method; if it's a step in a service's work, it belongs in a private method on the service. A free function is what's
+  left when the logic fits neither — a genuinely standalone pure transform.
 
 ## The boundary
 
-| Stays a free function | Must be a service method |
-|-----------------------|--------------------------|
+| Stays a free function                                                                 | Must be a service method                                                                                                       |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Takes only stdlib types / domain dataclasses (`ProjectRepository`, `FeatureWorktree`) | Takes or needs an injected collaborator — a Protocol seam (`IReadFooRepository`, `ICliOutputService`) or the adapter behind it |
-| Pure: same inputs → same output | Performs I/O, or orchestrates multiple steps with side effects |
-| No knowledge of how the app is wired | Resolved from `container.py` and depends on the Protocol seam |
+| Pure: same inputs → same output                                                       | Performs I/O, or orchestrates multiple steps with side effects                                                                 |
+| No knowledge of how the app is wired                                                  | Resolved from `container.py` and depends on the Protocol seam                                                                  |
 
-The test is collaborators, not line count. A long pure transform is fine as a free function; a two-line function that calls a repository is not. A *domain dataclass* whose name ends in a role-like noun — `ProjectRepository`, `StandaloneRepository` — is a value, not a collaborator; passing one to a free function is fine.
+The test is collaborators, not line count. A long pure transform is fine as a free function; a two-line function that
+calls a repository is not. A *domain dataclass* whose name ends in a role-like noun — `ProjectRepository`,
+`StandaloneRepository` — is a value, not a collaborator; passing one to a free function is fine.
 
 ## Why: dependency inversion
 
-The service shape exists to serve the **Dependency Inversion Principle** — high-level behavior depends on abstractions (Protocols, domain objects), never on concretes or global state. A free function that reaches for a collaborator hard-wires that dependency: it can't be substituted at the test boundary, can't be re-pointed at a different adapter, and hides what it consumes from its signature. Lifting it into a service whose `__init__` declares the Protocol inverts the arrow — the full reasoning, and the testability / pluggability / discoverability payoffs, are in `./dependency-injection.md` and `./module-layout.md`.
+The service shape exists to serve the **Dependency Inversion Principle** — high-level behavior depends on abstractions
+(Protocols, domain objects), never on concretes or global state. A free function that reaches for a collaborator
+hard-wires that dependency: it can't be substituted at the test boundary, can't be re-pointed at a different adapter,
+and hides what it consumes from its signature. Lifting it into a service whose `__init__` declares the Protocol inverts
+the arrow — the full reasoning, and the testability / pluggability / discoverability payoffs, are in
+`./dependency-injection.md` and `./module-layout.md`.
 
 ## Do
 
@@ -55,11 +78,21 @@ def sync(repo: ProjectRepository, env: FeatureWorktree) -> None:
 
 ## Enforcement
 
-In winter-cli, this rule is checked at `mise run test` time by `winter:/tools/winter-cli/tests/conventions/test_service_based_behavior.py`. It flags the tractable, false-positive-free signal: a **module-level function whose parameter is annotated with an `I`-prefixed Protocol** — the form every injected collaborator takes (DI consumers depend on the Protocol seam, and the `I`-prefix is reserved for Protocols by the naming check). A free function receiving a Protocol is behavior that escaped its class. Matching the `I`-prefix rather than a concrete role suffix is deliberate: domain dataclasses share those nouns (`ProjectRepository` is a value, not a collaborator), so a suffix match would flag the pure helpers this principle permits. The check is also narrow on purpose — it catches the Protocol-param signal, not a function that *constructs* collaborators inside its body (that's `./repository-pattern.md`'s territory). The `_conforms_*` conformance sentinels (`../standards/protocol-conformance.md`) take a concrete adapter, not an `I*` Protocol, so they fall outside the signal automatically.
+In winter-cli, this rule is checked at `mise run test` time by
+`winter:/tools/winter-cli/tests/conventions/test_service_based_behavior.py`. It flags the tractable, false-positive-free
+signal: a **module-level function whose parameter is annotated with an `I`-prefixed Protocol** — the form every injected
+collaborator takes (DI consumers depend on the Protocol seam, and the `I`-prefix is reserved for Protocols by the naming
+check). A free function receiving a Protocol is behavior that escaped its class. Matching the `I`-prefix rather than a
+concrete role suffix is deliberate: domain dataclasses share those nouns (`ProjectRepository` is a value, not a
+collaborator), so a suffix match would flag the pure helpers this principle permits. The check is also narrow on purpose
+— it catches the Protocol-param signal, not a function that *constructs* collaborators inside its body (that's
+`./repository-pattern.md`'s territory). The `_conforms_*` conformance sentinels (`../standards/protocol-conformance.md`)
+take a concrete adapter, not an `I*` Protocol, so they fall outside the signal automatically.
 
 ## See also
 
-- `./system-architecture.md` — the system-level counterpart: winter-owned contracts over swappable backends, and the no-pass-through rule.
+- `./system-architecture.md` — the system-level counterpart: winter-owned contracts over swappable backends, and the
+  no-pass-through rule.
 - `./dependency-injection.md` — how collaborators get injected, and the no-whole-config rule.
 - `./module-layout.md` — where the service, its Protocol seam, and its adapter live.
 - `./repository-pattern.md` — the service that owns I/O against one external system.

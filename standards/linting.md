@@ -9,9 +9,12 @@
 
 ## Why
 
-The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/context/project/contributing.md`). There is no PR/MR review and no CI gate yet, so lint/format drift lands silently unless the agent runs the tasks locally before push.
+The delivery flow is "rebase onto `origin/master` and push" (see `workspace:/context/project/contributing.md`). There is
+no PR/MR review and no CI gate yet, so lint/format drift lands silently unless the agent runs the tasks locally before
+push.
 
-Single-tool ruff provides the same coverage as separate linting and formatting tools — one config block, one invocation, no tool-version skew.
+Single-tool ruff provides the same coverage as separate linting and formatting tools — one config block, one invocation,
+no tool-version skew.
 
 ## Do
 
@@ -22,7 +25,8 @@ mise run format    # rewrites in place
 mise run lint      # exits 0 on a clean tree
 ```
 
-If `lint` reports issues, fix them and re-run until clean. Many violations are autofixable — pass `--fix` directly: `uv run ruff check --fix .` (no `mise` wrapper for this one-shot mode; it's the same `ruff` binary).
+If `lint` reports issues, fix them and re-run until clean. Many violations are autofixable — pass `--fix` directly:
+`uv run ruff check --fix .` (no `mise` wrapper for this one-shot mode; it's the same `ruff` binary).
 
 ## Configuration
 
@@ -49,7 +53,8 @@ select = ["E", "F", "I", "UP", "B", "C4", "SIM", "RUF"]
 "tests/*" = ["E501", "B008"]
 ```
 
-Rule families: pycodestyle errors (`E`), pyflakes (`F`), isort (`I`), pyupgrade (`UP`), flake8-bugbear (`B`), flake8-comprehensions (`C4`), flake8-simplify (`SIM`), Ruff-native (`RUF`).
+Rule families: pycodestyle errors (`E`), pyflakes (`F`), isort (`I`), pyupgrade (`UP`), flake8-bugbear (`B`),
+flake8-comprehensions (`C4`), flake8-simplify (`SIM`), Ruff-native (`RUF`).
 
 Canonical `mise.toml` tasks:
 
@@ -65,7 +70,8 @@ run = "uv run ruff format ."
 
 ## Per-file ignores
 
-Use `[tool.ruff.lint.per-file-ignores]` for genuinely intentional patterns — not as a blanket escape hatch. Each entry should have a comment explaining *why* the rule doesn't apply.
+Use `[tool.ruff.lint.per-file-ignores]` for genuinely intentional patterns — not as a blanket escape hatch. Each entry
+should have a comment explaining *why* the rule doesn't apply.
 
 Real examples from `winter-cli`:
 
@@ -77,7 +83,8 @@ Real examples from `winter-cli`:
 "src/winter_cli/cli.py" = ["E402"]
 ```
 
-If a rule fires across many files for legitimate reasons, prefer fixing the code over disabling the rule globally. Reach for `select = [...]` adjustments only when an entire rule family is genuinely inappropriate for the codebase.
+If a rule fires across many files for legitimate reasons, prefer fixing the code over disabling the rule globally. Reach
+for `select = [...]` adjustments only when an entire rule family is genuinely inappropriate for the codebase.
 
 ## When to enable more
 

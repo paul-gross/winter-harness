@@ -197,8 +197,10 @@ class DocReferenceLint:
             lines = self._scanner.read_lines(file)
             if lines is None:
                 continue
-            for lineno, line in self._scanner.iter_content_lines("\n".join(lines)):
-                if self._scanner.has_example_marker(line):
+            text = "\n".join(lines)
+            exempt = self._scanner.exempt_lines(text)
+            for lineno, line in self._scanner.iter_content_lines(text):
+                if lineno in exempt:
                     continue
                 for target in self._scanner.link_targets(line):
                     if not self._is_local_relative(target):

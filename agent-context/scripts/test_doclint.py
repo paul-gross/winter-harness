@@ -4,6 +4,9 @@ Stdlib `unittest` only — no third-party dependency, so the whole `scripts/`
 directory can be invoked from any consumer checkout intact. Run with:
 
     python3 -m unittest test_doclint
+
+The style lint's own suite is `test_markdown_style`; `python3 -m unittest
+discover` runs both.
 """
 
 from __future__ import annotations
@@ -269,6 +272,43 @@ class CollectMarkdownTest(unittest.TestCase):
             self.assertIn("own.md", names)
             self.assertNotIn("buried.md", names)
             self.assertNotIn("also-buried.md", names)
+
+
+class ExemptLinesTest(unittest.TestCase):
+    """The `<!-- winter-lint:example -->` marker exempts its block, not its line.
+
+    A formatter owns where lines break, so a marker parked at the end of a
+    wrapped paragraph has to cover the reference reflow pushed further up.
+    """
+
+    def setUp(self) -> None:
+        self.scanner = dl.MarkdownScanner()
+
+    def test_marker_covers_the_whole_paragraph_it_sits_in(self) -> None:
+        text = "# Doc\n\nfirst\nsecond\nthird <!-- winter-lint:example -->\n"
+        self.assertEqual(self.scanner.exempt_lines(text), {3, 4, 5})
+
+    def test_unmarked_blocks_are_untouched(self) -> None:
+        text = "marked <!-- winter-lint:example -->\n\nunmarked\n"
+        self.assertEqual(self.scanner.exempt_lines(text), {1})
+
+    def test_marker_alone_in_a_block_exempts_only_itself(self) -> None:
+        # A formatter puts a blank line between a table and an adjacent comment,
+        # which is exactly why a table's marker belongs inside a cell.
+        text = "<!-- winter-lint:example -->\n\n| a | b |\n| - | - |\n"
+        self.assertEqual(self.scanner.exempt_lines(text), {1})
+
+    def test_marker_in_a_table_cell_exempts_the_table(self) -> None:
+        text = "| a | b <!-- winter-lint:example --> |\n| - | - |\n"
+        self.assertEqual(self.scanner.exempt_lines(text), {1, 2})
+
+    def test_reflowed_reference_stays_exempt(self) -> None:
+        body = "Do not write sibling-relative paths (`../winter-product/...`) when crossing a\nboundary. <!-- winter-lint:example -->\n"
+        lint = paths.PathNotationLint(self.scanner, "warn")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "doc.md").write_text(body)
+            self.assertEqual(lint.check([root], root), [])
 
 
 class LintCliTest(unittest.TestCase):
