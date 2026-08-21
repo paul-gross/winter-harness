@@ -448,6 +448,13 @@ class LinkAnchorSlugTest(unittest.TestCase):
         self.assertIn("beta-1", slugs)
         self.assertIn("with-code-span", slugs)
 
+    def test_explicit_heading_id_is_the_anchor(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Path(tmp) / "explicit.md"
+            f.write_text("## Capability registry {#capability-registry}\n")
+            slugs = anchors.file_heading_slugs(f)
+            self.assertEqual(slugs, {"capability-registry"})
+
     def test_fenced_headings_not_counted(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             f = Path(tmp) / "fenced.md"

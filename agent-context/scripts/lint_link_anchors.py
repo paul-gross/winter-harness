@@ -13,7 +13,8 @@ Four link forms are handled:
 
 Heading slugs follow GitHub's algorithm: lowercase, strip non-word/space/hyphen
 characters (backtick spans are inlined before stripping), spaces to hyphens,
-duplicate headings disambiguated as `slug`, `slug-1`, `slug-2`, …
+duplicate headings disambiguated as `slug`, `slug-1`, `slug-2`, …  A heading
+that declares its own id (`## Title {#custom-id}`) is anchored by that id.
 
 Cross-repo resolution prefers selected module roots for their own canonical
 identities, then uses `WINTER_WORKSPACE_DIR` to locate foreign installed
@@ -53,6 +54,9 @@ _BACKTICK_RE = re.compile(r"`([^`]*)`")
 # Markdown heading line: `# Title`, `## Title`, …
 _HEADING_RE = re.compile(r"^#{1,6}\s+(.*)")
 
+# An explicit heading id, replacing the generated slug: `## Title {#custom-id}`.
+_EXPLICIT_ID_RE = re.compile(r"\s*\{#([^\s{}]+)\}\s*$")
+
 # Any URI scheme (`https://`, `mailto:`, `tel:`, `ftp://`, …) — not resolvable
 # locally.  The `+` and `.` in the character class allow e.g. `svn+ssh:`.
 _ANY_SCHEME_RE = re.compile(r"^[a-z][a-z0-9+.-]*:")
@@ -90,7 +94,12 @@ def _extract_heading_slugs(lines: list[str], scanner: dl.MarkdownScanner) -> set
         m = _HEADING_RE.match(line)
         if not m:
             continue
-        base = _compute_slug(m.group(1))
+        text = m.group(1)
+        explicit = _EXPLICIT_ID_RE.search(text)
+        if explicit:
+            slugs.add(explicit.group(1))
+            continue
+        base = _compute_slug(text)
         if not base:
             continue
         if base not in counts:
