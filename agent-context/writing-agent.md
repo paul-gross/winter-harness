@@ -55,6 +55,13 @@ reach the agent — it is a routing key, not documentation. The exclusion rules 
 reviewers by the *object each acts on* rather than by "Do NOT use" lists — are shared with skills: see
 [what a description must not contain](./writing-skill.md#what-a-description-must-not-contain).
 
+An agent that is only ever spawned **by canonical role from a procedure** declares `description: "N/A"`. Nothing routes
+on the field — the process doc that spawns it names the role outright — so a prose description is rent charged to every
+session for a decision no caller makes. The frontmatter key stays (`winter lint` requires it non-empty) and the agent
+row stays visible to the harness; only the unread prose goes. This holds while the naming does: an agent a session may
+reasonably reach for outside its procedures keeps a one-clause description, and stripping one whose procedure does *not*
+name it makes it unreachable.
+
 ### `model:` — a tier label
 
 Pick the tier appropriate for the role's reasoning load — a built-in tier, or a custom label a workspace defines in
