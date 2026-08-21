@@ -49,12 +49,12 @@ not exist or a file that is missing.
 
 Four link forms are handled:
 
-| Form                         | Resolution                                                                                                                                   |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `#anchor`                    | same-file headings                                                                                                                           |
-| `path/to/file.md#anchor`     | file relative to the linking document                                                                                                        |
-| `winter-foo:/path.md#anchor` | the selected module root for a `winter-foo` self-reference; otherwise the installed extension under `$WINTER_WORKSPACE_DIR/.winter/ext/foo/` |
-| `workspace:/path.md#anchor`  | file under `$WINTER_WORKSPACE_DIR`                                                                                                           |
+| Form <!-- winter-lint:example --> | Resolution                                                                                                                                   |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `#anchor`                         | same-file headings                                                                                                                           |
+| `path/to/file.md#anchor`          | file relative to the linking document                                                                                                        |
+| `winter-foo:/path.md#anchor`      | the selected module root for a `winter-foo` self-reference; otherwise the installed extension under `$WINTER_WORKSPACE_DIR/.winter/ext/foo/` |
+| `workspace:/path.md#anchor`       | file under `$WINTER_WORKSPACE_DIR`                                                                                                           |
 
 Two kinds of findings:
 
