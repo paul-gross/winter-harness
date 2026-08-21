@@ -28,8 +28,9 @@ Two corollaries:
 
 ### `skills/<name>/SKILL.md`
 
-Frontmatter is the standard Claude Code skill set — `description`, `allowed-tools`, and `argument-hint` when the skill
-takes `$ARGUMENTS`. Nothing shape-specific here; same fields a self-contained skill uses.
+Frontmatter is the standard Claude Code skill set — `description`, `allowed-tools`, `argument-hint` when the skill takes
+`$ARGUMENTS`, and `disable-model-invocation` when only a human ever fires it. Nothing shape-specific here; same fields a
+self-contained skill uses.
 
 Do not declare a `name:` field. The skill's canonical name is the directory name (`foo/SKILL.md` → `foo`); a frontmatter
 `name:` either restates it (drift risk) or contradicts it (loader confusion).
@@ -42,8 +43,15 @@ agent definitions carry their own `model:` — rather than switching the whole s
 The `description` field must cover **what the skill does and when to use it** — the skill picker reads it to decide
 whether to fire on a given user prompt, so a description that says only "what" loses to one that also says "when".
 Pattern: "<one-clause what>. Use when <trigger / cadence / context>." See
-[`winter-workflow:/skills/harness-score/SKILL.md`](https://github.com/paul-gross/winter-workflow/blob/master/skills/harness-score/SKILL.md)
-for an exemplar — it ends `… Use weekly to track progress or divergence.`
+[`winter-workflow:/skills/snowball/SKILL.md`](https://github.com/paul-gross/winter-workflow/blob/master/skills/snowball/SKILL.md)
+for an exemplar — it ends `… Use for narrow, localized work on code that already exists.`
+
+Declare `disable-model-invocation: true` when the skill is only ever fired by a human typing it. The description then
+leaves the always-on context entirely and the skill stays invocable as a slash command, so a family a user reaches by
+name — workspace git operations, an interactive setup walkthrough — costs nothing per session. Two tests must both pass
+before silencing one: no harness document instructs an agent to run it (a convention no agent can route to is a dead
+convention), and nothing else in the session's context depends on the picker knowing it exists. A skill that answers
+natural phrasing — *file an issue*, *review this diff* — keeps its routing and pays for it.
 
 #### What a description must not contain
 
