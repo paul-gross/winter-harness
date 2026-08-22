@@ -41,13 +41,15 @@ a pinned model id. An agent with no override blocks is a complete, valid canonic
 
 ## Model tier → vendor id
 
-The common `model` field is a **tier label** — either a built-in tier (`haiku` / `sonnet` / `opus`) or a custom label
-defined in `[model_tiers]` — never a raw model id. The transform resolves the model for each harness using a three-level
-precedence: workspace `[agent_model_overrides]` (highest) → per-harness `model:` override block → effective tier table
-(lowest). See `workspace:/context/winter-cli/configuration/agents.md` for the authoritative precedence definition, merge
-rules, and validation table.
+The common `model` field is a **tier label** — either a built-in tier or a custom label defined in `[model_tiers]` —
+never a raw model id. The transform resolves the model for each harness through workspace configuration, the per-harness
+override block, and the effective tier table. See `workspace:/context/winter-cli/configuration/agents.md` for the
+authoritative schemas, precedence, merge rules, and validation table.
 
-Each built-in tier (`opus`, `sonnet`, `haiku`) resolves to a per-vendor id — one representative row:
+A resolved workspace effort projects to `effort` for Claude Code, `model_reasoning_effort` for Codex, and
+`reasoningEffort` for OpenCode.
+
+A built-in tier resolves to a per-vendor id — one representative row:
 
 | Tier   | Claude | Codex     | OpenCode                           |
 | ------ | ------ | --------- | ---------------------------------- |
